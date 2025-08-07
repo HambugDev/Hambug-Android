@@ -30,3 +30,6 @@ ktlint_standard_parameter-list-spacing = enabled
 ktlint_standard_function-naming = disabled
 # 와일드카드 import 규칙
 ktlint_standard_no-wildcard-imports = disabled
+# = 오른쪽에 여러줄 이어질 경우, 줄바꿈을 강제하지 않음
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_string-template-indent = disabled
