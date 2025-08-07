@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import desktop.hambug.ui.component.HambugBottomNav
+import desktop.hambug.ui.component.HambugTopAppBar
 import desktop.hambug.ui.theme.HambugTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,6 +35,18 @@ fun HambugApp() {
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     Scaffold(
+        topBar = {
+            val title = when (currentRoute) {
+                "home" -> "홈"
+                "community" -> "커뮤니티"
+                "my" -> "마이"
+                else -> ""
+            }
+            HambugTopAppBar(
+                title = title,
+                onBellClick = {}
+            )
+        },
         bottomBar = {
             HambugBottomNav(
                 currentRoute = currentRoute,
