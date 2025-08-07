@@ -1,0 +1,35 @@
+root = true
+
+[*]
+# 줄바꿈 방식
+end_of_line = lf
+# 파일 끝에 빈 줄 추가
+insert_final_newline = true
+# 줄 끝 공백 제거
+trim_trailing_whitespace = true
+# 파일 인코딩 설정
+charset = utf-8
+# 들여쓰기 방식
+indent_style = space
+indent_size = 4
+
+[*.kt]
+# kotlin 파일 전용 설정
+
+# 한 줄 최대 길이 제한 (120자)
+max_line_length = 120
+ktlint_standard_max-line-length = 120
+# 세미콜론 사용 여부
+ktlint_standard_no-semi = enabled
+# 마지막 쉼표 허용 여부
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
+# 람다 인자와 중괄호 사이 공백
+ktlint_standard_parameter-list-spacing = enabled
+# 함수 이름 명명 규칙 비활성화
+ktlint_standard_function-naming = disabled
+# 와일드카드 import 규칙
+ktlint_standard_no-wildcard-imports = disabled
+# = 오른쪽에 여러줄 이어질 경우, 줄바꿈을 강제하지 않음
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_string-template-indent = disabled

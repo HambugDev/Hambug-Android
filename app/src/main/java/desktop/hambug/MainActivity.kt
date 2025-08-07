@@ -3,45 +3,75 @@ package desktop.hambug
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import desktop.hambug.ui.component.HambugBottomNav
+import desktop.hambug.ui.component.HambugTopAppBar
 import desktop.hambug.ui.theme.HambugTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             HambugTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                HambugApp()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun HambugApp() {
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HambugTheme {
-        Greeting("Android")
+    Scaffold(
+        topBar = {
+            val title = when (currentRoute) {
+                "home" -> "홈"
+                "community" -> "커뮤니티"
+                "my" -> "마이"
+                else -> ""
+            }
+            HambugTopAppBar(
+                title = title,
+                onBellClick = {}
+            )
+        },
+        bottomBar = {
+            HambugBottomNav(
+                currentRoute = currentRoute,
+                onNavItemClick = { route ->
+                    if (navController.currentDestination?.route != route) {
+                        navController.navigate(route)
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = "home",
+            modifier = Modifier.padding(innerPadding),
+        ) {
+            composable("home") {
+                Text("홈 화면")
+            }
+            composable("community") {
+                Text("커뮤니티 화면")
+            }
+            composable("my") {
+                Text("마이 화면")
+            }
+        }
     }
 }
