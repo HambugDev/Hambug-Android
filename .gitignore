@@ -46,3 +46,6 @@ local.properties
 # Keystore files
 *.jks
 *.keystore
+
+# firebase
+google-services.json
