@@ -99,7 +99,8 @@ fun HambugTheme(
     val colors = if (darkTheme) DarkColorPalette else LightColorPalette
 
     CompositionLocalProvider(
-        LocalHambugColors provides colors
+        LocalHambugColors provides colors,
+        LocalSpacing provides Spacing()
     ) {
         MaterialTheme(
             colorScheme = hambugLightColorScheme(colors),
