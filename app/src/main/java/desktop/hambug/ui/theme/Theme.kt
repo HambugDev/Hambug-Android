@@ -103,6 +103,7 @@ fun HambugTheme(
     ) {
         MaterialTheme(
             colorScheme = hambugLightColorScheme(colors),
+            typography = Typography,
             content = content
         )
     }
