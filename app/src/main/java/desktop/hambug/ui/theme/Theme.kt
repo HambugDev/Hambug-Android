@@ -1,59 +1,118 @@
 package desktop.hambug.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme =
-    darkColorScheme(
-        primary = Purple80,
-        secondary = PurpleGrey80,
-        tertiary = Pink80
-    )
+@Immutable
+data class HambugColors(
+    // primary palette
+    val primRed: Color,
+    val primGray: Color,
+    val primBackground: Color,
 
-private val LightColorScheme =
-    lightColorScheme(
-        primary = Purple40,
-        secondary = PurpleGrey40,
-        tertiary = Pink40
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-     */
-    )
+    // secondary palette
+    val secondBrown: Color,
+    val secondYellow: Color,
+    val secondRed: Color,
+    val secondGreen: Color,
+
+    // text color
+    val textHeadline: Color,
+    val textBody: Color,
+    val textDisabled: Color,
+
+    // border color
+    val borderHoverFocus: Color,
+    val borderDefault: Color,
+    val borderDisabled: Color,
+
+    // icon color
+    val iconDefault: Color,
+    val iconDisabled: Color,
+
+    // background color
+    val bgDarker: Color,
+    val bgNormal: Color,
+    val bgLight: Color,
+    val bgLighter: Color,
+    val bgWhite: Color,
+
+    val isDark: Boolean
+)
+
+val LightColorPalette = HambugColors(
+    primRed = HambugRed,
+    primGray = HambugGray,
+    primBackground = HambugBackground,
+    secondBrown = Brown400,
+    secondYellow = Yellow400,
+    secondRed = Red400,
+    secondGreen = Green400,
+    textHeadline = Gray900,
+    textBody = Gray800,
+    textDisabled = Gray600,
+    borderHoverFocus = Gray500,
+    borderDefault = Gray400,
+    borderDisabled = Gray300,
+    iconDefault = IconGray800,
+    iconDisabled = IconGray600,
+    bgDarker = Gray200,
+    bgNormal = Gray100,
+    bgLight = Gray75,
+    bgLighter = Gray50,
+    bgWhite = Gray0,
+    isDark = false
+)
+
+val DarkColorPalette = LightColorPalette.copy(
+    isDark = true
+)
+
+// 커스텀 색상 CompositionLocal 정의
+private val LocalHambugColors = staticCompositionLocalOf<HambugColors> {
+    error("No HambugColorPalette provided")
+}
+
+// Material3 기본 ColorScheme에 커스텀 색상 매핑
+private fun hambugLightColorScheme(colors: HambugColors) = lightColorScheme(
+    primary = colors.primRed,
+    onPrimary = colors.bgWhite,
+    background = colors.bgNormal,
+    onBackground = colors.textBody,
+    surface = colors.bgWhite,
+    onSurface = colors.textBody,
+    error = colors.secondRed,
+    onError = colors.bgWhite,
+)
 
 @Composable
 fun HambugTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme =
-        when {
-            dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-                val context = LocalContext.current
-                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-            }
+    val colors = if (darkTheme) DarkColorPalette else LightColorPalette
 
-            darkTheme -> DarkColorScheme
-            else -> LightColorScheme
-        }
+    CompositionLocalProvider(
+        LocalHambugColors provides colors,
+        LocalSpacing provides Spacing()
+    ) {
+        MaterialTheme(
+            colorScheme = hambugLightColorScheme(colors),
+            typography = Typography,
+            content = content
+        )
+    }
+}
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+// UI에서 커스텀 색상 사용 가능하게 확장속성 정의
+object HambugTheme {
+    val colors: HambugColors
+        @Composable
+        get() = LocalHambugColors.current
 }

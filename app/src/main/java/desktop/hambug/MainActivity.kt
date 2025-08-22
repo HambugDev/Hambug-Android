@@ -15,6 +15,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import desktop.hambug.ui.component.HambugBottomNav
 import desktop.hambug.ui.component.HambugTopAppBar
+import desktop.hambug.ui.home.HomeScreen
 import desktop.hambug.ui.theme.HambugTheme
 
 class MainActivity : ComponentActivity() {
@@ -64,7 +65,7 @@ fun HambugApp() {
             modifier = Modifier.padding(innerPadding),
         ) {
             composable("home") {
-                Text("홈 화면")
+                HomeScreen()
             }
             composable("community") {
                 Text("커뮤니티 화면")
