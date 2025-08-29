@@ -33,6 +33,18 @@ val Typography = Typography(
         fontSize = 22.sp,
         lineHeight = (22 * 1.5).sp
     ),
+    titleLarge = TextStyle(
+        fontFamily = pretendard,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        lineHeight = (20 * 1.5).sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = pretendard,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = (18 * 1.5).sp
+    ),
     bodyLarge = TextStyle(
         fontFamily = pretendard,
         fontWeight = FontWeight.Normal,

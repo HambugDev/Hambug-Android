@@ -14,13 +14,13 @@ data class HambugColors(
     // primary palette
     val primRed: Color,
     val primGray: Color,
-    val primBackground: Color,
+    val primWhite: Color,
 
     // secondary palette
-    val secondBrown: Color,
+    val secondOrange: Color,
     val secondYellow: Color,
-    val secondRed: Color,
     val secondGreen: Color,
+    val secondBrown: Color,
 
     // text color
     val textHeadline: Color,
@@ -39,9 +39,9 @@ data class HambugColors(
     // background color
     val bgDarker: Color,
     val bgNormal: Color,
-    val bgLight: Color,
     val bgLighter: Color,
     val bgWhite: Color,
+    val bgYellow: Color,
 
     val isDark: Boolean
 )
@@ -49,11 +49,11 @@ data class HambugColors(
 val LightColorPalette = HambugColors(
     primRed = HambugRed,
     primGray = HambugGray,
-    primBackground = HambugBackground,
-    secondBrown = Brown400,
+    primWhite = HambugWhite,
+    secondOrange = Orange400,
     secondYellow = Yellow400,
-    secondRed = Red400,
     secondGreen = Green400,
+    secondBrown = Brown400,
     textHeadline = Gray900,
     textBody = Gray800,
     textDisabled = Gray600,
@@ -64,9 +64,9 @@ val LightColorPalette = HambugColors(
     iconDisabled = IconGray600,
     bgDarker = Gray200,
     bgNormal = Gray100,
-    bgLight = Gray75,
     bgLighter = Gray50,
     bgWhite = Gray0,
+    bgYellow = BgYellow,
     isDark = false
 )
 
@@ -87,7 +87,7 @@ private fun hambugLightColorScheme(colors: HambugColors) = lightColorScheme(
     onBackground = colors.textBody,
     surface = colors.bgWhite,
     onSurface = colors.textBody,
-    error = colors.secondRed,
+    error = colors.primRed,
     onError = colors.bgWhite,
 )
 
