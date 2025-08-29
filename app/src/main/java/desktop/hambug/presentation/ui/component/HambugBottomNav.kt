@@ -1,4 +1,4 @@
-package desktop.hambug.ui.component
+package desktop.hambug.presentation.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource

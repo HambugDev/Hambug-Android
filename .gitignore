@@ -23,6 +23,7 @@ local.properties
 # Kotlin files
 *.kt.log
 *.kt.test.log
+.kotlin/
 
 # Android Studio 4.x
 .idea/runConfigurations.xml
