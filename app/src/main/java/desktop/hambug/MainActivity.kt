@@ -13,11 +13,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import desktop.hambug.ui.component.HambugBottomNav
-import desktop.hambug.ui.component.HambugTopAppBar
-import desktop.hambug.ui.home.HomeScreen
-import desktop.hambug.ui.theme.HambugTheme
+import dagger.hilt.android.AndroidEntryPoint
+import desktop.hambug.presentation.ui.component.HambugBottomNav
+import desktop.hambug.presentation.ui.component.HambugTopAppBar
+import desktop.hambug.presentation.ui.home.HomeScreen
+import desktop.hambug.presentation.ui.theme.HambugTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
