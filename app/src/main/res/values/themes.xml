@@ -6,4 +6,8 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
+
+    <style name="Theme.Hambug.SplashScreen" parent="Theme.Hambug">
+        <item name="android:windowBackground">@drawable/splash_layer_list</item>
+    </style>
 </resources>
