@@ -1,9 +1,6 @@
 package desktop.hambug.presentation.ui.theme
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -22,11 +19,9 @@ data class Spacing(
     val xxextra: Dp = 64.dp
 )
 
-// Spacing CompositionLocal 정의 (spacing 값 제공)
-val LocalSpacing = staticCompositionLocalOf { Spacing() }
-
-// UI에서 MaterialTheme.spacing으로 접근 가능하게 확장속성 정의
-val MaterialTheme.spacing: Spacing
-    @Composable
-    @ReadOnlyComposable
-    get() = LocalSpacing.current
+/**
+ * CompositionLocal을 통해 spacing 값 제공
+ */
+val LocalSpacing = staticCompositionLocalOf<Spacing> {
+    error("No spacing provided")
+}

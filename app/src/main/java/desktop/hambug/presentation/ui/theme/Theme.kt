@@ -6,6 +6,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
@@ -74,7 +75,9 @@ val DarkColorPalette = LightColorPalette.copy(
     isDark = true
 )
 
-// 커스텀 색상 CompositionLocal 정의
+/**
+ * CompositionLocal을 통해 커스텀 색상 팔레트 제공
+ */
 private val LocalHambugColors = staticCompositionLocalOf<HambugColors> {
     error("No HambugColorPalette provided")
 }
@@ -97,22 +100,36 @@ fun HambugTheme(
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) DarkColorPalette else LightColorPalette
+    val appTypography = getAppTypography()
 
     CompositionLocalProvider(
         LocalHambugColors provides colors,
-        LocalSpacing provides Spacing()
+        LocalSpacing provides Spacing(),
+        LocalAppTypography provides appTypography
     ) {
         MaterialTheme(
             colorScheme = hambugLightColorScheme(colors),
-            typography = Typography,
             content = content
         )
     }
 }
 
-// UI에서 커스텀 색상 사용 가능하게 확장속성 정의
+/**
+ * Hambug 디자인 속성에 접근하기 위한 객체
+ */
 object HambugTheme {
     val colors: HambugColors
         @Composable
+        @ReadOnlyComposable
         get() = LocalHambugColors.current
+
+    val spacing: Spacing
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalSpacing.current
+
+    val typography: AppTypography
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAppTypography.current
 }
