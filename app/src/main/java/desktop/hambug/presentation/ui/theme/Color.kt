@@ -11,7 +11,7 @@ val HambugWhite = Color(0xFFFAFAF9)
 // secondary palette
 val Orange400 = Color(0xFFFF9247)
 val Yellow400 = Color(0xFFF4E378)
-val Green400 = Color(0xFF227E30)
+val Green400 = Color(0xFF48CA5B)
 val Brown400 = Color(0xFF6A453F)
 
 // text color

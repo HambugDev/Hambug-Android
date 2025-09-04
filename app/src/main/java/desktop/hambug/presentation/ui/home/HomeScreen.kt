@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import desktop.hambug.presentation.ui.theme.HambugTheme
-import desktop.hambug.presentation.ui.theme.spacing
 
 @Composable
 fun HomeScreen(
@@ -29,19 +28,19 @@ fun HomeScreen(
     ) {
         Text(
             text = "안녕하세요 테스트입니다",
-            style = MaterialTheme.typography.headlineMedium,
+            style = HambugTheme.typography.heading01,
             color = HambugTheme.colors.primRed
         )
 
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+        Spacer(modifier = Modifier.height(HambugTheme.spacing.large))
 
         Text(
             text = "hello test",
-            style = MaterialTheme.typography.bodyLarge,
+            style = HambugTheme.typography.body01,
             color = HambugTheme.colors.secondGreen
         )
 
-        Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
+        Spacer(modifier = Modifier.height(HambugTheme.spacing.large))
 
         burgers.forEach { burger ->
             Text(

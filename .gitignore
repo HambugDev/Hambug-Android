@@ -11,6 +11,13 @@
 .gradle/
 build/
 local.properties
+
+# Local configuration files
+.env
+.env.local
+.DS_Store
+
+# IDE specific files (Android Studio)
 .idea/caches/
 .idea/libraries/
 .idea/workspace.xml
@@ -19,30 +26,19 @@ local.properties
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
+.idea/deploymentTargetSelector.xml
+.idea/runConfigurations.xml
+.idea/codeStyles/
+.idea/AndroidProjectSystem.xml
+.idea/compiler.xml
+.idea/migrations.xml
+.idea/assetWizardSettings.xml
+.idea/inspectionProfiles/
 
 # Kotlin files
 *.kt.log
 *.kt.test.log
 .kotlin/
-
-# Android Studio 4.x
-.idea/runConfigurations.xml
-
-# Local configuration files (e.g., used by third-party tools)
-.env
-.env.local
-.DS_Store
-
-# IDE specific files
-.idea/
-*.iws
-*.iml
-*.ipr
-.idea/codeStyles/
-.idea/gradle.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/vcs.xml
 
 # Keystore files
 *.jks
