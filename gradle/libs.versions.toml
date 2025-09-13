@@ -1,6 +1,6 @@
 [versions]
 agp = "8.11.1"
-kotlin = "2.0.21"
+kotlin = "2.2.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -14,7 +14,7 @@ nav = "2.9.3"
 google = "4.4.3"
 firebaseBom = "34.1.0"
 hilt = "2.56.2"
-ksp = "2.0.21-1.0.28"
+ksp = "2.2.0-2.0.2"
 hiltNavigationCopmose = "1.2.0"
 splash = "1.0.1"
 
