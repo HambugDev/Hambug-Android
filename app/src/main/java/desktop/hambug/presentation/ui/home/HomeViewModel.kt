@@ -3,8 +3,8 @@ package desktop.hambug.presentation.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import desktop.hambug.domain.model.Burger
-import desktop.hambug.domain.usecase.GetBurgerListUseCase
+import desktop.hambug.domain.model.Album
+import desktop.hambug.domain.usecase.GetAlbumListUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -12,19 +12,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getBurgerListUseCase: GetBurgerListUseCase
+    private val getAlbumListUserCase: GetAlbumListUseCase
 ) : ViewModel() {
 
-    private val _burgers = MutableStateFlow<List<Burger>>(emptyList())
-    val burgers: StateFlow<List<Burger>> = _burgers
+    private val _albums = MutableStateFlow<List<Album>>(emptyList())
+    val albums: StateFlow<List<Album>> = _albums
 
-    init {
-        getBurgers()
-    }
-
-    private fun getBurgers() {
+    fun getAlbums(userId: Int) {
         viewModelScope.launch {
-            _burgers.value = getBurgerListUseCase.invoke()
+            _albums.value = getAlbumListUserCase(userId)
         }
     }
 }

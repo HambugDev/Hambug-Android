@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,38 +19,35 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val burgers by viewModel.burgers.collectAsStateWithLifecycle()
+    val albums by viewModel.albums.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.getAlbums(userId = 1)
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "안녕하세요 테스트입니다",
-            style = HambugTheme.typography.heading01,
-            color = HambugTheme.colors.primRed
-        )
+//        Text(
+//            text = "안녕하세요 테스트입니다",
+//            style = HambugTheme.typography.heading01,
+//            color = HambugTheme.colors.primRed
+//        )
+//
+//        Spacer(modifier = Modifier.height(HambugTheme.spacing.large))
+//
+//        Text(
+//            text = "hello test",
+//            style = HambugTheme.typography.body01,
+//            color = HambugTheme.colors.secondGreen
+//        )
+//
+//        Spacer(modifier = Modifier.height(HambugTheme.spacing.large))
 
-        Spacer(modifier = Modifier.height(HambugTheme.spacing.large))
-
-        Text(
-            text = "hello test",
-            style = HambugTheme.typography.body01,
-            color = HambugTheme.colors.secondGreen
-        )
-
-        Spacer(modifier = Modifier.height(HambugTheme.spacing.large))
-
-        burgers.forEach { burger ->
-            Text(
-                text = burger.name,
-                style = MaterialTheme.typography.headlineMedium,
-            )
-            Text(
-                text = burger.description,
-                style = MaterialTheme.typography.bodyLarge,
-            )
+        albums.forEach { album ->
+            Text(text = "ID : ${album.id}, title = ${album.title}")
         }
     }
 }
