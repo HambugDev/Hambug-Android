@@ -34,3 +34,7 @@ val Gray100 = Color(0xFFF5F5F4)
 val Gray50 = Color(0xFFFAFAF9)
 val Gray0 = Color(0xFFFFFFFF)
 val BgYellow = Color(0xFFF7EEDA)
+
+// 기타
+val Gray1000 = Color(0xFF000000)
+val KakaoYellow = Color(0xFFFEE500)
