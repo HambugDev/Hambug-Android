@@ -1,4 +1,4 @@
-package desktop.hambug.presentation.ui.home
+package desktop.hambug.presentation.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

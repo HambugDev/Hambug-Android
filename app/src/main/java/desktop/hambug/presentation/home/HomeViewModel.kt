@@ -1,4 +1,4 @@
-package desktop.hambug.presentation.ui.home
+package desktop.hambug.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

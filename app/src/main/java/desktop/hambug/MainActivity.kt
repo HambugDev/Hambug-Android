@@ -21,7 +21,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.presentation.ui.component.HambugBottomNav
 import desktop.hambug.presentation.ui.component.HambugTopAppBar
 import desktop.hambug.presentation.ui.component.SplashScreen
-import desktop.hambug.presentation.ui.home.HomeScreen
+import desktop.hambug.presentation.home.HomeScreen
+import desktop.hambug.presentation.login.LoginScreen
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -46,7 +47,8 @@ class MainActivity : ComponentActivity() {
                 if (isLoading) {
                     SplashScreen()
                 } else {
-                    HambugApp()
+//                    HambugApp()
+                    LoginScreen()
                 }
             }
         }
