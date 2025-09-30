@@ -1,4 +1,4 @@
-package desktop.hambug.presentation.ui.component
+package desktop.hambug.presentation.community.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
