@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import desktop.hambug.presentation.community.component.PostFeedItem
+import desktop.hambug.presentation.community.component.PostListItem
 import desktop.hambug.presentation.ui.theme.CommunityFilterSelected
 import desktop.hambug.presentation.ui.theme.HambugTheme
 
