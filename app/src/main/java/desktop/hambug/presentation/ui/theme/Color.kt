@@ -38,3 +38,4 @@ val BgYellow = Color(0xFFF7EEDA)
 // 기타
 val Gray1000 = Color(0xFF000000)
 val KakaoYellow = Color(0xFFFEE500)
+val CommunityFilterSelected = Color(0xFFFFD9D1)

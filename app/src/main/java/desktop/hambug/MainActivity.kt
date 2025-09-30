@@ -18,6 +18,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import desktop.hambug.presentation.community.CommunityScreen
+import desktop.hambug.presentation.community.PostDetailScreen
+import desktop.hambug.presentation.community.PostWriteScreen
 import desktop.hambug.presentation.ui.component.HambugBottomNav
 import desktop.hambug.presentation.ui.component.HambugTopAppBar
 import desktop.hambug.presentation.ui.component.SplashScreen
@@ -48,7 +51,10 @@ class MainActivity : ComponentActivity() {
                     SplashScreen()
                 } else {
 //                    HambugApp()
-                    LoginScreen()
+//                    LoginScreen()
+//                    CommunityScreen()
+//                    PostWriteScreen()
+                    PostDetailScreen()
                 }
             }
         }
