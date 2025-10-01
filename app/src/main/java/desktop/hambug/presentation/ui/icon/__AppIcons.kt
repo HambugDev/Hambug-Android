@@ -2,6 +2,7 @@ package desktop.hambug.presentation.ui.icon
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import desktop.hambug.presentation.ui.icon.appicons.Apple
+import desktop.hambug.presentation.ui.icon.appicons.Back
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
 import desktop.hambug.presentation.ui.icon.appicons.Camera
 import desktop.hambug.presentation.ui.icon.appicons.CircleCross
@@ -22,7 +23,7 @@ public val AppIcons.AllIcons: ____KtList<ImageVector>
     if (__AllIcons != null) {
       return __AllIcons!!
     }
-    __AllIcons= listOf(Apple, BackDetail, Camera, CircleCross, Comment, CommentDetail, Dots, Heart,
-        HeartBorder, Kakao)
+    __AllIcons= listOf(Apple, Back, BackDetail, Camera, CircleCross, Comment, CommentDetail, Dots,
+        Heart, HeartBorder, Kakao)
     return __AllIcons!!
   }
