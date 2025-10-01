@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.presentation.community.CommunityScreen
 import desktop.hambug.presentation.community.PostDetailScreen
 import desktop.hambug.presentation.community.PostWriteScreen
+import desktop.hambug.presentation.community.ReportScreen
 import desktop.hambug.presentation.ui.component.HambugBottomNav
 import desktop.hambug.presentation.ui.component.HambugTopAppBar
 import desktop.hambug.presentation.ui.component.SplashScreen
@@ -54,7 +55,8 @@ class MainActivity : ComponentActivity() {
 //                    LoginScreen()
 //                    CommunityScreen()
 //                    PostWriteScreen()
-                    PostDetailScreen()
+//                    PostDetailScreen()
+                    ReportScreen()
                 }
             }
         }
