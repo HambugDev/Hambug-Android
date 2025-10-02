@@ -27,6 +27,7 @@ import desktop.hambug.presentation.ui.component.HambugTopAppBar
 import desktop.hambug.presentation.ui.component.SplashScreen
 import desktop.hambug.presentation.home.HomeScreen
 import desktop.hambug.presentation.login.LoginScreen
+import desktop.hambug.presentation.my.MyActivityScreen
 import desktop.hambug.presentation.my.MypageScreen
 import desktop.hambug.presentation.noti.NotificationScreen
 import desktop.hambug.presentation.ui.theme.HambugTheme
@@ -60,7 +61,8 @@ class MainActivity : ComponentActivity() {
 //                    PostDetailScreen()
 //                    ReportScreen()
 //                    NotificationScreen()
-                    MypageScreen()
+//                    MypageScreen()
+                    MyActivityScreen()
                 }
             }
         }

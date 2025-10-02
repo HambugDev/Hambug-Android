@@ -48,7 +48,7 @@ fun MypageScreen() {
     Scaffold(
         containerColor = Color.White,
         topBar = {
-            TopAppBar(
+            TopAppBar(   
                 title = {
                     Text(
                         text = "마이페이지",
