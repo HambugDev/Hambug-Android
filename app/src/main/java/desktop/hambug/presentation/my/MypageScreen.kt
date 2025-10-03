@@ -33,12 +33,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import desktop.hambug.R
+import desktop.hambug.presentation.my.component.UserRemoveDialog
+import desktop.hambug.presentation.my.component.UserRemoveSuccessDialog
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Activity
 import desktop.hambug.presentation.ui.icon.appicons.ArrowRight
@@ -53,6 +54,8 @@ import desktop.hambug.presentation.ui.theme.RemoveRed
 fun MypageScreen() {
 
     var showBottomSheet by remember { mutableStateOf(false) }
+    var showUserRemoveDialog by remember { mutableStateOf(false) }
+    var showUserRemoveSuccessDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = HambugTheme.colors.bgWhite,
@@ -86,7 +89,9 @@ fun MypageScreen() {
             Spacer(Modifier.height(40.dp))
 
             // 메뉴 선택 영역
-            MypageMenuSection()
+            MypageMenuSection(
+                onUserRemove = { showUserRemoveSuccessDialog = true }
+            )
         }
     }
 
@@ -102,6 +107,23 @@ fun MypageScreen() {
                 onDismiss = { showBottomSheet = false }
             )
         }
+    }
+
+    // 회원탈퇴 확인 모달창
+    if (showUserRemoveDialog) {
+        UserRemoveDialog(
+            onDismiss = { showUserRemoveDialog = false },
+            onCancel = { showUserRemoveDialog = false },
+            onConfirm = {}
+        )
+    }
+
+    // 회원탈퇴 완료 모달창
+    if (showUserRemoveSuccessDialog) {
+        UserRemoveSuccessDialog (
+            onDismiss = { showUserRemoveSuccessDialog = false},
+            onConfirm = { showUserRemoveSuccessDialog = false }
+        )
     }
 }
 
@@ -165,7 +187,9 @@ fun MypageProfileImage() {
 }
 
 @Composable
-fun MypageMenuSection() {
+fun MypageMenuSection(
+    onUserRemove: () -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -194,7 +218,7 @@ fun MypageMenuSection() {
         MypageMenuButton(
             menuIcon = AppIcons.Remove,
             menuText = "탈퇴하기",
-            onClick = {},
+            onClick = { onUserRemove() },
             modifier = Modifier
                 .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
                 .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 20.dp)
