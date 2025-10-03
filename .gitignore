@@ -35,6 +35,10 @@ local.properties
 .idea/assetWizardSettings.xml
 .idea/inspectionProfiles/
 
+# Modules files
+.idea/modules/
+*.iml
+
 # Kotlin files
 *.kt.log
 *.kt.test.log
