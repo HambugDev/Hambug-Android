@@ -19,12 +19,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,10 +51,13 @@ import desktop.hambug.presentation.ui.theme.RemoveRed
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MypageScreen() {
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+
     Scaffold(
-        containerColor = Color.White,
+        containerColor = HambugTheme.colors.bgWhite,
         topBar = {
-            TopAppBar(   
+            TopAppBar(
                 title = {
                     Text(
                         text = "마이페이지",
@@ -67,8 +76,12 @@ fun MypageScreen() {
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
+            Spacer(Modifier.height(20.dp))
+
             // 상단 영역 (프로필이미지 + 닉네임)
-            MypageHeaderSection()
+            MypageHeaderSection(
+                onClick = { showBottomSheet = true }
+            )
 
             Spacer(Modifier.height(40.dp))
 
@@ -76,15 +89,32 @@ fun MypageScreen() {
             MypageMenuSection()
         }
     }
+
+    // 프로필(이미지, 닉네임) 클릭 시 바텀시트 표시
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+            dragHandle = null,
+            containerColor = HambugTheme.colors.bgWhite,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        ) {
+            ProfileBottomSheetContent(
+                onDismiss = { showBottomSheet = false }
+            )
+        }
+    }
 }
 
 @Composable
-fun MypageHeaderSection() {
+fun MypageHeaderSection(
+    onClick: () -> Unit
+) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.height(20.dp))
         MypageProfileImage()
         Spacer(Modifier.height(24.dp))
         Text(
@@ -138,7 +168,7 @@ fun MypageProfileImage() {
 fun MypageMenuSection() {
     Column(
         modifier = Modifier
-            .padding(horizontal = 32.dp)
+            .padding(horizontal = 20.dp)
             .fillMaxWidth()
     ) {
         MypageMenuButton(
@@ -146,7 +176,7 @@ fun MypageMenuSection() {
             menuText = "활동 내역",
             onClick = {},
             modifier = Modifier
-                .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(4.dp))
+                .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(12.dp))
                 .padding(20.dp)
         )
 
@@ -157,7 +187,7 @@ fun MypageMenuSection() {
             menuText = "로그아웃",
             onClick = {},
             modifier = Modifier
-                .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                 .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 10.dp)
         )
 
@@ -166,7 +196,7 @@ fun MypageMenuSection() {
             menuText = "탈퇴하기",
             onClick = {},
             modifier = Modifier
-                .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(bottomStart = 4.dp, bottomEnd = 4.dp))
+                .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
                 .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 20.dp)
         )
     }
@@ -207,6 +237,81 @@ fun MypageMenuButton(
             imageVector = AppIcons.ArrowRight,
             contentDescription = null,
             tint = HambugTheme.colors.iconDefault
+        )
+    }
+}
+
+@Composable
+fun ProfileBottomSheetContent(
+    onDismiss: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        MypageBottomSheetButton(
+            buttonText = "닉네임 변경",
+            onClick = {},
+            modifier = Modifier
+                .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                .padding(16.dp)
+        )
+
+        HorizontalDivider(thickness = 0.5.dp, color = HambugTheme.colors.bgDarker)
+
+        MypageBottomSheetButton(
+            buttonText = "프로필 이미지 변경",
+            onClick = {},
+            modifier = Modifier
+                .background(color = HambugTheme.colors.bgNormal)
+                .padding(16.dp)
+        )
+
+        HorizontalDivider(thickness = 0.5.dp, color = HambugTheme.colors.bgDarker)
+
+        MypageBottomSheetButton(
+            buttonText = "기본 이미지 적용",
+            onClick = {},
+            modifier = Modifier
+                .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                .padding(16.dp)
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Box(
+            modifier = Modifier
+                .clickable { onDismiss() }
+                .fillMaxWidth()
+                .background(color = HambugTheme.colors.bgNormal, RoundedCornerShape(12.dp))
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "취소",
+                style = HambugTheme.typography.body02Prominent,
+                color = HambugTheme.colors.textBody
+            )
+        }
+    }
+}
+
+@Composable
+fun MypageBottomSheetButton(
+    buttonText: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .clickable(onClick = onClick)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = buttonText,
+            style = HambugTheme.typography.body02,
+            color = HambugTheme.colors.textBody
         )
     }
 }
