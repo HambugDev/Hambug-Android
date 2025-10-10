@@ -1,29 +1,29 @@
 package desktop.hambug.presentation.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import desktop.hambug.presentation.ui.icon.AppIcons
+import desktop.hambug.presentation.ui.icon.appicons.Community
+import desktop.hambug.presentation.ui.icon.appicons.Home
+import desktop.hambug.presentation.ui.icon.appicons.User
+import desktop.hambug.presentation.ui.theme.HambugTheme
 
 data class BottomNavItem(
     val icon: ImageVector,
@@ -37,19 +37,21 @@ fun HambugBottomNav(
     onNavItemClick: (String) -> Unit,
 ) {
     val items = listOf(
-        BottomNavItem(Icons.Filled.Home, "홈", "home"),
-        BottomNavItem(Icons.Filled.MailOutline, "커뮤니티", "community"),
-        BottomNavItem(Icons.Filled.AccountCircle, "마이", "my")
+        BottomNavItem(AppIcons.Home, "홈", "home"),
+        BottomNavItem(AppIcons.Community, "커뮤니티", "community"),
+        BottomNavItem(AppIcons.User, "마이", "my")
     )
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = Color.White
+    Column(
+        modifier = Modifier.fillMaxWidth()
     ) {
+        HorizontalDivider(thickness = 1.dp, color = HambugTheme.colors.bgNormal)
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(56.dp)
+                .background(HambugTheme.colors.bgWhite),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             items.forEach { item ->
@@ -66,20 +68,19 @@ fun HambugBottomNav(
                         ) {
                             onNavItemClick(item.route)
                         },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Spacer(Modifier.height(10.dp))
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.label,
-                        tint = if (selected) Color.Black else Color.Gray,
-                        modifier = Modifier.size(24.dp)
+                        tint = if (selected) HambugTheme.colors.primRed else HambugTheme.colors.borderDefault
                     )
+                    Spacer(Modifier.height(6.dp))
                     Text(
                         text = item.label,
-                        color = if (selected) Color.Black else Color.Gray,
-                        fontSize = 12.sp,
-                        lineHeight = 12.sp
+                        style = HambugTheme.typography.label02,
+                        color = if (selected) HambugTheme.colors.primRed else HambugTheme.colors.borderDefault
                     )
                 }
             }
