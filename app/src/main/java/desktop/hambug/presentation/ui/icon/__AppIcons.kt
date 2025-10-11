@@ -6,18 +6,23 @@ import desktop.hambug.presentation.ui.icon.appicons.Apple
 import desktop.hambug.presentation.ui.icon.appicons.ArrowRight
 import desktop.hambug.presentation.ui.icon.appicons.Back
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
+import desktop.hambug.presentation.ui.icon.appicons.Bell
+import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.icon.appicons.Camera
 import desktop.hambug.presentation.ui.icon.appicons.CircleCross
 import desktop.hambug.presentation.ui.icon.appicons.Comment
 import desktop.hambug.presentation.ui.icon.appicons.CommentBorder
 import desktop.hambug.presentation.ui.icon.appicons.CommentDetail
+import desktop.hambug.presentation.ui.icon.appicons.Community
 import desktop.hambug.presentation.ui.icon.appicons.Dots
 import desktop.hambug.presentation.ui.icon.appicons.Heart
 import desktop.hambug.presentation.ui.icon.appicons.HeartBorder
+import desktop.hambug.presentation.ui.icon.appicons.Home
 import desktop.hambug.presentation.ui.icon.appicons.Kakao
 import desktop.hambug.presentation.ui.icon.appicons.Logout
 import desktop.hambug.presentation.ui.icon.appicons.Pen
 import desktop.hambug.presentation.ui.icon.appicons.Remove
+import desktop.hambug.presentation.ui.icon.appicons.User
 import kotlin.collections.List as ____KtList
 
 public object AppIcons
@@ -29,7 +34,8 @@ public val AppIcons.AllIcons: ____KtList<ImageVector>
     if (__AllIcons != null) {
       return __AllIcons!!
     }
-    __AllIcons= listOf(Activity, Apple, ArrowRight, Back, BackDetail, Camera, CircleCross, Comment,
-        CommentBorder, CommentDetail, Dots, Heart, HeartBorder, Kakao, Logout, Pen, Remove)
+    __AllIcons= listOf(Activity, Apple, ArrowRight, Back, BackDetail, Bell, BellBorder, Camera,
+        CircleCross, Comment, CommentBorder, CommentDetail, Community, Dots, Heart, HeartBorder,
+        Home, Kakao, Logout, Pen, Remove, User)
     return __AllIcons!!
   }

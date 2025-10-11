@@ -1,6 +1,7 @@
 package desktop.hambug.presentation.community.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,11 +28,14 @@ import desktop.hambug.presentation.ui.icon.appicons.Heart
 import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @Composable
-fun PostFeedItem() {
+fun PostFeedItem(
+    onClick: () -> Unit
+) {
     Column(
         modifier = Modifier
-            .padding(horizontal = 20.dp)
+            .clickable { onClick() }
             .fillMaxWidth()
+            .padding(horizontal = 20.dp),
     ) {
         Image(
             painter = painterResource(R.drawable.hambuger),
@@ -43,7 +47,7 @@ fun PostFeedItem() {
                 .clip(RoundedCornerShape(6.dp))
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -66,7 +70,7 @@ fun PostFeedItem() {
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.height(8.dp))
 
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -77,7 +81,7 @@ fun PostFeedItem() {
                 color = HambugTheme.colors.textBody
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(Modifier.width(8.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -87,7 +91,7 @@ fun PostFeedItem() {
                     contentDescription = null,
                     tint = HambugTheme.colors.primRed
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(Modifier.width(4.dp))
                 Text(
                     text = "11",
                     style = HambugTheme.typography.label02,
@@ -95,7 +99,7 @@ fun PostFeedItem() {
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(Modifier.width(8.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -105,7 +109,7 @@ fun PostFeedItem() {
                     contentDescription = null,
                     tint = HambugTheme.colors.iconDisabled
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(Modifier.width(4.dp))
                 Text(
                     text = "6",
                     style = HambugTheme.typography.label02,
@@ -114,7 +118,7 @@ fun PostFeedItem() {
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.height(8.dp))
 
         Text(
             text = "오늘 점심으로 맘스터치 싸이버거를 먹었는데, 역시 기대를 저버리지 않았어요. 일단 패티가 정말 두툼하고 겉은 바삭, 속은 촉촉해서 식감이 일품이에요. 특히 매콤달콤한 소스가 중독성이 강해서 먹는 내내 행복했어요. 신선한 양상추와 부드러운 빵까지 완벽한 조합이었습니다",

@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,17 +18,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.presentation.community.CommunityScreen
-import desktop.hambug.presentation.community.PostDetailScreen
-import desktop.hambug.presentation.community.PostWriteScreen
-import desktop.hambug.presentation.community.ReportScreen
 import desktop.hambug.presentation.ui.component.HambugBottomNav
-import desktop.hambug.presentation.ui.component.HambugTopAppBar
 import desktop.hambug.presentation.ui.component.SplashScreen
 import desktop.hambug.presentation.home.HomeScreen
-import desktop.hambug.presentation.login.LoginScreen
-import desktop.hambug.presentation.my.MyActivityScreen
 import desktop.hambug.presentation.my.MypageScreen
-import desktop.hambug.presentation.noti.NotificationScreen
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,15 +46,7 @@ class MainActivity : ComponentActivity() {
                 if (isLoading) {
                     SplashScreen()
                 } else {
-//                    HambugApp()
-//                    LoginScreen()
-//                    CommunityScreen()
-//                    PostWriteScreen()
-//                    PostDetailScreen()
-//                    ReportScreen()
-//                    NotificationScreen()
-//                    MypageScreen()
-                    MyActivityScreen()
+                    HambugApp()
                 }
             }
         }
@@ -76,18 +60,6 @@ fun HambugApp() {
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     Scaffold(
-        topBar = {
-            val title = when (currentRoute) {
-                "home" -> "홈"
-                "community" -> "커뮤니티"
-                "my" -> "마이"
-                else -> ""
-            }
-            HambugTopAppBar(
-                title = title,
-                onBellClick = {}
-            )
-        },
         bottomBar = {
             HambugBottomNav(
                 currentRoute = currentRoute,
@@ -108,10 +80,10 @@ fun HambugApp() {
                 HomeScreen()
             }
             composable("community") {
-                Text("커뮤니티 화면")
+                CommunityScreen()
             }
             composable("my") {
-                Text("마이 화면")
+                MypageScreen()
             }
         }
     }

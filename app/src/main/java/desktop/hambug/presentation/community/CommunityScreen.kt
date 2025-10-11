@@ -1,40 +1,61 @@
 package desktop.hambug.presentation.community
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import desktop.hambug.presentation.community.component.PostFeedItem
-import desktop.hambug.presentation.community.component.PostListItem
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import desktop.hambug.domain.model.Filter
+import desktop.hambug.domain.model.FilterType
+import desktop.hambug.presentation.community.component.FeedViewContent
+import desktop.hambug.presentation.community.component.ListViewContent
+import desktop.hambug.presentation.ui.icon.AppIcons
+import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.theme.CommunityFilterSelected
 import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommunityScreen() {
+fun CommunityScreen(
+    communityViewModel: CommunityViewModel = hiltViewModel()
+) {
+    // 필터링 목록 (전체, 자유잡담, 햄버거리뷰, 맛집추천)
+    val filterList = communityViewModel.filterList
+    // 리스트형 여부 (리스트형 or 피드형)
+    val isListView by communityViewModel.isListView.collectAsStateWithLifecycle()
+    // 현재 선택된 필터
+    val currentFilter by communityViewModel.currentFilter.collectAsStateWithLifecycle()
+
+    // 현재 선택된 필터(탭)에 해당하는 스크롤 상태를 가져오거나 생성한다
+    // -> 탭 전환 시 스크롤 위치를 복원/유지하기 위함
+    val scrollState = remember(currentFilter) {
+        communityViewModel.getScrollPositionForFilter(currentFilter)
+    }
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -51,8 +72,12 @@ fun CommunityScreen() {
                 ),
                 actions = {
                     Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = null
+                        modifier = Modifier
+                            .clickable {  }
+                            .padding(16.dp),
+                        imageVector = AppIcons.BellBorder,
+                        contentDescription = null,
+                        tint = HambugTheme.colors.bgWhite
                     )
                 }
             )
@@ -71,77 +96,74 @@ fun CommunityScreen() {
                     .background(color = HambugTheme.colors.primRed)
                     .padding(horizontal = 20.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .height(34.dp)
-                            .background(color = CommunityFilterSelected, shape = RoundedCornerShape(6.dp))
-                            .padding(horizontal = 12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "전체",
-                            style = HambugTheme.typography.label02,
-                            color = HambugTheme.colors.primRed
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .height(34.dp)
-                            .background(color = HambugTheme.colors.primWhite, shape = RoundedCornerShape(6.dp))
-                            .padding(horizontal = 12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "자유잡담",
-                            style = HambugTheme.typography.label02,
-                            color = HambugTheme.colors.textDisabled
-                        )
-                    }
-                }
+                FilterButtonSection(
+                    filterList = filterList,
+                    currentFilter = currentFilter,
+                    onClick = { filterType -> communityViewModel.setFilter(filterType) }
+                )
             }
 
-            // 리스트형
-//            Box(
-//                modifier = Modifier
-//                    .padding(horizontal = 20.dp)
-//                    .fillMaxSize()
-//            ) {
-//                Column (
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .offset(y = 46.dp)
-//                        .background(color = Color.White, shape = RoundedCornerShape(6.dp))
-//                        .padding(horizontal = 20.dp)
-//                ) {
-//                    Spacer(modifier = Modifier.height(20.dp))
-//
-//                    for (i in 0 until 10) {
-//                        PostListItem()
-//                        Spacer(modifier = Modifier.height(24.dp))
-//                    }
-//                }
-//            }
-
-            // 피드형
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .offset(y = 46.dp)
-            ) {
-                for (idx in 0 until 3) {
-                    if (idx > 0) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
-                    PostFeedItem()
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider(thickness = 2.dp, color = HambugTheme.colors.borderDisabled)
-                }
+            if (isListView) {
+                // 리스트형
+                ListViewContent(
+                    scrollState = scrollState,
+                    onClick = {}
+                )
+            } else {
+                // 피드형
+                FeedViewContent(
+                    scrollState = scrollState,
+                    onClick = {}
+                )
             }
         }
+    }
+}
+
+@Composable
+fun FilterButtonSection(
+    filterList: List<Filter>,
+    currentFilter: FilterType,
+    onClick: (FilterType) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        filterList.forEach { item ->
+            val selected = currentFilter == item.type
+
+            FilterButtonItem(
+                filter = item,
+                selected = selected,
+                onClick = onClick
+            )
+            Spacer(Modifier.width(8.dp))
+        }
+    }
+}
+
+@Composable
+fun FilterButtonItem(
+    filter: Filter,
+    selected: Boolean,
+    onClick: (FilterType) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clickable { onClick(filter.type) }
+            .height(34.dp)
+            .background(
+                color = if (selected) CommunityFilterSelected else HambugTheme.colors.primWhite,
+                shape = RoundedCornerShape(6.dp)
+            )
+            .padding(horizontal = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = filter.title,
+            style = HambugTheme.typography.label02,
+            color = if (selected) HambugTheme.colors.primRed else HambugTheme.colors.textDisabled
+        )
     }
 }
 
