@@ -6,6 +6,8 @@ import desktop.hambug.presentation.ui.icon.appicons.Apple
 import desktop.hambug.presentation.ui.icon.appicons.ArrowRight
 import desktop.hambug.presentation.ui.icon.appicons.Back
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
+import desktop.hambug.presentation.ui.icon.appicons.Bell
+import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.icon.appicons.Camera
 import desktop.hambug.presentation.ui.icon.appicons.CircleCross
 import desktop.hambug.presentation.ui.icon.appicons.Comment
@@ -32,8 +34,8 @@ public val AppIcons.AllIcons: ____KtList<ImageVector>
     if (__AllIcons != null) {
       return __AllIcons!!
     }
-    __AllIcons= listOf(Activity, Apple, ArrowRight, Back, BackDetail, Camera, CircleCross, Comment,
-        CommentBorder, CommentDetail, Community, Dots, Heart, HeartBorder, Home, Kakao, Logout, Pen,
-        Remove, User)
+    __AllIcons= listOf(Activity, Apple, ArrowRight, Back, BackDetail, Bell, BellBorder, Camera,
+        CircleCross, Comment, CommentBorder, CommentDetail, Community, Dots, Heart, HeartBorder,
+        Home, Kakao, Logout, Pen, Remove, User)
     return __AllIcons!!
   }
