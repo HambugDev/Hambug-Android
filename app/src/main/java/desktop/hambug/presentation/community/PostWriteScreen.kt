@@ -2,6 +2,7 @@ package desktop.hambug.presentation.community
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,11 +26,16 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import desktop.hambug.domain.model.Category
+import desktop.hambug.domain.model.CategoryType
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Camera
@@ -38,7 +44,14 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostWriteScreen() {
+fun PostWriteScreen(
+    postWriteViewModel: PostWriteViewModel = hiltViewModel()
+) {
+    // 카테고리 목록 (자유잡담, 프랜차이즈, 수제버거, 맛집추천)
+    val categoryList = postWriteViewModel.categoryList
+    // 현재 선택된 카테고리
+    val currentCategory by postWriteViewModel.currentCategory.collectAsStateWithLifecycle()
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -76,37 +89,11 @@ fun PostWriteScreen() {
             Spacer(modifier = Modifier.height(12.dp))
 
             // 카테고리 목록
-            Row {
-                Box(
-                    modifier = Modifier
-                        .height(34.dp)
-                        .background(color = HambugTheme.colors.bgWhite)
-                        .border(width = 1.dp, color = HambugTheme.colors.primRed, shape = RoundedCornerShape(2.dp))
-                        .padding(horizontal = 12.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "자유잡담",
-                        style = HambugTheme.typography.label02,
-                        color = HambugTheme.colors.primRed
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Box(
-                    modifier = Modifier
-                        .height(34.dp)
-                        .background(color = HambugTheme.colors.bgWhite)
-                        .border(width = 1.dp, color = HambugTheme.colors.borderDisabled, shape = RoundedCornerShape(2.dp))
-                        .padding(horizontal = 12.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "프렌차이즈",
-                        style = HambugTheme.typography.label02,
-                        color = HambugTheme.colors.textDisabled
-                    )
-                }
-            }
+            CategoryButtonSection(
+                categoryList = categoryList,
+                currentCategory = currentCategory,
+                onClick = { categoryType -> postWriteViewModel.setCategory(categoryType) }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -236,6 +223,53 @@ fun PostWriteScreen() {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun CategoryButtonSection(
+    categoryList: List<Category>,
+    currentCategory: CategoryType,
+    onClick: (CategoryType) -> Unit
+) {
+    Row {
+        categoryList.forEach { item ->
+            val selected = (currentCategory == item.type)
+
+            CategoryButtonItem(
+                category = item,
+                selected = selected,
+                onClick = onClick
+            )
+            Spacer(Modifier.width(8.dp))
+        }
+    }
+}
+
+@Composable
+fun CategoryButtonItem(
+    category: Category,
+    selected: Boolean,
+    onClick: (CategoryType) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clickable { onClick(category.type) }
+            .height(34.dp)
+            .background(color = HambugTheme.colors.bgWhite)
+            .border(
+                width = 1.dp,
+                color = if (selected) HambugTheme.colors.primRed else HambugTheme.colors.borderDisabled,
+                shape = RoundedCornerShape(2.dp)
+            )
+            .padding(horizontal = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = category.title,
+            style = HambugTheme.typography.label02,
+            color = if (selected) HambugTheme.colors.primRed else HambugTheme.colors.textDisabled
+        )
     }
 }
 
