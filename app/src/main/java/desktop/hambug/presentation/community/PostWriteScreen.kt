@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import desktop.hambug.domain.model.Category
-import desktop.hambug.domain.model.CategoryType
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
 import desktop.hambug.presentation.ui.component.CustomContentTextField
 import desktop.hambug.presentation.ui.component.CustomTitleTextField
@@ -117,6 +116,7 @@ fun PostWriteScreen(
 
                 // 내용 영역
                 WriteContentSection(
+                    placeholder = currentCategory.placeholder,
                     postContent = postContent,
                     postWriteViewModel = postWriteViewModel
                 )
@@ -149,12 +149,12 @@ fun PostWriteScreen(
 @Composable
 fun CategoryButtonSection(
     categoryList: List<Category>,
-    currentCategory: CategoryType,
-    onClick: (CategoryType) -> Unit
+    currentCategory: Category,
+    onClick: (Category) -> Unit
 ) {
     Row {
         categoryList.forEach { item ->
-            val selected = (currentCategory == item.type)
+            val selected = (currentCategory == item)
 
             CategoryButtonItem(
                 category = item,
@@ -170,11 +170,11 @@ fun CategoryButtonSection(
 fun CategoryButtonItem(
     category: Category,
     selected: Boolean,
-    onClick: (CategoryType) -> Unit
+    onClick: (Category) -> Unit
 ) {
     Box(
         modifier = Modifier
-            .clickable { onClick(category.type) }
+            .clickable { onClick(category) }
             .height(34.dp)
             .background(color = HambugTheme.colors.bgWhite)
             .border(
@@ -216,15 +216,33 @@ fun WriteTitleSection(
 
 @Composable
 fun WriteContentSection(
+    placeholder: String,
     postContent: String,
     postWriteViewModel: PostWriteViewModel
 ) {
     RequiredFieldTitle(title = "내용")
     Spacer(modifier = Modifier.height(12.dp))
-    CustomContentTextField(
-        value = postContent,
-        onValueChange = { newContent -> postWriteViewModel.updatePostContent(newContent)}
-    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(220.dp)
+            .background(color = HambugTheme.colors.bgLighter, shape = RoundedCornerShape(6.dp))
+            .border(width = 1.dp, color = HambugTheme.colors.borderDefault, shape = RoundedCornerShape(6.dp))
+            .padding(12.dp),
+    ) {
+        // 플레이스홀더
+        if (postContent.isEmpty()) {
+            Text(
+                text = placeholder,
+                style = HambugTheme.typography.body03,
+                color = HambugTheme.colors.borderDefault
+            )
+        }
+        CustomContentTextField(
+            value = postContent,
+            onValueChange = { newContent -> postWriteViewModel.updatePostContent(newContent)}
+        )
+    }
 }
 
 @Composable

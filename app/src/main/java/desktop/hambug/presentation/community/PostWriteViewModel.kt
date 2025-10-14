@@ -13,14 +13,14 @@ import javax.inject.Inject
 class PostWriteViewModel @Inject constructor() : ViewModel() {
 
     val categoryList = listOf(
-        Category(1, "자유잡담", CategoryType.FREE_TALK),
-        Category(2, "프랜차이즈", CategoryType.FRANCHISE),
-        Category(3, "수제버거", CategoryType.HANDMADE),
-        Category(4, "맛집추천", CategoryType.RECOMMENDATION)
+        Category(1, "자유잡담", "자유롭게 이야기를 나눠보세요", CategoryType.FREE_TALK),
+        Category(2, "프랜차이즈", "프랜차이즈 햄버거 경험을 공유해주세요", CategoryType.FRANCHISE),
+        Category(3, "수제버거", "수제버거 경험을 공유해주세요", CategoryType.HANDMADE),
+        Category(4, "맛집추천", "햄버거 맛집 정보를 추천해주세요", CategoryType.RECOMMENDATION)
     )
 
-    private val _currentCategory = MutableStateFlow(CategoryType.FREE_TALK)
-    val currentCategory: StateFlow<CategoryType> = _currentCategory.asStateFlow()
+    private val _currentCategory = MutableStateFlow(categoryList[0])
+    val currentCategory: StateFlow<Category> = _currentCategory.asStateFlow()
 
     // 게시물 제목 상태
     private val _postTitle = MutableStateFlow("")
@@ -32,8 +32,8 @@ class PostWriteViewModel @Inject constructor() : ViewModel() {
     /**
      * 카테고리 설정
      */
-    fun setCategory(categoryType: CategoryType) {
-        _currentCategory.value = categoryType
+    fun setCategory(category: Category) {
+        _currentCategory.value = category
     }
 
     /**
