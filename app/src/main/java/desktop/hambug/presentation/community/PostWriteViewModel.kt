@@ -22,7 +22,31 @@ class PostWriteViewModel @Inject constructor() : ViewModel() {
     private val _currentCategory = MutableStateFlow(CategoryType.FREE_TALK)
     val currentCategory: StateFlow<CategoryType> = _currentCategory.asStateFlow()
 
+    // 게시물 제목 상태
+    private val _postTitle = MutableStateFlow("")
+    val postTitle: StateFlow<String> = _postTitle.asStateFlow()
+    // 게시물 내용 상태
+    private val _postContent = MutableStateFlow("")
+    val postContent: StateFlow<String> = _postContent.asStateFlow()
+
+    /**
+     * 카테고리 설정
+     */
     fun setCategory(categoryType: CategoryType) {
         _currentCategory.value = categoryType
+    }
+
+    /**
+     * 제목 업데이트
+     */
+    fun updatePostTitle(newTitle: String) {
+        _postTitle.value = newTitle
+    }
+
+    /**
+     * 내용 업데이트
+     */
+    fun updatePostContent(newContent: String) {
+        _postContent.value = newContent
     }
 }
