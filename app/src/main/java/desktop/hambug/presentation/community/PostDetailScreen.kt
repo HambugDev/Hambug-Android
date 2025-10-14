@@ -15,10 +15,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +32,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import desktop.hambug.R
+import desktop.hambug.presentation.community.component.DetailMyBottomSheet
+import desktop.hambug.presentation.community.component.DetailOtherBottomSheet
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
 import desktop.hambug.presentation.ui.icon.appicons.CommentDetail
@@ -33,8 +41,13 @@ import desktop.hambug.presentation.ui.icon.appicons.Dots
 import desktop.hambug.presentation.ui.icon.appicons.HeartBorder
 import desktop.hambug.presentation.ui.theme.HambugTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostDetailScreen() {
+
+    var showPostBottomSheet by remember { mutableStateOf(false) }
+    var showCommentBottomSheet by remember { mutableStateOf(false) }
+
     Surface (
         modifier = Modifier.fillMaxSize(),
         color = HambugTheme.colors.bgWhite
@@ -78,6 +91,7 @@ fun PostDetailScreen() {
                 }
 
                 Icon(
+                    modifier = Modifier.clickable { showPostBottomSheet = true },
                     imageVector = AppIcons.Dots,
                     contentDescription = null,
                     tint = Color.Unspecified
@@ -203,6 +217,7 @@ fun PostDetailScreen() {
                             color = HambugTheme.colors.textHeadline
                         )
                         Icon(
+                            modifier = Modifier.clickable { showCommentBottomSheet = true },
                             imageVector = AppIcons.Dots,
                             contentDescription = null,
                             tint = Color.Unspecified
@@ -224,6 +239,42 @@ fun PostDetailScreen() {
                     )
                 }
             }
+        }
+    }
+
+    // 게시물 바텀시트
+    if (showPostBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showPostBottomSheet = false },
+            dragHandle = null,
+            containerColor = HambugTheme.colors.bgWhite,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        ) {
+            // 자신의 게시물
+            DetailMyBottomSheet(
+                onEdit = {},
+                onDelete = {},
+                onCancel = { showPostBottomSheet = false }
+            )
+            // 타인의 게시물
+        }
+    }
+
+    // 댓글 바텀시트
+    if (showCommentBottomSheet) {
+        // 자신의 댓글
+
+        // 타인의 댓글
+        ModalBottomSheet(
+            onDismissRequest = { showCommentBottomSheet = false },
+            dragHandle = null,
+            containerColor = HambugTheme.colors.bgWhite,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        ) {
+            DetailOtherBottomSheet(
+                onReport = {},
+                onCancel = { showCommentBottomSheet = false }
+            )
         }
     }
 }
