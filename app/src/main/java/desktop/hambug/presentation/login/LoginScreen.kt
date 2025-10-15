@@ -19,10 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import desktop.hambug.R
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Apple
@@ -32,7 +34,11 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.ui.theme.KakaoYellow
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    loginViewModel: LoginViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -44,7 +50,11 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(148.dp))
             LoginHeaderSection()
             Spacer(modifier = Modifier.height(100.dp))
-            LoginButtonSection()
+            LoginButtonSection(
+                onClickKakao = {
+                    loginViewModel.startKakaoLogin(context)
+                }
+            )
         }
     }
 }
@@ -104,7 +114,9 @@ private fun LoginLogoImage() {
 }
 
 @Composable
-private fun LoginButtonSection() {
+private fun LoginButtonSection(
+    onClickKakao: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -115,7 +127,9 @@ private fun LoginButtonSection() {
             color = HambugTheme.colors.borderDefault
         )
         Spacer(modifier = Modifier.height(14.dp))
-        KakaoButton(onClick = {})
+        KakaoButton(
+            onClick = { onClickKakao() }
+        )
         Spacer(modifier = Modifier.height(10.dp))
         AppleButton(onClick = {})
     }

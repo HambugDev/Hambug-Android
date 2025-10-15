@@ -18,10 +18,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.presentation.community.CommunityScreen
-import desktop.hambug.presentation.community.PostWriteScreen
 import desktop.hambug.presentation.ui.component.HambugBottomNav
 import desktop.hambug.presentation.ui.component.SplashScreen
 import desktop.hambug.presentation.home.HomeScreen
+import desktop.hambug.presentation.login.LoginScreen
 import desktop.hambug.presentation.my.MypageScreen
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.delay
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                     SplashScreen()
                 } else {
 //                    HambugApp()
-                    PostWriteScreen()
+                    LoginScreen()
                 }
             }
         }
