@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -21,6 +23,16 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Properties 객체 생성
+        val properties = Properties()
+        // local.properties 파일 읽어서 Properties 객체에 로드
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        // Properties에서 값 가져옴
+        val kakaoNativeAppKey = properties.getProperty("kakao.native.app.key") ?: ""
+
+        // BuildConfig.KAKAO_NATIVE_APP_KEY = "실제키값" 형태로 생성됨
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNativeAppKey\"")
     }
 
     buildTypes {
@@ -41,6 +53,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -81,6 +94,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     // okhttp (logging interceptor)
     implementation(libs.okhttp.logging)
+    // kakao
+    implementation(libs.kakao.sdk)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
