@@ -33,6 +33,9 @@ android {
 
         // BuildConfig.KAKAO_NATIVE_APP_KEY = "실제키값" 형태로 생성됨
         buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$kakaoNativeAppKey\"")
+
+        // AndroidManifest.xml에 전달할 플레이스홀더 정의
+        manifestPlaceholders["kakaoNativeAppKey"] = kakaoNativeAppKey
     }
 
     buildTypes {
