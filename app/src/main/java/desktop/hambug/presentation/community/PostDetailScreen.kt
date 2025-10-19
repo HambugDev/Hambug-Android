@@ -32,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import desktop.hambug.R
 import desktop.hambug.presentation.community.component.DetailMyBottomSheet
 import desktop.hambug.presentation.community.component.DetailOtherBottomSheet
@@ -44,7 +45,7 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostDetailScreen() {
+fun PostDetailScreen(navController: NavHostController) {
 
     var showPostBottomSheet by remember { mutableStateOf(false) }
     var showCommentBottomSheet by remember { mutableStateOf(false) }
@@ -61,7 +62,7 @@ fun PostDetailScreen() {
 
             // 상단 프로필 영역
             PostDetailProfileSection(
-                onClickBack = {},
+                onClickBack = { navController.popBackStack() },
                 onClickMore = { showPostBottomSheet = true }
             )
 
@@ -310,6 +311,6 @@ fun PostDetailIconSection() {
 @Composable
 fun PostDetailScreenPreview() {
     HambugTheme {
-        PostDetailScreen()
+//        PostDetailScreen()
     }
 }

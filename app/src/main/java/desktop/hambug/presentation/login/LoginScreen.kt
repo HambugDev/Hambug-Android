@@ -25,6 +25,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import desktop.hambug.R
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Apple
@@ -35,6 +36,7 @@ import desktop.hambug.presentation.ui.theme.KakaoYellow
 
 @Composable
 fun LoginScreen(
+    navController: NavHostController,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -52,7 +54,11 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(100.dp))
             LoginButtonSection(
                 onClickKakao = {
-                    loginViewModel.startKakaoLogin(context)
+//                    loginViewModel.startKakaoLogin(context)
+                    navController.navigate("home")
+                },
+                onClickApple = {
+                    navController.navigate("home")
                 }
             )
         }
@@ -115,7 +121,8 @@ private fun LoginLogoImage() {
 
 @Composable
 private fun LoginButtonSection(
-    onClickKakao: () -> Unit
+    onClickKakao: () -> Unit,
+    onClickApple: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -131,7 +138,9 @@ private fun LoginButtonSection(
             onClick = { onClickKakao() }
         )
         Spacer(modifier = Modifier.height(10.dp))
-        AppleButton(onClick = {})
+        AppleButton(
+            onClick = { onClickApple() }
+        )
     }
 }
 

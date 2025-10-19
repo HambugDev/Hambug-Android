@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import desktop.hambug.R
 import desktop.hambug.presentation.my.component.UserRemoveDialog
 import desktop.hambug.presentation.my.component.UserRemoveSuccessDialog
@@ -51,7 +52,7 @@ import desktop.hambug.presentation.ui.theme.RemoveRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MypageScreen() {
+fun MypageScreen(navController: NavHostController) {
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var showUserRemoveDialog by remember { mutableStateOf(false) }
@@ -90,6 +91,7 @@ fun MypageScreen() {
 
             // 메뉴 선택 영역
             MypageMenuSection(
+                onActivityClick = { navController.navigate("my_activity") },
                 onUserRemove = { showUserRemoveSuccessDialog = true }
             )
         }
@@ -188,6 +190,7 @@ fun MypageProfileImage() {
 
 @Composable
 fun MypageMenuSection(
+    onActivityClick: () -> Unit,
     onUserRemove: () -> Unit
 ) {
     Column(
@@ -198,7 +201,7 @@ fun MypageMenuSection(
         MypageMenuButton(
             menuIcon = AppIcons.Activity,
             menuText = "활동 내역",
-            onClick = {},
+            onClick = { onActivityClick() },
             modifier = Modifier
                 .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(12.dp))
                 .padding(20.dp)
@@ -344,6 +347,6 @@ fun MypageBottomSheetButton(
 @Composable
 fun MypageScreenPreview() {
     HambugTheme {
-        MypageScreen()
+//        MypageScreen()
     }
 }

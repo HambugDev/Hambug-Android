@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import desktop.hambug.presentation.community.component.PostListItem
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
@@ -39,7 +40,7 @@ import desktop.hambug.presentation.ui.icon.appicons.CommentBorder
 import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @Composable
-fun MyActivityScreen() {
+fun MyActivityScreen(navController: NavHostController) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = HambugTheme.colors.bgNormal
@@ -50,7 +51,7 @@ fun MyActivityScreen() {
             Spacer(Modifier.height(16.dp))
 
             MyActivityHeaderSection(
-                onClick = {}
+                onClick = { navController.popBackStack() }
             )
 
             Spacer(Modifier.height(8.dp))
@@ -233,6 +234,6 @@ fun MyActivityCommentItem() {
 @Composable
 fun MyActivityScreenPreview() {
     HambugTheme {
-        MyActivityScreen()
+//        MyActivityScreen()
     }
 }

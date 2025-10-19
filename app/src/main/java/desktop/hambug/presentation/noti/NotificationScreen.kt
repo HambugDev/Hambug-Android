@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import desktop.hambug.R
 import desktop.hambug.presentation.noti.component.NotiItem
 import desktop.hambug.presentation.ui.icon.AppIcons
@@ -31,7 +32,7 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen() {
+fun NotificationScreen(navController: NavHostController) {
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -46,7 +47,7 @@ fun NotificationScreen() {
                 navigationIcon = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.popBackStack() }
                             .padding(16.dp),
                         imageVector = AppIcons.Back,
                         contentDescription = null,
@@ -112,6 +113,6 @@ fun NotificationScreen() {
 @Composable
 fun NotificationScreenPreview() {
     HambugTheme {
-        NotificationScreen()
+//        NotificationScreen()
     }
 }

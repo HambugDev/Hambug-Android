@@ -18,11 +18,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.presentation.community.CommunityScreen
+import desktop.hambug.presentation.community.PostDetailScreen
 import desktop.hambug.presentation.ui.component.HambugBottomNav
 import desktop.hambug.presentation.ui.component.SplashScreen
 import desktop.hambug.presentation.home.HomeScreen
 import desktop.hambug.presentation.login.LoginScreen
+import desktop.hambug.presentation.my.MyActivityScreen
 import desktop.hambug.presentation.my.MypageScreen
+import desktop.hambug.presentation.noti.NotificationScreen
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -47,8 +50,7 @@ class MainActivity : ComponentActivity() {
                 if (isLoading) {
                     SplashScreen()
                 } else {
-//                    HambugApp()
-                    LoginScreen()
+                    HambugApp()
                 }
             }
         }
@@ -61,31 +63,50 @@ fun HambugApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
+    val showBottomBar = when (currentRoute) {
+        "login", "bell", "community_detail", "my_activity" -> false
+        else -> true
+    }
+
     Scaffold(
         bottomBar = {
-            HambugBottomNav(
-                currentRoute = currentRoute,
-                onNavItemClick = { route ->
-                    if (navController.currentDestination?.route != route) {
-                        navController.navigate(route)
+            if (showBottomBar) {
+                HambugBottomNav(
+                    currentRoute = currentRoute,
+                    onNavItemClick = { route ->
+                        if (navController.currentDestination?.route != route) {
+                            navController.navigate(route)
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "home",
+            startDestination = "login",
             modifier = Modifier.padding(innerPadding),
         ) {
             composable("home") {
-                HomeScreen()
+                HomeScreen(navController = navController)
             }
             composable("community") {
-                CommunityScreen()
+                CommunityScreen(navController = navController)
             }
             composable("my") {
-                MypageScreen()
+                MypageScreen(navController = navController)
+            }
+            composable("login") {
+                LoginScreen(navController = navController)
+            }
+            composable("bell") {
+                NotificationScreen(navController = navController)
+            }
+            composable("community_detail") {
+                PostDetailScreen(navController = navController)
+            }
+            composable("my_activity") {
+                MyActivityScreen(navController = navController)
             }
         }
     }
