@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Bell
 import desktop.hambug.presentation.ui.icon.appicons.Hambug
@@ -31,6 +32,7 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    navController: NavHostController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val albums by viewModel.albums.collectAsStateWithLifecycle()
@@ -70,7 +72,7 @@ fun HomeScreen(
                 actions = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.navigate("bell") }
                             .padding(16.dp),
                         imageVector = AppIcons.Bell,
                         contentDescription = null,
@@ -106,6 +108,6 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     HambugTheme {
-        HomeScreen()
+//        HomeScreen()
     }
 }

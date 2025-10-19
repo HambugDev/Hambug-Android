@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import desktop.hambug.domain.model.Filter
 import desktop.hambug.domain.model.FilterType
 import desktop.hambug.presentation.community.component.FeedViewContent
@@ -41,6 +42,7 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
+    navController: NavHostController,
     communityViewModel: CommunityViewModel = hiltViewModel()
 ) {
     // 필터링 목록 (전체, 자유잡담, 햄버거리뷰, 맛집추천)
@@ -107,13 +109,13 @@ fun CommunityScreen(
                 // 리스트형
                 ListViewContent(
                     scrollState = scrollState,
-                    onClick = {}
+                    onClick = { navController.navigate("community_detail") }
                 )
             } else {
                 // 피드형
                 FeedViewContent(
                     scrollState = scrollState,
-                    onClick = {}
+                    onClick = { navController.navigate("community_detail") }
                 )
             }
         }
@@ -171,6 +173,6 @@ fun FilterButtonItem(
 @Composable
 fun CommunityScreenPreview() {
     HambugTheme {
-        CommunityScreen()
+//        CommunityScreen()
     }
 }
