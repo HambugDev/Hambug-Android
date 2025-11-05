@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import desktop.hambug.domain.model.Category
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
 import desktop.hambug.presentation.ui.component.CustomContentTextField
@@ -45,6 +46,7 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostWriteScreen(
+    navController: NavHostController,
     postWriteViewModel: PostWriteViewModel = hiltViewModel()
 ) {
     // 카테고리 목록 (자유잡담, 프랜차이즈, 수제버거, 맛집추천)
@@ -69,7 +71,7 @@ fun PostWriteScreen(
                 navigationIcon = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.popBackStack() }
                             .padding(16.dp),
                         imageVector = AppIcons.BackDetail,
                         contentDescription = null,
@@ -335,6 +337,6 @@ fun WriteRegisterButton() {
 @Composable
 fun PostWriteScreenPreview() {
     HambugTheme {
-        PostWriteScreen()
+//        PostWriteScreen()
     }
 }

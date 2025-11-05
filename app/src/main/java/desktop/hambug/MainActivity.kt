@@ -1,6 +1,6 @@
 package desktop.hambug
 
-import android.os.Bundle
+import  android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.presentation.community.CommunityScreen
 import desktop.hambug.presentation.community.PostDetailScreen
+import desktop.hambug.presentation.community.PostWriteScreen
 import desktop.hambug.presentation.ui.component.HambugBottomNav
 import desktop.hambug.presentation.ui.component.SplashScreen
 import desktop.hambug.presentation.home.HomeScreen
@@ -64,7 +65,7 @@ fun HambugApp() {
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     val showBottomBar = when (currentRoute) {
-        "login", "bell", "community_detail", "my_activity" -> false
+        "login", "bell", "community_detail", "my_activity", "write" -> false
         else -> true
     }
 
@@ -101,6 +102,9 @@ fun HambugApp() {
             }
             composable("bell") {
                 NotificationScreen(navController = navController)
+            }
+            composable("write") {
+                PostWriteScreen(navController = navController)
             }
             composable("community_detail") {
                 PostDetailScreen(navController = navController)
