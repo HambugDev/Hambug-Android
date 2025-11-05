@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -32,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import desktop.hambug.domain.model.Filter
 import desktop.hambug.domain.model.FilterType
+import desktop.hambug.presentation.community.component.CustomFloatingActionButton
 import desktop.hambug.presentation.community.component.FeedViewContent
 import desktop.hambug.presentation.community.component.ListViewContent
 import desktop.hambug.presentation.ui.icon.AppIcons
@@ -81,6 +80,13 @@ fun CommunityScreen(
                         contentDescription = null,
                         tint = HambugTheme.colors.bgWhite
                     )
+                }
+            )
+        },
+        floatingActionButton = {
+            CustomFloatingActionButton(
+                onClick = {
+                    navController.navigate("write")
                 }
             )
         }
