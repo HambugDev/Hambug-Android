@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -43,7 +44,10 @@ fun HambugBottomNav(
     )
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            // bottomBar가 navigationBar 위에 올라가도록 padding 처리
+            .navigationBarsPadding()
     ) {
         HorizontalDivider(thickness = 1.dp, color = HambugTheme.colors.bgNormal)
 
