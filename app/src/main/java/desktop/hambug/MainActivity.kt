@@ -3,6 +3,8 @@ package desktop.hambug
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -41,6 +43,9 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
+        // 콘텐츠를 화면 끝까지 확장
+        enableEdgeToEdge()
+
         lifecycleScope.launch {
             delay(1500)
             isLoading = false
@@ -70,6 +75,8 @@ fun HambugApp() {
     }
 
     Scaffold(
+        // padding 중복을 막기 위해 모든 Insets 차단
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
                 HambugBottomNav(
@@ -84,9 +91,9 @@ fun HambugApp() {
         }
     ) { innerPadding ->
         NavHost(
-            navController = navController,
-            startDestination = "login",
             modifier = Modifier.padding(innerPadding),
+            navController = navController,
+            startDestination = "login"
         ) {
             composable("home") {
                 HomeScreen(navController = navController)

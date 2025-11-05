@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -58,6 +59,7 @@ fun CommunityScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = Color.White,
         topBar = {
             TopAppBar(
@@ -74,7 +76,7 @@ fun CommunityScreen(
                 actions = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.navigate("bell") }
                             .padding(16.dp),
                         imageVector = AppIcons.BellBorder,
                         contentDescription = null,
