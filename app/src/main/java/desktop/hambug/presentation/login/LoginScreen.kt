@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +42,18 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        loginViewModel.loginEvent.collect { event ->
+            when (event) {
+                LoginEvent.NavigateToHome -> {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
+            }
+        }
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -53,10 +66,7 @@ fun LoginScreen(
             LoginHeaderSection()
             Spacer(modifier = Modifier.height(100.dp))
             LoginButtonSection(
-                onClickKakao = {
-//                    loginViewModel.startKakaoLogin(context)
-                    navController.navigate("home")
-                },
+                onClickKakao = { loginViewModel.onKakaoLogin(context) },
                 onClickApple = {
                     navController.navigate("home")
                 }
