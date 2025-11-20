@@ -99,6 +99,8 @@ dependencies {
     implementation(libs.okhttp.logging)
     // kakao
     implementation(libs.kakao.sdk)
+    // datastore
+    implementation(libs.datastore.preferences)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
