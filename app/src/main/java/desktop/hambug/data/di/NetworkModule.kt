@@ -7,12 +7,14 @@ import dagger.hilt.components.SingletonComponent
 import desktop.hambug.data.api.HambugApi
 import desktop.hambug.data.local.HambugTokenManager
 import desktop.hambug.data.network.AuthInterceptor
+import desktop.hambug.data.network.TokenAuthenticator
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -20,6 +22,14 @@ import javax.inject.Singleton
 object NetworkModule {
 
     private const val BASE_URL = "https://hambug.p-e.kr/api/v1/"
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class RefreshOkHttpClient
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class RefreshRetrofit
 
     @Provides
     @Singleton
@@ -37,15 +47,48 @@ object NetworkModule {
         return AuthInterceptor(tokenManager)
     }
 
+    // Refresh API용 OkHttpClient
+    @Provides
+    @Singleton
+    @RefreshOkHttpClient
+    fun provideRefreshOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    // Refresh API용 Retrofit
+    @Provides
+    @Singleton
+    @RefreshRetrofit
+    fun provideRefreshRetrofit(
+        @RefreshOkHttpClient okHttpClient: OkHttpClient
+    ): Retrofit {
+        val contentType = "application/json".toMediaType()
+        val json = Json { ignoreUnknownKeys = true }
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
+    }
+
     @Provides
     @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        authInterceptor: AuthInterceptor
+        authInterceptor: AuthInterceptor,
+        tokenManager: HambugTokenManager,
+        @RefreshRetrofit refreshRetrofit: Retrofit
     ): OkHttpClient {
+        val tokenAuthenticator = TokenAuthenticator(tokenManager, refreshRetrofit)
+
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
+            .authenticator(tokenAuthenticator)
             .build()
     }
 

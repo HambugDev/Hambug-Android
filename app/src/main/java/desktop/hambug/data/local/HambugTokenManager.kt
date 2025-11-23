@@ -4,6 +4,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -17,6 +20,10 @@ private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
 class HambugTokenManager @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
+    // 로그아웃 이벤트를 외부에 알리기 위해 사용
+    private val _authStatus = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    val authStatus: SharedFlow<Boolean> = _authStatus.asSharedFlow()
+
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
         dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN_KEY] = accessToken
@@ -46,10 +53,14 @@ class HambugTokenManager @Inject constructor(
             }.firstOrNull()
     }
 
-    // access token 삭제
-    suspend fun clearAccessToken() {
+    suspend fun logout() {
+        // 토큰 제거
         dataStore.edit { preferences ->
             preferences.remove(ACCESS_TOKEN_KEY)
+            preferences.remove(REFRESH_TOKEN_KEY)
         }
+
+        // 로그아웃이 필요함을 알림
+        _authStatus.emit(true)
     }
 }
