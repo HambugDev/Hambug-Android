@@ -1,6 +1,7 @@
 package desktop.hambug
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,11 +9,13 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,6 +34,7 @@ import desktop.hambug.presentation.my.MypageScreen
 import desktop.hambug.presentation.noti.NotificationScreen
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -64,10 +68,24 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HambugApp() {
+fun HambugApp(
+    mainViewModel: MainViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
+
+    // 로그아웃 이벤트 구독
+    LaunchedEffect(Unit) {
+        mainViewModel.logoutEvent.collectLatest {
+            Log.d("auth", "로그아웃 이벤트 수신. 로그인 화면으로 이동")
+            navController.navigate("login") {
+                // 스택 모두 제거
+                popUpTo(navController.graph.id) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
 
     val showBottomBar = when (currentRoute) {
         "login", "bell", "community_detail", "my_activity", "write" -> false
