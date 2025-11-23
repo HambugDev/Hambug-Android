@@ -22,6 +22,7 @@ kotlinSerialization = "1.9.0"
 okhttp = "5.0.0"
 kakao = "2.21.7"
 datastore = "1.1.7"
+coroutines = "1.10.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -51,7 +52,9 @@ retrofit-converter-kotlinx-serialization = { module = "com.squareup.retrofit2:co
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 kakao-sdk = { module = "com.kakao.sdk:v2-user", version.ref = "kakao" }
-datastore-preferences = { module = "androidx.datastore:datastore-preferences" , version.ref = "datastore" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

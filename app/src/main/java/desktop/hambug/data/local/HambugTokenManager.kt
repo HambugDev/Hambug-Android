@@ -46,10 +46,10 @@ class HambugTokenManager @Inject constructor(
             }.firstOrNull()
     }
 
-    // access token 삭제
-    suspend fun clearAccessToken() {
+    suspend fun clearTokens() {
         dataStore.edit { preferences ->
             preferences.remove(ACCESS_TOKEN_KEY)
+            preferences.remove(REFRESH_TOKEN_KEY)
         }
     }
 }

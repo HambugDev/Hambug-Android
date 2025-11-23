@@ -101,6 +101,9 @@ dependencies {
     implementation(libs.kakao.sdk)
     // datastore
     implementation(libs.datastore.preferences)
+    // coroutines
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
