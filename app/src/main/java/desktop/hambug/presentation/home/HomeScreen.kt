@@ -16,10 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -27,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -35,8 +38,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import desktop.hambug.R
+import desktop.hambug.domain.model.HomeBurger
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Bell
 import desktop.hambug.presentation.ui.icon.appicons.Comment
@@ -47,8 +54,13 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    homeViewModel: HomeViewModel = hiltViewModel(
+        viewModelStoreOwner = navController.getBackStackEntry("main_graph")
+    )
 ) {
+    val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = HambugTheme.colors.bgNormal,
@@ -74,23 +86,47 @@ fun HomeScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            Spacer(Modifier.height(12.dp))
 
-            // 추천버거 영역
-            RecommendBurgerSection()
+        when (uiState) {
+            is HomeUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(40.dp),
+                        color = HambugTheme.colors.primRed,
+                        strokeWidth = 4.dp
+                    )
+                }
+            }
+            is HomeUiState.Error -> {
 
-            Spacer(Modifier.height(30.dp))
+            }
+            is HomeUiState.Success -> {
+                val data = uiState as HomeUiState.Success
 
-            // 인기글 영역
-            HomePostSection()
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Spacer(Modifier.height(12.dp))
 
-            Spacer(Modifier.height(20.dp))
+                    // 추천버거 영역
+                    RecommendBurgerSection(
+                        burgers = data.burgers
+                    )
+
+                    Spacer(Modifier.height(30.dp))
+
+                    // 인기글 영역
+                    HomePostSection()
+
+                    Spacer(Modifier.height(20.dp))
+                }
+            }
         }
     }
 }
@@ -116,7 +152,9 @@ fun HomeNavigationIcon() {
 }
 
 @Composable
-fun RecommendBurgerSection() {
+fun RecommendBurgerSection(
+    burgers: List<HomeBurger>
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -133,16 +171,19 @@ fun RecommendBurgerSection() {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(count = 3) {
-                // 추천버거 아이템
-                RecommendBurgerItem()
+            items(burgers) { burger ->
+                RecommendBurgerItem(
+                    burger = burger
+                )
             }
         }
     }
 }
 
 @Composable
-fun RecommendBurgerItem() {
+fun RecommendBurgerItem(
+    burger: HomeBurger
+) {
     Column(
         modifier = Modifier
             .width(260.dp)
@@ -150,9 +191,9 @@ fun RecommendBurgerItem() {
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
+        AsyncImage(
             modifier = Modifier.size(180.dp),
-            painter = painterResource(R.drawable.burger),
+            model = burger.imageUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -165,7 +206,7 @@ fun RecommendBurgerItem() {
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
             Text(
-                text = "버거킹",
+                text = burger.franchiseName,
                 style = HambugTheme.typography.body04Prominent,
                 color = HambugTheme.colors.bgWhite
             )
@@ -174,7 +215,7 @@ fun RecommendBurgerItem() {
         Spacer(Modifier.height(8.dp))
 
         Text(
-            text = "베이컨토마토디럭스",
+            text = burger.name,
             style = HambugTheme.typography.title02,
             color = HambugTheme.colors.textHeadline
         )
@@ -182,7 +223,7 @@ fun RecommendBurgerItem() {
         Spacer(Modifier.height(8.dp))
 
         Text(
-            text = "두툼한 비프, 1955소스의 오리지널 풍미",
+            text = burger.description,
             style = HambugTheme.typography.body03,
             color = HambugTheme.colors.textDisabled,
             textAlign = TextAlign.Center

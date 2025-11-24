@@ -14,6 +14,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -22,6 +23,8 @@ import javax.inject.Singleton
 object NetworkModule {
 
     private const val BASE_URL = "https://hambug.p-e.kr/api/v1/"
+
+    private const val MaxTimeoutMillis = 30_000L
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
@@ -55,6 +58,9 @@ object NetworkModule {
         loggingInterceptor: HttpLoggingInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
+            .connectTimeout(MaxTimeoutMillis, TimeUnit.MILLISECONDS)
+            .readTimeout(MaxTimeoutMillis, TimeUnit.MILLISECONDS)
+            .writeTimeout(MaxTimeoutMillis, TimeUnit.MILLISECONDS)
             .addInterceptor(loggingInterceptor)
             .build()
     }
@@ -86,6 +92,9 @@ object NetworkModule {
         val tokenAuthenticator = TokenAuthenticator(tokenManager, refreshRetrofit)
 
         return OkHttpClient.Builder()
+            .connectTimeout(MaxTimeoutMillis, TimeUnit.MILLISECONDS)
+            .readTimeout(MaxTimeoutMillis, TimeUnit.MILLISECONDS)
+            .writeTimeout(MaxTimeoutMillis, TimeUnit.MILLISECONDS)
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
             .authenticator(tokenAuthenticator)
