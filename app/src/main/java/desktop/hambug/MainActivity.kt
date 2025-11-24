@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.presentation.community.CommunityScreen
@@ -113,15 +114,22 @@ fun HambugApp(
             navController = navController,
             startDestination = "login"
         ) {
-            composable("home") {
-                HomeScreen(navController = navController)
+            // 메인 그래프
+            navigation(
+                startDestination = "home",
+                route = "main_graph"
+            ) {
+                composable("home") {
+                    HomeScreen(navController = navController)
+                }
+                composable("community") {
+                    CommunityScreen(navController = navController)
+                }
+                composable("my") {
+                    MypageScreen(navController = navController)
+                }
             }
-            composable("community") {
-                CommunityScreen(navController = navController)
-            }
-            composable("my") {
-                MypageScreen(navController = navController)
-            }
+
             composable("login") {
                 LoginScreen(navController = navController)
             }

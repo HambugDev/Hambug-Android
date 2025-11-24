@@ -104,6 +104,9 @@ dependencies {
     // coroutines
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
+    // coil
+    implementation(libs.coil)
+    implementation(libs.coil.okhttp)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
