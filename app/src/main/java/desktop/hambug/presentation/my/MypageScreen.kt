@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.UserInfo
+import desktop.hambug.presentation.my.component.NicknameUpdateDialog
 import desktop.hambug.presentation.my.component.UserRemoveDialog
 import desktop.hambug.presentation.my.component.UserRemoveSuccessDialog
 import desktop.hambug.presentation.ui.icon.AppIcons
@@ -63,10 +64,12 @@ fun MypageScreen(
     )
 ) {
     val uiState by mypageViewModel.uiState.collectAsStateWithLifecycle()
+    val nicknameState by mypageViewModel.nicknameState.collectAsStateWithLifecycle()
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var showUserRemoveDialog by remember { mutableStateOf(false) }
     var showUserRemoveSuccessDialog by remember { mutableStateOf(false) }
+    var showNicknameUpdateDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = HambugTheme.colors.bgWhite,
@@ -139,9 +142,26 @@ fun MypageScreen(
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             ProfileBottomSheetContent(
+                onNicknameClick = {
+                    showBottomSheet = false
+                    showNicknameUpdateDialog = true
+                },
                 onDismiss = { showBottomSheet = false }
             )
         }
+    }
+
+    // 닉네임 변경 모달
+    if (showNicknameUpdateDialog) {
+        NicknameUpdateDialog(
+            state = nicknameState,
+            onValueChange = { newValue ->
+                mypageViewModel.onNicknameChange(newValue)
+            },
+            onDismiss = { showNicknameUpdateDialog = false },
+            onCancel = { showNicknameUpdateDialog = false },
+            onConfirm = {}
+        )
     }
 
     // 회원탈퇴 확인 모달창
@@ -310,6 +330,7 @@ fun MypageMenuButton(
 
 @Composable
 fun ProfileBottomSheetContent(
+    onNicknameClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Column(
@@ -319,7 +340,7 @@ fun ProfileBottomSheetContent(
     ) {
         MypageBottomSheetButton(
             buttonText = "닉네임 변경",
-            onClick = {},
+            onClick = { onNicknameClick() },
             modifier = Modifier
                 .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                 .padding(16.dp)
