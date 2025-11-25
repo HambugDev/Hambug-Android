@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.usecase.GetUserInfoUseCase
+import desktop.hambug.domain.usecase.UpdateUserNicknameUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MypageViewModel @Inject constructor(
-    private val getUserInfoUseCase: GetUserInfoUseCase
+    private val getUserInfoUseCase: GetUserInfoUseCase,
+    private val updateUserNicknameUseCase: UpdateUserNicknameUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MyUiState>(MyUiState.Loading)
@@ -91,5 +93,42 @@ class MypageViewModel @Inject constructor(
 
         // 모든 조건 통과
         return Pair(true, null)
+    }
+
+    /**
+     * 닉네임 변경
+     */
+    fun updateUserNickname(onSuccess: () -> Unit) {
+
+        val currentUiState = _uiState.value
+        val currentNicknameState = _nicknameState.value
+
+        if (currentUiState is MyUiState.Success) {
+            if (!currentNicknameState.isValid || currentNicknameState.isSaving) {
+                return
+            }
+
+            // 저장 시작
+            _nicknameState.update { it.copy(isSaving = true) }
+
+            val userId = currentUiState.userInfo.userId
+            val newNickname = currentNicknameState.currentNickname
+
+            viewModelScope.launch {
+                updateUserNicknameUseCase(userId = userId, nickname = newNickname)
+                    .onSuccess { userInfo ->
+                        Log.d("my", "updateUserNickname 성공")
+                        _uiState.value = MyUiState.Success(userInfo)
+                        onSuccess()
+                    }
+                    .onFailure { exception ->
+                        Log.e("my", "updateUserNickname 실패: ${exception.message}", exception)
+                        val exceptionMessage = exception.message ?: "updateUserNickname 오류 발생"
+                        _uiState.value = MyUiState.Error(exceptionMessage)
+                    }
+
+                _nicknameState.update { it.copy(isSaving = false) }
+            }
+        }
     }
 }

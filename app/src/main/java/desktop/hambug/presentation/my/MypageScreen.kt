@@ -160,7 +160,11 @@ fun MypageScreen(
             },
             onDismiss = { showNicknameUpdateDialog = false },
             onCancel = { showNicknameUpdateDialog = false },
-            onConfirm = {}
+            onConfirm = {
+                mypageViewModel.updateUserNickname(
+                    onSuccess = { showNicknameUpdateDialog = false }
+                )
+            }
         )
     }
 
