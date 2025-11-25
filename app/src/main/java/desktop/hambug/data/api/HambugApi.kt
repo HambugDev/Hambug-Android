@@ -3,6 +3,7 @@ package desktop.hambug.data.api
 import desktop.hambug.data.dto.HomeBurgerResponse
 import desktop.hambug.data.dto.LoginRequest
 import desktop.hambug.data.dto.LoginResponse
+import desktop.hambug.data.dto.UserInfoResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -18,4 +19,8 @@ interface HambugApi {
     // 오늘의 추천 햄버거 조회
     @GET("burgers/recommended")
     suspend fun getHomeBurgers(): HomeBurgerResponse
+
+    // JWT 토큰으로 내 정보 조회
+    @GET("auth/me")
+    suspend fun getUserInfo(): UserInfoResponse
 }
