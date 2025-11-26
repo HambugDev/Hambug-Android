@@ -1,5 +1,9 @@
 package desktop.hambug.presentation.my
 
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,6 +69,7 @@ fun MypageScreen(
         viewModelStoreOwner = navController.getBackStackEntry("main_graph")
     )
 ) {
+    val context = LocalContext.current
     val uiState by mypageViewModel.uiState.collectAsStateWithLifecycle()
     val nicknameState by mypageViewModel.nicknameState.collectAsStateWithLifecycle()
 
@@ -70,6 +77,34 @@ fun MypageScreen(
     var showUserRemoveDialog by remember { mutableStateOf(false) }
     var showUserRemoveSuccessDialog by remember { mutableStateOf(false) }
     var showNicknameUpdateDialog by remember { mutableStateOf(false) }
+
+    // Photo Picker 런처 등록
+    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        // Uri 결과 전달
+        mypageViewModel.onImageSelected(uri)
+
+        // Uri 접근권한 지속적으로 요청
+        if (uri != null) {
+            val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, flags)
+        }
+    }
+
+    // Photo Picker 실행 요청
+    LaunchedEffect(Unit) {
+        mypageViewModel.mypageEvent.collect { event ->
+            when (event) {
+                is MypageEvent.LaunchPhotoPicker -> {
+                    // Photo Picker 실행
+                    singlePhotoPickerLauncher.launch(
+                        input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }
+            }
+        }
+    }
 
     Scaffold(
         containerColor = HambugTheme.colors.bgWhite,
@@ -133,7 +168,7 @@ fun MypageScreen(
         }
     }
 
-    // 프로필(이미지, 닉네임) 클릭 시 바텀시트 표시
+    // 프로필 클릭 시 바텀시트 표시 (닉네임, 프로필 이미지, 기본 이미지)
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = { showBottomSheet = false },
@@ -145,6 +180,10 @@ fun MypageScreen(
                 onNicknameClick = {
                     showBottomSheet = false
                     showNicknameUpdateDialog = true
+                },
+                onProfileImageClick = {
+                    showBottomSheet = false
+                    mypageViewModel.onProfileImageClicked()
                 },
                 onDismiss = { showBottomSheet = false }
             )
@@ -335,6 +374,7 @@ fun MypageMenuButton(
 @Composable
 fun ProfileBottomSheetContent(
     onNicknameClick: () -> Unit,
+    onProfileImageClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Column(
@@ -354,7 +394,7 @@ fun ProfileBottomSheetContent(
 
         MypageBottomSheetButton(
             buttonText = "프로필 이미지 변경",
-            onClick = {},
+            onClick = { onProfileImageClick() },
             modifier = Modifier
                 .background(color = HambugTheme.colors.bgNormal)
                 .padding(16.dp)

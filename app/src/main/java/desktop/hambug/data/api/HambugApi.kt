@@ -5,11 +5,15 @@ import desktop.hambug.data.dto.LoginRequest
 import desktop.hambug.data.dto.LoginResponse
 import desktop.hambug.data.dto.NicknameUpdateRequest
 import desktop.hambug.data.dto.NicknameUpdateResponse
+import desktop.hambug.data.dto.ProfileImageUpdateResponse
 import desktop.hambug.data.dto.UserInfoResponse
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface HambugApi {
@@ -32,4 +36,11 @@ interface HambugApi {
         @Path("id") id: Int,
         @Body request: NicknameUpdateRequest
     ): NicknameUpdateResponse
+    // 프로필 이미지 변경
+    @Multipart
+    @PUT("users/{id}/profile")
+    suspend fun putUserProfileImage(
+        @Path("id") id: Int,
+        @Part file: MultipartBody.Part
+    ): ProfileImageUpdateResponse
 }
