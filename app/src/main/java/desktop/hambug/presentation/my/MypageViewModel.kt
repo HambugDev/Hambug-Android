@@ -91,7 +91,7 @@ class MypageViewModel @Inject constructor(
     private fun validateNickname(nickname: String): Pair<Boolean, String?> {
 
         // 빈 문자열인 경우
-        if (nickname.isEmpty()) {
+        if (nickname.isBlank()) {
             return Pair(false, null)
         }
 
@@ -118,7 +118,7 @@ class MypageViewModel @Inject constructor(
         val currentNicknameState = _nicknameState.value
 
         if (currentUiState is MyUiState.Success) {
-            if (!currentNicknameState.isValid || currentNicknameState.isSaving) {
+            if (!currentNicknameState.isValid || currentNicknameState.isSaving || currentNicknameState.currentNickname.isEmpty()) {
                 return
             }
 

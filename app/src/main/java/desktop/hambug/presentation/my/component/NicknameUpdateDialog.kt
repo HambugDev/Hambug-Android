@@ -87,7 +87,8 @@ fun NicknameUpdateDialog(
                             modifier = Modifier.fillMaxWidth(),
                             value = state.currentNickname,
                             onValueChange = { newValue ->
-                                onValueChange(newValue)
+                                val filteredValue = newValue.replace(" ", "")
+                                onValueChange(filteredValue)
                             },
                             textStyle = HambugTheme.typography.body02Prominent.copy(
                                 color = HambugTheme.colors.textDisabled,
