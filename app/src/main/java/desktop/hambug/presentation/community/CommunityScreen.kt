@@ -3,6 +3,7 @@ package desktop.hambug.presentation.community
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -101,12 +102,15 @@ fun CommunityScreen(
         }
     ) { paddingValues ->
 
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .background(color = HambugTheme.colors.bgNormal)
         ) {
+            // paddingValues 적용 후의 사용 가능 높이
+            val availableHeight = maxHeight
+
             // 필터 영역
             Box(
                 modifier = Modifier
@@ -125,8 +129,9 @@ fun CommunityScreen(
             // 콘텐츠 영역
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(horizontal = 20.dp)
+                    .fillMaxWidth()
+                    .height(availableHeight - 46.dp)
                     .offset(y = 46.dp)
                     .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp))
             ) {
