@@ -7,6 +7,8 @@ import desktop.hambug.data.dto.NicknameUpdateRequest
 import desktop.hambug.data.dto.NicknameUpdateResponse
 import desktop.hambug.data.dto.ProfileImageUpdateResponse
 import desktop.hambug.data.dto.UserInfoResponse
+import desktop.hambug.data.dto.community.BoardsResponse
+import desktop.hambug.data.dto.community.CategoryBoardsResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -15,6 +17,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface HambugApi {
     @POST("auth/login/{provider}")
@@ -26,6 +29,15 @@ interface HambugApi {
     // 오늘의 추천 햄버거 조회
     @GET("burgers/recommended")
     suspend fun getHomeBurgers(): HomeBurgerResponse
+
+    // 게시물 전체 조회
+    @GET("boards")
+    suspend fun getBoards(): BoardsResponse
+    // 카테고리별 게시물 조회
+    @GET("boards/category")
+    suspend fun getCategoryBoards(
+        @Query("category") category: String
+    ): CategoryBoardsResponse
 
     // JWT 토큰으로 내 정보 조회
     @GET("auth/me")

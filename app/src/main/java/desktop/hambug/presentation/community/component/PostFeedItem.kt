@@ -1,6 +1,5 @@
 package desktop.hambug.presentation.community.component
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,10 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import desktop.hambug.R
+import coil3.compose.AsyncImage
+import desktop.hambug.domain.model.Board
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Comment
 import desktop.hambug.presentation.ui.icon.appicons.Heart
@@ -29,6 +28,7 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @Composable
 fun PostFeedItem(
+    board: Board,
     onClick: () -> Unit
 ) {
     Column(
@@ -37,17 +37,19 @@ fun PostFeedItem(
             .fillMaxWidth()
             .padding(horizontal = 20.dp),
     ) {
-        Image(
-            painter = painterResource(R.drawable.hambuger),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(192.dp)
-                .clip(RoundedCornerShape(6.dp))
-        )
+        if (board.imageUrl != null) {
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(192.dp)
+                    .clip(RoundedCornerShape(6.dp)),
+                model = board.imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
 
-        Spacer(Modifier.height(8.dp))
+            )
+            Spacer(Modifier.height(8.dp))
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -55,7 +57,7 @@ fun PostFeedItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "맘스터치 싸이버거는 언제나 옳다! 겉바속촉 치킨 패티에 중독성 강한 소스가 대박!",
+                text = board.title,
                 modifier = Modifier.weight(1f),
                 style = HambugTheme.typography.body02Prominent,
                 color = HambugTheme.colors.textBody,
@@ -76,7 +78,7 @@ fun PostFeedItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "패티포터",
+                text = board.authorNickname,
                 style = HambugTheme.typography.label02,
                 color = HambugTheme.colors.textBody
             )
@@ -93,7 +95,7 @@ fun PostFeedItem(
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "11",
+                    text = board.likeCount.toString(),
                     style = HambugTheme.typography.label02,
                     color = HambugTheme.colors.textDisabled
                 )
@@ -121,7 +123,7 @@ fun PostFeedItem(
         Spacer(Modifier.height(8.dp))
 
         Text(
-            text = "오늘 점심으로 맘스터치 싸이버거를 먹었는데, 역시 기대를 저버리지 않았어요. 일단 패티가 정말 두툼하고 겉은 바삭, 속은 촉촉해서 식감이 일품이에요. 특히 매콤달콤한 소스가 중독성이 강해서 먹는 내내 행복했어요. 신선한 양상추와 부드러운 빵까지 완벽한 조합이었습니다",
+            text = board.content,
             style = HambugTheme.typography.label02,
             color = HambugTheme.colors.textDisabled,
             maxLines = 3,

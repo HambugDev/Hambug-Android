@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -43,8 +46,12 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 @Composable
 fun CommunityScreen(
     navController: NavHostController,
-    communityViewModel: CommunityViewModel = hiltViewModel()
+    communityViewModel: CommunityViewModel = hiltViewModel(
+        viewModelStoreOwner = navController.getBackStackEntry("main_graph")
+    )
 ) {
+    val uiState by communityViewModel.currentUiState.collectAsStateWithLifecycle()
+
     // 필터링 목록 (전체, 자유잡담, 햄버거리뷰, 맛집추천)
     val filterList = communityViewModel.filterList
     // 리스트형 여부 (리스트형 or 피드형)
@@ -93,12 +100,14 @@ fun CommunityScreen(
             )
         }
     ) { paddingValues ->
+
         Box(
             modifier = Modifier
-                .padding(paddingValues)
                 .fillMaxSize()
+                .padding(paddingValues)
                 .background(color = HambugTheme.colors.bgNormal)
         ) {
+            // 필터 영역
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -113,18 +122,48 @@ fun CommunityScreen(
                 )
             }
 
-            if (isListView) {
-                // 리스트형
-                ListViewContent(
-                    scrollState = scrollState,
-                    onClick = { navController.navigate("community_detail") }
-                )
-            } else {
-                // 피드형
-                FeedViewContent(
-                    scrollState = scrollState,
-                    onClick = { navController.navigate("community_detail") }
-                )
+            // 콘텐츠 영역
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp)
+                    .offset(y = 46.dp)
+                    .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp))
+            ) {
+                when (uiState) {
+                    is CommunityUiState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(40.dp),
+                                color = HambugTheme.colors.primRed,
+                                strokeWidth = 4.dp
+                            )
+                        }
+                    }
+                    is CommunityUiState.Error -> {}
+                    is CommunityUiState.Success -> {
+                        val data = uiState as CommunityUiState.Success
+
+                        if (isListView) {
+                            // 리스트형
+                            ListViewContent(
+                                boards = data.boards,
+                                scrollState = scrollState,
+                                onClick = { navController.navigate("community_detail") }
+                            )
+                        } else {
+                            // 피드형
+                            FeedViewContent(
+                                boards = data.boards,
+                                scrollState = scrollState,
+                                onClick = { navController.navigate("community_detail") }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
