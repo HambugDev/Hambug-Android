@@ -27,6 +27,8 @@ data class BoardDetailData(
     val imageUrls: List<String>,
     @SerialName("authorNickname")
     val authorNickname: String,
+    @SerialName("authorProfileImageUrl")
+    val authorProfileImageUrl: String,
     @SerialName("authorId")
     val authorId: Int,
     @SerialName("createdAt")
@@ -37,6 +39,8 @@ data class BoardDetailData(
     val viewCount: Int,
     @SerialName("likeCount")
     val likeCount: Int,
+    @SerialName("commentCount")
+    val commentCount: Int,
     @SerialName("isLiked")
     val isLiked: Boolean
 )

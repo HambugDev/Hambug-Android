@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -95,8 +96,9 @@ fun BoardDetailScreen(
                     Spacer(modifier = Modifier.height(20.dp))
 
                     // 상단 프로필 영역
-                    PostDetailProfileSection(
+                    BoardDetailProfileSection(
                         authorNickname = data.board.authorNickname,
+                        authorProfileImageUrl = data.board.authorProfileImageUrl,
                         onClickBack = { navController.popBackStack() },
                         onClickMore = { showPostBottomSheet = true }
                     )
@@ -104,7 +106,7 @@ fun BoardDetailScreen(
                     Spacer(modifier = Modifier.height(20.dp))
 
                     // 제목 + 시간 + 내용 영역
-                    PostDetailTextSection(
+                    BoardDetailTextSection(
                         title = data.board.title,
                         content = data.board.content
                     )
@@ -113,7 +115,7 @@ fun BoardDetailScreen(
 
                     if (data.board.imageUrls != null) {
                         // 게시물 이미지 영역
-                        PostDetailImageSection(
+                        BoardDetailImageSection(
                             imageUrls = data.board.imageUrls
                         )
                         Spacer(modifier = Modifier.height(20.dp))
@@ -122,7 +124,10 @@ fun BoardDetailScreen(
                     }
 
                     // 아이콘 영역
-                    PostDetailIconSection()
+                    BoardDetailIconSection(
+                        likeCount = data.board.likeCount,
+                        commentCount = data.board.commentCount
+                    )
 
                     Spacer(modifier = Modifier.height(36.dp))
 
@@ -216,8 +221,9 @@ fun BoardDetailScreen(
 }
 
 @Composable
-fun PostDetailProfileSection(
+fun BoardDetailProfileSection(
     authorNickname: String,
+    authorProfileImageUrl: String,
     onClickBack: () -> Unit,
     onClickMore: () -> Unit
 ) {
@@ -239,10 +245,13 @@ fun PostDetailProfileSection(
                 contentDescription = null,
                 tint = HambugTheme.colors.iconDefault
             )
-            Image(
-                modifier = Modifier.size(35.dp),
-                painter = painterResource(id = R.drawable.logo_profile),
-                contentDescription = null
+            AsyncImage(
+                modifier = Modifier
+                    .size(35.dp)
+                    .clip(CircleShape),
+                model = authorProfileImageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -262,7 +271,7 @@ fun PostDetailProfileSection(
 }
 
 @Composable
-fun PostDetailTextSection(
+fun BoardDetailTextSection(
     title: String,
     content: String
 ) {
@@ -296,7 +305,7 @@ fun PostDetailTextSection(
 }
 
 @Composable
-fun PostDetailImageSection(
+fun BoardDetailImageSection(
     imageUrls: List<String>
 ) {
     if (imageUrls.size == 1) {
@@ -333,7 +342,10 @@ fun PostDetailImageSection(
 }
 
 @Composable
-fun PostDetailIconSection() {
+fun BoardDetailIconSection(
+    likeCount: Int,
+    commentCount: Int
+) {
     Row(
         modifier = Modifier.padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -348,7 +360,7 @@ fun PostDetailIconSection() {
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "11",
+                text = likeCount.toString(),
                 style = HambugTheme.typography.body01,
                 color = HambugTheme.colors.textDisabled
             )
@@ -366,7 +378,7 @@ fun PostDetailIconSection() {
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "6",
+                text = commentCount.toString(),
                 style = HambugTheme.typography.body01,
                 color = HambugTheme.colors.textDisabled
             )
@@ -376,8 +388,8 @@ fun PostDetailIconSection() {
 
 @Preview
 @Composable
-fun PostDetailScreenPreview() {
+fun BoardDetailScreenPreview() {
     HambugTheme {
-//        PostDetailScreen()
+//        BoardDetailScreen()
     }
 }

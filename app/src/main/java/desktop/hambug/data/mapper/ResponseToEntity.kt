@@ -46,7 +46,9 @@ fun BoardDetailData.toEntity(): BoardDetail {
         content = this.content,
         imageUrls = if (this.imageUrls.isEmpty()) null else this.imageUrls,
         authorNickname = this.authorNickname,
+        authorProfileImageUrl = this.authorProfileImageUrl,
         createdAt = this.createdAt,
-        likeCount = this.likeCount
+        likeCount = this.likeCount,
+        commentCount = this.commentCount
     )
 }
