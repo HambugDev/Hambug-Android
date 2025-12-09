@@ -3,6 +3,7 @@ package desktop.hambug.data.repository
 import desktop.hambug.data.api.HambugApi
 import desktop.hambug.data.mapper.toEntity
 import desktop.hambug.domain.model.Board
+import desktop.hambug.domain.model.BoardDetail
 import desktop.hambug.domain.repository.CommunityRepository
 import javax.inject.Inject
 
@@ -27,5 +28,15 @@ class CommunityRepositoryImpl @Inject constructor(
         }
 
         return response.data.map { it.toEntity() }
+    }
+
+    override suspend fun getBoardDetail(boardId: Int): BoardDetail {
+        val response = hambugApi.getBoardDetail(boardId)
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+
+        return response.data.toEntity()
     }
 }

@@ -17,7 +17,7 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 fun FeedViewContent(
     boards: List<Board>,
     scrollState: LazyListState,
-    onClick: () -> Unit
+    onClick: (Int) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
@@ -33,7 +33,7 @@ fun FeedViewContent(
             }
             PostFeedItem(
                 board = board,
-                onClick = { onClick() }
+                onClick = { onClick(board.id) }
             )
             Spacer(Modifier.height(16.dp))
             HorizontalDivider(thickness = 1.dp, color = HambugTheme.colors.bgDarker)

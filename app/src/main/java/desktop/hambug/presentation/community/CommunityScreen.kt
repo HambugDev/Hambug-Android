@@ -157,14 +157,18 @@ fun CommunityScreen(
                             ListViewContent(
                                 boards = data.boards,
                                 scrollState = scrollState,
-                                onClick = { navController.navigate("community_detail") }
+                                onClick = { boardId ->
+                                    navController.navigate("community_detail/$boardId")
+                                }
                             )
                         } else {
                             // 피드형
                             FeedViewContent(
                                 boards = data.boards,
                                 scrollState = scrollState,
-                                onClick = { navController.navigate("community_detail") }
+                                onClick = { boardId ->
+                                    navController.navigate("community_detail/$boardId")
+                                }
                             )
                         }
                     }

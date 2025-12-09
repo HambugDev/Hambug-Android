@@ -3,6 +3,7 @@ package desktop.hambug.presentation.community
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,9 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -32,7 +38,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import desktop.hambug.R
 import desktop.hambug.presentation.community.component.DetailMyBottomSheet
 import desktop.hambug.presentation.community.component.DetailOtherBottomSheet
@@ -45,89 +54,123 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostDetailScreen(navController: NavHostController) {
+fun BoardDetailScreen(
+    navController: NavHostController,
+    boardDetailViewModel: BoardDetailViewModel = hiltViewModel()
+) {
+    val uiState by boardDetailViewModel.uiState.collectAsStateWithLifecycle()
 
     var showPostBottomSheet by remember { mutableStateOf(false) }
     var showCommentBottomSheet by remember { mutableStateOf(false) }
 
     Surface (
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
         color = HambugTheme.colors.bgWhite
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(20.dp))
+        when (uiState) {
+            is BoardDetailUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(40.dp),
+                        color = HambugTheme.colors.primRed,
+                        strokeWidth = 4.dp
+                    )
+                }
+            }
+            is BoardDetailUiState.Error -> {}
+            is BoardDetailUiState.Success -> {
+                val data = uiState as BoardDetailUiState.Success
 
-            // 상단 프로필 영역
-            PostDetailProfileSection(
-                onClickBack = { navController.popBackStack() },
-                onClickMore = { showPostBottomSheet = true }
-            )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Spacer(modifier = Modifier.height(20.dp))
 
-            Spacer(modifier = Modifier.height(20.dp))
+                    // 상단 프로필 영역
+                    PostDetailProfileSection(
+                        authorNickname = data.board.authorNickname,
+                        onClickBack = { navController.popBackStack() },
+                        onClickMore = { showPostBottomSheet = true }
+                    )
 
-            // 제목 + 시간 + 내용 영역
-            PostDetailTextSection()
+                    Spacer(modifier = Modifier.height(20.dp))
 
-            Spacer(modifier = Modifier.height(20.dp))
+                    // 제목 + 시간 + 내용 영역
+                    PostDetailTextSection(
+                        title = data.board.title,
+                        content = data.board.content
+                    )
 
-            // 게시물 이미지 영역
-            PostDetailImageSection()
+                    Spacer(modifier = Modifier.height(20.dp))
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // 아이콘 영역
-            PostDetailIconSection()
-
-            Spacer(modifier = Modifier.height(36.dp))
-
-            // 댓글 영역
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-            ) {
-                Image(
-                    modifier = Modifier.size(35.dp),
-                    painter = painterResource(id = R.drawable.logo_profile),
-                    contentDescription = null
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "상하이버거상하이버거",
-                            style = HambugTheme.typography.body02,
-                            color = HambugTheme.colors.textHeadline
-                        )
-                        Icon(
-                            modifier = Modifier.clickable { showCommentBottomSheet = true },
-                            imageVector = AppIcons.Dots,
-                            contentDescription = null,
-                            tint = Color.Unspecified
+                    if (data.board.imageUrls != null) {
+                        // 게시물 이미지 영역
+                        PostDetailImageSection(
+                            imageUrls = data.board.imageUrls
                         )
                     }
 
-                    Text(
-                        text = "15분 전",
-                        style = HambugTheme.typography.label02,
-                        color = HambugTheme.colors.textDisabled
-                    )
+                    Spacer(modifier = Modifier.height(32.dp))
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    // 아이콘 영역
+                    PostDetailIconSection()
 
-                    Text(
-                        text = "와 이 햄버거 진짜 맛있어 보이네요! 패티가 두툼하고 야채 신선해 보여요. 저도 꼭 가봐야겠어요. 혹시 소스는 어떤 맛인가요? 치즈도 듬뿍 들어있는 게 정말 좋아 보입니다. 빵도 촉촉해 보이고 구성이 완벽하네요. 다음 주말에 방문 예정인데 너무 기대되요! 가격대는 어느 정도인가요?",
-                        style = HambugTheme.typography.body03,
-                        color = HambugTheme.colors.textHeadline
-                    )
+                    Spacer(modifier = Modifier.height(36.dp))
+
+                    // 댓글 영역
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                    ) {
+                        Image(
+                            modifier = Modifier.size(35.dp),
+                            painter = painterResource(id = R.drawable.logo_profile),
+                            contentDescription = null
+                        )
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "상하이버거상하이버거",
+                                    style = HambugTheme.typography.body02,
+                                    color = HambugTheme.colors.textHeadline
+                                )
+                                Icon(
+                                    modifier = Modifier.clickable { showCommentBottomSheet = true },
+                                    imageVector = AppIcons.Dots,
+                                    contentDescription = null,
+                                    tint = Color.Unspecified
+                                )
+                            }
+
+                            Text(
+                                text = "15분 전",
+                                style = HambugTheme.typography.label02,
+                                color = HambugTheme.colors.textDisabled
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Text(
+                                text = "와 이 햄버거 진짜 맛있어 보이네요! 패티가 두툼하고 야채 신선해 보여요. 저도 꼭 가봐야겠어요. 혹시 소스는 어떤 맛인가요? 치즈도 듬뿍 들어있는 게 정말 좋아 보입니다. 빵도 촉촉해 보이고 구성이 완벽하네요. 다음 주말에 방문 예정인데 너무 기대되요! 가격대는 어느 정도인가요?",
+                                style = HambugTheme.typography.body03,
+                                color = HambugTheme.colors.textHeadline
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -172,6 +215,7 @@ fun PostDetailScreen(navController: NavHostController) {
 
 @Composable
 fun PostDetailProfileSection(
+    authorNickname: String,
     onClickBack: () -> Unit,
     onClickMore: () -> Unit
 ) {
@@ -200,7 +244,7 @@ fun PostDetailProfileSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "닉네임",
+                text = authorNickname,
                 style = HambugTheme.typography.body02,
                 color = HambugTheme.colors.textHeadline
             )
@@ -216,14 +260,17 @@ fun PostDetailProfileSection(
 }
 
 @Composable
-fun PostDetailTextSection() {
+fun PostDetailTextSection(
+    title: String,
+    content: String
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
         Text(
-            text = "맘스터치 싸이버거는 언제나 옳다! 겉바속촉 치킨 패티에 중독성 강한 소스가 대박!",
+            text = title,
             style = HambugTheme.typography.title02,
             color = HambugTheme.colors.textHeadline
         )
@@ -239,7 +286,7 @@ fun PostDetailTextSection() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "오늘 점심으로 맘스터치 싸이버거를 먹었는데, 역시 기대를 저버리지 않았어요. 일단 패티가 정말 두툼하고 겉은 바삭, 속은 촉촉해서 식감이 일품이에요. 특히 매콤달콤한 소스가 중독성이 강해서 먹는 내내 행복했어요. 신선한 양상추와 부드러운 빵까지 완벽한 조합이었습니다",
+            text = content,
             style = HambugTheme.typography.body02,
             color = HambugTheme.colors.textHeadline
         )
@@ -247,17 +294,19 @@ fun PostDetailTextSection() {
 }
 
 @Composable
-fun PostDetailImageSection() {
+fun PostDetailImageSection(
+    imageUrls: List<String>
+) {
     LazyRow(
         modifier = Modifier.padding(start = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        items(count = 5) {
-            Image(
+        items(imageUrls) { imageUrl ->
+            AsyncImage(
                 modifier = Modifier
                     .size(272.dp)
                     .clip(RoundedCornerShape(6.dp)),
-                painter = painterResource(R.drawable.hambuger),
+                model = imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )

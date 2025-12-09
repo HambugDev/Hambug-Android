@@ -7,6 +7,7 @@ import desktop.hambug.data.dto.NicknameUpdateRequest
 import desktop.hambug.data.dto.NicknameUpdateResponse
 import desktop.hambug.data.dto.ProfileImageUpdateResponse
 import desktop.hambug.data.dto.UserInfoResponse
+import desktop.hambug.data.dto.community.BoardDetailResponse
 import desktop.hambug.data.dto.community.BoardsResponse
 import desktop.hambug.data.dto.community.CategoryBoardsResponse
 import okhttp3.MultipartBody
@@ -38,6 +39,11 @@ interface HambugApi {
     suspend fun getCategoryBoards(
         @Query("category") category: String
     ): CategoryBoardsResponse
+    // 게시물 상세 조회
+    @GET("boards/{id}")
+    suspend fun getBoardDetail(
+        @Path("id") id: Int
+    ): BoardDetailResponse
 
     // JWT 토큰으로 내 정보 조회
     @GET("auth/me")

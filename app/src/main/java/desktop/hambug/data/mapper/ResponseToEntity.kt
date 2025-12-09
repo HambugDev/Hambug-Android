@@ -3,7 +3,9 @@ package desktop.hambug.data.mapper
 import desktop.hambug.data.dto.HomeBurgerData
 import desktop.hambug.data.dto.UserInfoData
 import desktop.hambug.data.dto.community.BoardData
+import desktop.hambug.data.dto.community.BoardDetailData
 import desktop.hambug.domain.model.Board
+import desktop.hambug.domain.model.BoardDetail
 import desktop.hambug.domain.model.HomeBurger
 import desktop.hambug.domain.model.UserInfo
 
@@ -31,6 +33,18 @@ fun BoardData.toEntity(): Board {
         title = this.title,
         content = this.content,
         imageUrl = if (this.imageUrls.isEmpty()) null else this.imageUrls[0],
+        authorNickname = this.authorNickname,
+        createdAt = this.createdAt,
+        likeCount = this.likeCount
+    )
+}
+
+fun BoardDetailData.toEntity(): BoardDetail {
+    return BoardDetail(
+        id = this.id,
+        title = this.title,
+        content = this.content,
+        imageUrls = if (this.imageUrls.isEmpty()) null else this.imageUrls,
         authorNickname = this.authorNickname,
         createdAt = this.createdAt,
         likeCount = this.likeCount

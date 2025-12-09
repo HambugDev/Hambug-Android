@@ -16,7 +16,7 @@ import desktop.hambug.domain.model.Board
 fun ListViewContent(
     boards: List<Board>,
     scrollState: LazyListState,
-    onClick: () -> Unit
+    onClick: (Int) -> Unit
 ) {
     LazyColumn (
         modifier = Modifier
@@ -35,7 +35,7 @@ fun ListViewContent(
             }
             PostListItem(
                 board = board,
-                onClick = { onClick() }
+                onClick = { onClick(board.id) }
             )
             Spacer(Modifier.height(16.dp))
         }
