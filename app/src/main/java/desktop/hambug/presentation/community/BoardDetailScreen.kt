@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -115,9 +116,10 @@ fun BoardDetailScreen(
                         PostDetailImageSection(
                             imageUrls = data.board.imageUrls
                         )
+                        Spacer(modifier = Modifier.height(20.dp))
+                    } else {
+                        Spacer(modifier = Modifier.height(40.dp))
                     }
-
-                    Spacer(modifier = Modifier.height(32.dp))
 
                     // 아이콘 영역
                     PostDetailIconSection()
@@ -297,19 +299,35 @@ fun PostDetailTextSection(
 fun PostDetailImageSection(
     imageUrls: List<String>
 ) {
-    LazyRow(
-        modifier = Modifier.padding(start = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        items(imageUrls) { imageUrl ->
+    if (imageUrls.size == 1) {
+        Box(
+            modifier = Modifier.padding(horizontal = 16.dp)
+        ) {
             AsyncImage(
                 modifier = Modifier
-                    .size(272.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
                     .clip(RoundedCornerShape(6.dp)),
-                model = imageUrl,
+                model = imageUrls[0],
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
+        }
+    } else {
+        LazyRow(
+            modifier = Modifier.padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            items(imageUrls) { imageUrl ->
+                AsyncImage(
+                    modifier = Modifier
+                        .size(272.dp)
+                        .clip(RoundedCornerShape(6.dp)),
+                    model = imageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
     }
 }
