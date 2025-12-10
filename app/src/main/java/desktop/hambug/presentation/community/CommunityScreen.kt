@@ -3,15 +3,19 @@ package desktop.hambug.presentation.community
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -43,14 +47,19 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 @Composable
 fun CommunityScreen(
     navController: NavHostController,
-    communityViewModel: CommunityViewModel = hiltViewModel()
+    communityViewModel: CommunityViewModel = hiltViewModel(
+        viewModelStoreOwner = navController.getBackStackEntry("main_graph")
+    )
 ) {
+    val uiState by communityViewModel.currentUiState.collectAsStateWithLifecycle()
+
     // 필터링 목록 (전체, 자유잡담, 햄버거리뷰, 맛집추천)
     val filterList = communityViewModel.filterList
     // 리스트형 여부 (리스트형 or 피드형)
     val isListView by communityViewModel.isListView.collectAsStateWithLifecycle()
     // 현재 선택된 필터
     val currentFilter by communityViewModel.currentFilter.collectAsStateWithLifecycle()
+    val isLoadingMore by communityViewModel.isLoadingMore.collectAsStateWithLifecycle()
 
     // 현재 선택된 필터(탭)에 해당하는 스크롤 상태를 가져오거나 생성한다
     // -> 탭 전환 시 스크롤 위치를 복원/유지하기 위함
@@ -93,12 +102,17 @@ fun CommunityScreen(
             )
         }
     ) { paddingValues ->
-        Box(
+
+        BoxWithConstraints(
             modifier = Modifier
-                .padding(paddingValues)
                 .fillMaxSize()
+                .padding(paddingValues)
                 .background(color = HambugTheme.colors.bgNormal)
         ) {
+            // paddingValues 적용 후의 사용 가능 높이
+            val availableHeight = maxHeight
+
+            // 필터 영역
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -113,18 +127,56 @@ fun CommunityScreen(
                 )
             }
 
-            if (isListView) {
-                // 리스트형
-                ListViewContent(
-                    scrollState = scrollState,
-                    onClick = { navController.navigate("community_detail") }
-                )
-            } else {
-                // 피드형
-                FeedViewContent(
-                    scrollState = scrollState,
-                    onClick = { navController.navigate("community_detail") }
-                )
+            // 콘텐츠 영역
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .fillMaxWidth()
+                    .height(availableHeight - 46.dp)
+                    .offset(y = 46.dp)
+                    .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp))
+            ) {
+                when (uiState) {
+                    is CommunityUiState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(40.dp),
+                                color = HambugTheme.colors.primRed,
+                                strokeWidth = 4.dp
+                            )
+                        }
+                    }
+                    is CommunityUiState.Error -> {}
+                    is CommunityUiState.Success -> {
+                        val data = uiState as CommunityUiState.Success
+
+                        if (isListView) {
+                            // 리스트형
+                            ListViewContent(
+                                boards = data.boards,
+                                scrollState = scrollState,
+                                onClick = { boardId ->
+                                    navController.navigate("community_detail/$boardId")
+                                },
+                                currentFilter = currentFilter,
+                                onLoadMore = { communityViewModel.loadMoreBoards() },
+                                isLoadingMore = isLoadingMore
+                            )
+                        } else {
+                            // 피드형
+                            FeedViewContent(
+                                boards = data.boards,
+                                scrollState = scrollState,
+                                onClick = { boardId ->
+                                    navController.navigate("community_detail/$boardId")
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }

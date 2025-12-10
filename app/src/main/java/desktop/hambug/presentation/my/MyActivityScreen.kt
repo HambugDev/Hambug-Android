@@ -150,9 +150,9 @@ fun TwoTabSection() {
                         Spacer(modifier = Modifier.height(20.dp))
 
                         for (i in 0 until 10) {
-                            PostListItem(
-                                onClick = {}
-                            )
+//                            PostListItem(
+//                                onClick = {}
+//                            )
                             Spacer(modifier = Modifier.height(24.dp))
                         }
                     }

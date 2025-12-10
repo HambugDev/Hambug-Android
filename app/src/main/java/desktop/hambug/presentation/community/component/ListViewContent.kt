@@ -1,49 +1,83 @@
 package desktop.hambug.presentation.community.component
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import desktop.hambug.domain.model.Board
+import desktop.hambug.domain.model.FilterType
 import desktop.hambug.presentation.ui.theme.HambugTheme
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 
 @Composable
 fun ListViewContent(
+    boards: List<Board>,
     scrollState: LazyListState,
-    onClick: () -> Unit
+    onClick: (Int) -> Unit,
+    currentFilter: FilterType,
+    onLoadMore: () -> Unit,
+    isLoadingMore: Boolean
 ) {
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxSize()
-    ) {
-        LazyColumn (
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset(y = 46.dp)
-                .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp))
-                .padding(horizontal = 20.dp),
-            // 스크롤 상태 연결
-            state = scrollState
-        ) {
-            item {
-                Spacer(Modifier.height(20.dp))
-            }
+    val isPagination = currentFilter == FilterType.ALL
 
-            items(30) {
-                PostListItem(
-                    onClick = { onClick() }
-                )
-                Spacer(Modifier.height(24.dp))
+    if (isPagination) {
+        LaunchedEffect(Unit) {
+            snapshotFlow {
+                val totalItems = scrollState.layoutInfo.totalItemsCount
+                val lastVisibleItem = scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+
+                // 스크롤이 하단 3개 아이템에 도달했는지 체크
+                totalItems > 5 && lastVisibleItem >= totalItems - 3
+            }
+                .distinctUntilChanged()    // 값이 변경될 때만
+                .filter { it }             // ture일 때만
+                .collect { onLoadMore() }
+        }
+    }
+
+    LazyColumn (
+        modifier = Modifier.fillMaxWidth(),
+        state = scrollState,
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        items(
+            items = boards,
+            key = { it.id }
+        ) { board ->
+            PostListItem(
+                board = board,
+                onClick = { onClick(board.id) }
+            )
+        }
+
+        if (isPagination && isLoadingMore) {
+            item(key = "indicator") {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = HambugTheme.colors.primRed,
+                        strokeWidth = 2.dp
+                    )
+                }
             }
         }
     }

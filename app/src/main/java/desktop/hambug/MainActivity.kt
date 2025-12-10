@@ -17,14 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.presentation.community.CommunityScreen
-import desktop.hambug.presentation.community.PostDetailScreen
+import desktop.hambug.presentation.community.BoardDetailScreen
 import desktop.hambug.presentation.community.PostWriteScreen
 import desktop.hambug.presentation.ui.component.HambugBottomNav
 import desktop.hambug.presentation.ui.component.SplashScreen
@@ -89,8 +91,8 @@ fun HambugApp(
     }
 
     val showBottomBar = when (currentRoute) {
-        "login", "bell", "community_detail", "my_activity", "write" -> false
-        else -> true
+        "home", "community", "my" -> true
+        else -> false
     }
 
     Scaffold(
@@ -139,8 +141,13 @@ fun HambugApp(
             composable("write") {
                 PostWriteScreen(navController = navController)
             }
-            composable("community_detail") {
-                PostDetailScreen(navController = navController)
+            composable(
+                route = "community_detail/{boardId}",
+                arguments = listOf(
+                    navArgument("boardId") { type = NavType.IntType }
+                )
+            ) {
+                BoardDetailScreen(navController = navController)
             }
             composable("my_activity") {
                 MyActivityScreen(navController = navController)
