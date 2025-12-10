@@ -106,7 +106,7 @@ fun PostListItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "6",
+                        text = board.commentCount.toString(),
                         style = HambugTheme.typography.body03,
                         color = HambugTheme.colors.textBody
                     )

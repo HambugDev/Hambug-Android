@@ -2,10 +2,12 @@ package desktop.hambug.data.mapper
 
 import desktop.hambug.data.dto.HomeBurgerData
 import desktop.hambug.data.dto.UserInfoData
-import desktop.hambug.data.dto.community.BoardData
 import desktop.hambug.data.dto.community.BoardDetailData
+import desktop.hambug.data.dto.community.BoardItem
+import desktop.hambug.data.dto.community.BoardsData
 import desktop.hambug.domain.model.Board
 import desktop.hambug.domain.model.BoardDetail
+import desktop.hambug.domain.model.BoardPage
 import desktop.hambug.domain.model.HomeBurger
 import desktop.hambug.domain.model.UserInfo
 
@@ -27,7 +29,7 @@ fun UserInfoData.toEntity(): UserInfo {
     )
 }
 
-fun BoardData.toEntity(): Board {
+fun BoardItem.toEntity(): Board {
     return Board(
         id = this.id,
         title = this.title,
@@ -35,7 +37,16 @@ fun BoardData.toEntity(): Board {
         imageUrl = if (this.imageUrls.isEmpty()) null else this.imageUrls[0],
         authorNickname = this.authorNickname,
         createdAt = this.createdAt,
-        likeCount = this.likeCount
+        likeCount = this.likeCount,
+        commentCount = this.commentCount
+    )
+}
+
+fun BoardsData.toEntity(): BoardPage {
+    return BoardPage(
+        content = this.content.map { it.toEntity() },
+        nextCursorId = this.netCursorId,
+        nextPage = this.nextPage
     )
 }
 

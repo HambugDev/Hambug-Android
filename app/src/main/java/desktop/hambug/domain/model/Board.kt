@@ -7,5 +7,6 @@ data class Board(
     val imageUrl: String?,
     val authorNickname: String,
     val createdAt: String,
-    val likeCount: Int
+    val likeCount: Int,
+    val commentCount: Int
 )

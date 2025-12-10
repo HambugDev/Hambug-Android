@@ -33,7 +33,9 @@ interface HambugApi {
 
     // 게시물 전체 조회
     @GET("boards")
-    suspend fun getBoards(): BoardsResponse
+    suspend fun getBoards(
+        @Query("lastId") lastId: Int? = null
+    ): BoardsResponse
     // 카테고리별 게시물 조회
     @GET("boards/category")
     suspend fun getCategoryBoards(

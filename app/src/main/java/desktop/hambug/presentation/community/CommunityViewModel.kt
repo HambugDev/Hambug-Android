@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Board
+import desktop.hambug.domain.model.BoardPage
 import desktop.hambug.domain.model.Filter
 import desktop.hambug.domain.model.FilterType
 import desktop.hambug.domain.usecase.GetBoardsUseCase
@@ -32,6 +33,14 @@ class CommunityViewModel @Inject constructor(
     // 현재 보여줄 UI 상태
     private val _currentUiState = MutableStateFlow<CommunityUiState>(CommunityUiState.Loading)
     val currentUiState: StateFlow<CommunityUiState> = _currentUiState.asStateFlow()
+
+    // 페이지네이션 로딩 상태
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
+
+    // 페이지네이션 관련 데이터
+    private var nextCursorId: Int? = null
+    private var hasNextPage: Boolean = true
 
     // 각 필터별 캐시된 데이터
     private val _cachedBoards = mutableMapOf<FilterType, List<Board>>()
@@ -83,30 +92,70 @@ class CommunityViewModel @Inject constructor(
     }
 
     /**
-     * 전체 데이터 로드
+     * 전체 데이터 로드 (페이지네이션 적용)
      */
     private fun loadAllData() {
-        val filterType = FilterType.ALL
+        nextCursorId = null
+        hasNextPage = true
 
         viewModelScope.launch {
-            getBoardsUseCase()
-                .onSuccess { boards ->
+            getBoardsUseCase(lastId = null)
+                .onSuccess { page ->
                     Log.d("community", "loadAllData 성공")
-                    _cachedBoards[filterType] = boards
+                    updatePaginationState(page)
+
+                    _cachedBoards[FilterType.ALL] = page.content
 
                     // 현재 보고있는 필터가 ALL일 때만 UI 업데이트
-                    if (_currentFilter.value == filterType) {
-                        _currentUiState.value = CommunityUiState.Success(boards)
+                    if (_currentFilter.value == FilterType.ALL) {
+                        _currentUiState.value = CommunityUiState.Success(page.content)
                     }
                 }
                 .onFailure { exception ->
                     Log.e("community", "loadAllData 실패: ${exception.message}", exception)
-                    if (_currentFilter.value == filterType) {
-                        val message = exception.message ?: "커뮤니티 데이터 로딩 실패"
+                    if (_currentFilter.value == FilterType.ALL) {
+                        val message = exception.message ?: "전체 데이터 로드 실패"
                         _currentUiState.value = CommunityUiState.Error(message)
                     }
                 }
         }
+    }
+
+    /**
+     * 다음 페이지 로드
+     */
+    fun loadMoreBoards() {
+        // 이미 로딩 중이거나, 다음 페이지가 없거나, 현재 필터가 ALL이 아니면 반환
+        if (_isLoadingMore.value || !hasNextPage || _currentFilter.value != FilterType.ALL) return
+
+        viewModelScope.launch {
+            _isLoadingMore.value = true
+
+            getBoardsUseCase(lastId = nextCursorId)
+                .onSuccess { page ->
+                    updatePaginationState(page)
+
+                    // 기존 데이터 뒤에 새 데이터 붙이기
+                    val currentList = _cachedBoards[FilterType.ALL] ?: emptyList()
+                    val newList = currentList + page.content
+
+                    _cachedBoards[FilterType.ALL] = newList
+
+                    if (_currentFilter.value == FilterType.ALL) {
+                        _currentUiState.value = CommunityUiState.Success(newList)
+                    }
+                }
+                .onFailure {
+                    Log.e("community", "추가 로드 실패: ${it.message}")
+                }
+
+            _isLoadingMore.value = false
+        }
+    }
+
+    private fun updatePaginationState(page: BoardPage) {
+        nextCursorId = page.nextCursorId
+        hasNextPage = page.nextPage
     }
 
     /**

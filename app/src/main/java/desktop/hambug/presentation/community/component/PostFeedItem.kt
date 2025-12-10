@@ -113,7 +113,7 @@ fun PostFeedItem(
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "6",
+                    text = board.commentCount.toString(),
                     style = HambugTheme.typography.label02,
                     color = HambugTheme.colors.textDisabled
                 )

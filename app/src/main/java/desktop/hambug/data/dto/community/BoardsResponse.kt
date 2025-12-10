@@ -8,13 +8,23 @@ data class BoardsResponse(
     @SerialName("success")
     val success: Boolean,
     @SerialName("data")
-    val data: List<BoardData>,
+    val data: BoardsData,
     @SerialName("message")
     val message: String
 )
 
 @Serializable
-data class BoardData(
+data class BoardsData(
+    @SerialName("content")
+    val content: List<BoardItem>,
+    @SerialName("netCursorId")
+    val netCursorId: Int,
+    @SerialName("nextPage")
+    val nextPage: Boolean
+)
+
+@Serializable
+data class BoardItem(
     @SerialName("id")
     val id: Int,
     @SerialName("title")
@@ -37,6 +47,8 @@ data class BoardData(
     val viewCount: Int,
     @SerialName("likeCount")
     val likeCount: Int,
+    @SerialName("commentCount")
+    val commentCount: Int,
     @SerialName("isLiked")
     val isLiked: Boolean
 )

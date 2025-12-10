@@ -8,7 +8,7 @@ data class CategoryBoardsResponse(
     @SerialName("success")
     val success: Boolean,
     @SerialName("data")
-    val data: List<BoardData>,
+    val data: List<BoardItem>,
     @SerialName("message")
     val message: String
 )

@@ -59,6 +59,7 @@ fun CommunityScreen(
     val isListView by communityViewModel.isListView.collectAsStateWithLifecycle()
     // 현재 선택된 필터
     val currentFilter by communityViewModel.currentFilter.collectAsStateWithLifecycle()
+    val isLoadingMore by communityViewModel.isLoadingMore.collectAsStateWithLifecycle()
 
     // 현재 선택된 필터(탭)에 해당하는 스크롤 상태를 가져오거나 생성한다
     // -> 탭 전환 시 스크롤 위치를 복원/유지하기 위함
@@ -159,7 +160,10 @@ fun CommunityScreen(
                                 scrollState = scrollState,
                                 onClick = { boardId ->
                                     navController.navigate("community_detail/$boardId")
-                                }
+                                },
+                                currentFilter = currentFilter,
+                                onLoadMore = { communityViewModel.loadMoreBoards() },
+                                isLoadingMore = isLoadingMore
                             )
                         } else {
                             // 피드형
