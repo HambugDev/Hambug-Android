@@ -1,6 +1,5 @@
 package desktop.hambug.presentation.home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,8 +31,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import desktop.hambug.R
+import desktop.hambug.domain.model.HomeBoard
 import desktop.hambug.domain.model.HomeBurger
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Bell
@@ -115,14 +114,12 @@ fun HomeScreen(
                     Spacer(Modifier.height(12.dp))
 
                     // 추천버거 영역
-                    RecommendBurgerSection(
-                        burgers = data.burgers
-                    )
+                    RecommendBurgerSection(data.burgers)
 
                     Spacer(Modifier.height(30.dp))
 
                     // 인기글 영역
-                    HomePostSection()
+                    HomeBoardSection(data.boards)
 
                     Spacer(Modifier.height(20.dp))
                 }
@@ -232,7 +229,9 @@ fun RecommendBurgerItem(
 }
 
 @Composable
-fun HomePostSection() {
+fun HomeBoardSection(
+    boards: List<HomeBoard>
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -251,10 +250,10 @@ fun HomePostSection() {
                 .fillMaxWidth()
                 .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(16.dp))
         ) {
-            for (i in 0 until 5) {
-                HomePostItem()
+            boards.forEachIndexed { idx, board ->
+                HomePostItem(board)
 
-                if (i < 4) {
+                if (idx < 4) {
                     HorizontalDivider(thickness = 0.5.dp, color = HambugTheme.colors.bgNormal)
                 }
             }
@@ -263,7 +262,9 @@ fun HomePostSection() {
 }
 
 @Composable
-fun HomePostItem() {
+fun HomePostItem(
+    board: HomeBoard
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -275,7 +276,7 @@ fun HomePostItem() {
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "다들 햄최몇인가요 다들 햄최몇인가요 다들 햄최몇인가요",
+                text = board.title,
                 style = HambugTheme.typography.body02Prominent,
                 color = HambugTheme.colors.textBody,
                 maxLines = 1,
@@ -285,7 +286,7 @@ fun HomePostItem() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "저 오늘 버거킹가서 햄버거 세트 2개 먹었는데!! 진짜 맛있었어요 저 오늘 버거킹가서 햄버거 세트 2개 먹었는데!! 진짜 맛있었어요",
+                text = board.content,
                 style = HambugTheme.typography.body03,
                 color = HambugTheme.colors.textDisabled,
                 maxLines = 2,
@@ -298,7 +299,7 @@ fun HomePostItem() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "게시판",
+                    text = board.category,
                     style = HambugTheme.typography.body04Prominent,
                     color = HambugTheme.colors.primRed
                 )
@@ -315,7 +316,7 @@ fun HomePostItem() {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "11",
+                        text = board.likeCount.toString(),
                         style = HambugTheme.typography.label02,
                         color = HambugTheme.colors.textDisabled
                     )
@@ -333,7 +334,7 @@ fun HomePostItem() {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "6",
+                        text = board.commentCount.toString(),
                         style = HambugTheme.typography.body03,
                         color = HambugTheme.colors.textBody
                     )
@@ -349,20 +350,21 @@ fun HomePostItem() {
             }
         }
 
-        Box(
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .size(90.dp)
-                .background(color = HambugTheme.colors.bgYellow, shape = RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
+        if (board.imageUrl != null) {
+            Box(
                 modifier = Modifier
-                    .size(80.dp),
-                painter = painterResource(R.drawable.burger),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-            )
+                    .padding(start = 8.dp)
+                    .size(90.dp)
+                    .background(color = HambugTheme.colors.bgYellow, shape = RoundedCornerShape(10.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    modifier = Modifier.clip(RoundedCornerShape(10.dp)),
+                    model = board.imageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                )
+            }
         }
     }
 }

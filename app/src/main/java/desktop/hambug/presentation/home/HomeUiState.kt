@@ -1,9 +1,13 @@
 package desktop.hambug.presentation.home
 
+import desktop.hambug.domain.model.HomeBoard
 import desktop.hambug.domain.model.HomeBurger
 
 sealed class HomeUiState {
     data object Loading: HomeUiState()
-    data class Success(val burgers: List<HomeBurger>) : HomeUiState()
+    data class Success(
+        val burgers: List<HomeBurger>,
+        val boards: List<HomeBoard>
+    ) : HomeUiState()
     data class Error(val message: String) : HomeUiState()
 }
