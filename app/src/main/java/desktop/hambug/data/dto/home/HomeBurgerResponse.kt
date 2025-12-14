@@ -1,4 +1,4 @@
-package desktop.hambug.data.dto
+package desktop.hambug.data.dto.home
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

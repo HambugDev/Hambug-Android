@@ -1,6 +1,6 @@
 package desktop.hambug.data.api
 
-import desktop.hambug.data.dto.HomeBurgerResponse
+import desktop.hambug.data.dto.home.HomeBurgerResponse
 import desktop.hambug.data.dto.LoginRequest
 import desktop.hambug.data.dto.LoginResponse
 import desktop.hambug.data.dto.NicknameUpdateRequest
@@ -10,6 +10,7 @@ import desktop.hambug.data.dto.UserInfoResponse
 import desktop.hambug.data.dto.community.BoardDetailResponse
 import desktop.hambug.data.dto.community.BoardsResponse
 import desktop.hambug.data.dto.community.CategoryBoardsResponse
+import desktop.hambug.data.dto.home.HomeBoardResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -30,6 +31,9 @@ interface HambugApi {
     // 오늘의 추천 햄버거 조회
     @GET("burgers/recommended")
     suspend fun getHomeBurgers(): HomeBurgerResponse
+    // 인기 게시물 조회
+    @GET("boards/trending")
+    suspend fun getHomeBoards(): HomeBoardResponse
 
     // 게시물 전체 조회
     @GET("boards")

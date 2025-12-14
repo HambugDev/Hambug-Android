@@ -1,10 +1,11 @@
 package desktop.hambug.presentation.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import desktop.hambug.domain.usecase.GetHomeBoardsUseCase
 import desktop.hambug.domain.usecase.GetHomeBurgersUseCase
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    val getHomeBurgersUseCase: GetHomeBurgersUseCase
+    private val getHomeBurgersUseCase: GetHomeBurgersUseCase,
+    private val getHomeBoardsUseCase: GetHomeBoardsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
@@ -25,16 +27,25 @@ class HomeViewModel @Inject constructor(
 
     private fun loadHomeData() {
         viewModelScope.launch {
-            getHomeBurgersUseCase()
-                .onSuccess { burgers ->
-                    Log.d("home", "getHomeBurgers 성공")
-                    _uiState.value = HomeUiState.Success(burgers)
+            val deferredBurgers = async { getHomeBurgersUseCase() }
+            val deferredBoards = async { getHomeBoardsUseCase() }
+
+            val burgersResult = deferredBurgers.await()
+            val boardsResult = deferredBoards.await()
+
+            if (burgersResult.isSuccess && boardsResult.isSuccess) {
+                val burgers = burgersResult.getOrThrow()
+                val boards = boardsResult.getOrThrow()
+                _uiState.value = HomeUiState.Success(burgers, boards)
+            } else {
+                val errorMessage = when {
+                    burgersResult.isFailure && boardsResult.isFailure ->
+                        "데이터 로드 실패"
+                    burgersResult.isFailure -> "버거 정보 로드 실패"
+                    else -> "인기글 정보 로드 실패"
                 }
-                .onFailure { exception ->
-                    Log.e("home", "getHomeBurgers 실패: ${exception.message}", exception)
-                    val exceptionMessage = exception.message ?: "데이터 로딩 중 오류 발생"
-                    _uiState.value = HomeUiState.Error(exceptionMessage)
-                }
+                _uiState.value = HomeUiState.Error(errorMessage)
+            }
         }
     }
 }
