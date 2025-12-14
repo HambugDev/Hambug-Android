@@ -49,6 +49,7 @@ import desktop.hambug.presentation.ui.icon.appicons.Comment
 import desktop.hambug.presentation.ui.icon.appicons.Hambug
 import desktop.hambug.presentation.ui.icon.appicons.Heart
 import desktop.hambug.presentation.ui.theme.HambugTheme
+import desktop.hambug.presentation.util.toKoreanCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -299,7 +300,7 @@ fun HomePostItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = board.category,
+                    text = board.category.toKoreanCategory(),
                     style = HambugTheme.typography.body04Prominent,
                     color = HambugTheme.colors.primRed
                 )
