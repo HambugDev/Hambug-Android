@@ -50,6 +50,7 @@ import desktop.hambug.presentation.ui.icon.appicons.Hambug
 import desktop.hambug.presentation.ui.icon.appicons.Heart
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.util.toKoreanCategory
+import desktop.hambug.presentation.util.toTimeAgoString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -344,7 +345,7 @@ fun HomePostItem(
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Text(
-                    text = "5분 전",
+                    text = board.createdAt.toTimeAgoString(),
                     style = HambugTheme.typography.body04Prominent,
                     color = HambugTheme.colors.textDisabled
                 )
