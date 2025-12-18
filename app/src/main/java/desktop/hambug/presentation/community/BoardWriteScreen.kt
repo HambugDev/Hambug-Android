@@ -1,5 +1,9 @@
 package desktop.hambug.presentation.community
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +19,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,12 +33,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.Category
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
 import desktop.hambug.presentation.ui.component.CustomContentTextField
@@ -45,17 +54,26 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostWriteScreen(
+fun BoardWriteScreen(
     navController: NavHostController,
-    postWriteViewModel: PostWriteViewModel = hiltViewModel()
+    boardWriteViewModel: BoardWriteViewModel = hiltViewModel()
 ) {
+    val uiState by boardWriteViewModel.uiState.collectAsStateWithLifecycle()
     // 카테고리 목록 (자유잡담, 프랜차이즈, 수제버거, 맛집추천)
-    val categoryList = postWriteViewModel.categoryList
+    val categoryList = boardWriteViewModel.categoryList
     // 현재 선택된 카테고리
-    val currentCategory by postWriteViewModel.currentCategory.collectAsStateWithLifecycle()
+    val currentCategory by boardWriteViewModel.currentCategory.collectAsStateWithLifecycle()
+    val postTitle by boardWriteViewModel.postTitle.collectAsStateWithLifecycle()
+    val postContent by boardWriteViewModel.postContent.collectAsStateWithLifecycle()
 
-    val postTitle by postWriteViewModel.postTitle.collectAsStateWithLifecycle()
-    val postContent by postWriteViewModel.postContent.collectAsStateWithLifecycle()
+    // 다중 이미지 선택용 런처 등록 (최대 5개)
+    val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(5)
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            boardWriteViewModel.onPhotoSelected(uris)
+        }
+    }
 
     Scaffold(
         containerColor = Color.White,
@@ -103,7 +121,7 @@ fun PostWriteScreen(
                 CategoryButtonSection(
                     categoryList = categoryList,
                     currentCategory = currentCategory,
-                    onClick = { categoryType -> postWriteViewModel.setCategory(categoryType) }
+                    onClick = { categoryType -> boardWriteViewModel.setCategory(categoryType) }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -111,7 +129,7 @@ fun PostWriteScreen(
                 // 제목 영역
                 WriteTitleSection(
                     postTitle = postTitle,
-                    postWriteViewModel = postWriteViewModel
+                    boardWriteViewModel = boardWriteViewModel
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -120,7 +138,7 @@ fun PostWriteScreen(
                 WriteContentSection(
                     placeholder = currentCategory.placeholder,
                     postContent = postContent,
-                    postWriteViewModel = postWriteViewModel
+                    boardWriteViewModel = boardWriteViewModel
                 )
             }
 
@@ -130,12 +148,27 @@ fun PostWriteScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 // 이미지 표시 영역
-                WriteImageSection()
+                if (uiState.selectedImageUris.isNotEmpty()) {
+                    WriteImageSection(
+                        selectedImageUris = uiState.selectedImageUris,
+                        onRemoveClick = { uri ->
+                            boardWriteViewModel.onRemovePhoto(uri)
+                        }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // 사진추가 버튼
-                WriteImageAddButton()
+                WriteImageAddButton(
+                    imageCnt = uiState.selectedImageUris.size,
+                    onClick = {
+                        // Photo Picker 실행 요청
+                        multiplePhotoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -198,7 +231,7 @@ fun CategoryButtonItem(
 @Composable
 fun WriteTitleSection(
     postTitle: String,
-    postWriteViewModel: PostWriteViewModel
+    boardWriteViewModel: BoardWriteViewModel
 ) {
     RequiredFieldTitle(title = "제목")
 
@@ -209,7 +242,7 @@ fun WriteTitleSection(
     ) {
         CustomTitleTextField(
             value = postTitle,
-            onValueChange = { newTitle -> postWriteViewModel.updatePostTitle(newTitle) }
+            onValueChange = { newTitle -> boardWriteViewModel.updatePostTitle(newTitle) }
         )
         Spacer(Modifier.height(4.dp))
         HorizontalDivider(thickness = 1.dp, color = HambugTheme.colors.borderDefault)
@@ -220,7 +253,7 @@ fun WriteTitleSection(
 fun WriteContentSection(
     placeholder: String,
     postContent: String,
-    postWriteViewModel: PostWriteViewModel
+    boardWriteViewModel: BoardWriteViewModel
 ) {
     RequiredFieldTitle(title = "내용")
     Spacer(modifier = Modifier.height(12.dp))
@@ -242,55 +275,68 @@ fun WriteContentSection(
         }
         CustomContentTextField(
             value = postContent,
-            onValueChange = { newContent -> postWriteViewModel.updatePostContent(newContent)}
+            onValueChange = { newContent -> boardWriteViewModel.updatePostContent(newContent)}
         )
     }
 }
 
 @Composable
-fun WriteImageSection() {
-    Row(
-        modifier = Modifier.fillMaxWidth()
+fun WriteImageSection(
+    selectedImageUris: List<Uri>,
+    onRemoveClick: (Uri) -> Unit
+) {
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        for (idx in 0 until 5) {
-            WriteImageItem()
-            if (idx < 4) {
-                Spacer(modifier = Modifier.width(8.dp))
-            }
+        items(selectedImageUris) { uri ->
+            WriteImageItem(
+                selectedImageUri = uri,
+                onRemoveClick = { onRemoveClick(uri) }
+            )
         }
     }
 }
 
 @Composable
-fun WriteImageItem() {
+fun WriteImageItem(
+    selectedImageUri: Uri,
+    onRemoveClick: () -> Unit
+) {
     Box(
-        modifier = Modifier
-//            .size(100.dp)
-            .size(60.dp)
-            .background(color = HambugTheme.colors.bgDarker, shape = RoundedCornerShape(6.dp)),
         contentAlignment = Alignment.TopEnd
     ) {
-        Icon(
-            modifier = Modifier.offset(x = 4.dp, y = (-10).dp),
-            imageVector = AppIcons.CircleCross,
+        AsyncImage(
+            modifier = Modifier
+                .size(60.dp)
+                .clip(RoundedCornerShape(6.dp)),
+            model = selectedImageUri,
             contentDescription = null,
-            tint = HambugTheme.colors.iconDisabled
+            contentScale = ContentScale.Crop
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Icon(
-            modifier = Modifier.offset(x = 4.dp, y = (-10).dp),
-            imageVector = AppIcons.CircleCross,
-            contentDescription = null,
-            tint = HambugTheme.colors.iconDisabled
-        )
+
+        Box(
+            modifier = Modifier
+                .offset(x = 4.dp, y = (-10).dp)
+                .clickable { onRemoveClick() },
+        ) {
+            Icon(
+                imageVector = AppIcons.CircleCross,
+                contentDescription = null,
+                tint = HambugTheme.colors.iconDisabled
+            )
+        }
     }
 }
 
 @Composable
-fun WriteImageAddButton() {
+fun WriteImageAddButton(
+    imageCnt: Int,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
-            .clickable {  }
+            .clickable { onClick() }
             .fillMaxWidth()
             .height(40.dp)
             .background(color = HambugTheme.colors.bgWhite)
@@ -307,7 +353,7 @@ fun WriteImageAddButton() {
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = "사진추가 (2/5)",
+                text = "사진추가 (${imageCnt}/5)",
                 style = HambugTheme.typography.body03,
                 color = HambugTheme.colors.primRed
             )
@@ -335,8 +381,8 @@ fun WriteRegisterButton() {
 
 @Preview
 @Composable
-fun PostWriteScreenPreview() {
+fun BoardWriteScreenPreview() {
     HambugTheme {
-//        PostWriteScreen()
+//        BoardWriteViewModel()
     }
 }

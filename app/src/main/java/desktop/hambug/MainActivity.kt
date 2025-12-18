@@ -27,7 +27,7 @@ import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.presentation.community.CommunityScreen
 import desktop.hambug.presentation.community.BoardDetailScreen
-import desktop.hambug.presentation.community.PostWriteScreen
+import desktop.hambug.presentation.community.BoardWriteScreen
 import desktop.hambug.presentation.ui.component.HambugBottomNav
 import desktop.hambug.presentation.ui.component.SplashScreen
 import desktop.hambug.presentation.home.HomeScreen
@@ -139,7 +139,7 @@ fun HambugApp(
                 NotificationScreen(navController = navController)
             }
             composable("write") {
-                PostWriteScreen(navController = navController)
+                BoardWriteScreen(navController = navController)
             }
             composable(
                 route = "community_detail/{boardId}",
