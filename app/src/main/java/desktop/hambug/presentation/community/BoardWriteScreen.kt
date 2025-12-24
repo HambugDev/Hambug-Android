@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,8 +64,8 @@ fun BoardWriteScreen(
     val categoryList = boardWriteViewModel.categoryList
     // 현재 선택된 카테고리
     val currentCategory by boardWriteViewModel.currentCategory.collectAsStateWithLifecycle()
-    val postTitle by boardWriteViewModel.postTitle.collectAsStateWithLifecycle()
-    val postContent by boardWriteViewModel.postContent.collectAsStateWithLifecycle()
+    val boardTitle by boardWriteViewModel.boardTitle.collectAsStateWithLifecycle()
+    val boardContent by boardWriteViewModel.boardContent.collectAsStateWithLifecycle()
 
     // 다중 이미지 선택용 런처 등록 (최대 5개)
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
@@ -72,6 +73,19 @@ fun BoardWriteScreen(
     ) { uris ->
         if (uris.isNotEmpty()) {
             boardWriteViewModel.onPhotoSelected(uris)
+        }
+    }
+
+    // 이벤트 구독하여 화면 이동 처리
+    LaunchedEffect(true) {
+        boardWriteViewModel.eventFlow.collect { event ->
+            when(event) {
+                is BoardWriteEvent.NavigateToDetail -> {
+                    navController.navigate("community_detail/${event.boardId}") {
+                        popUpTo("write") { inclusive = true }
+                    }
+                }
+            }
         }
     }
 
@@ -128,7 +142,7 @@ fun BoardWriteScreen(
 
                 // 제목 영역
                 WriteTitleSection(
-                    postTitle = postTitle,
+                    boardTitle = boardTitle,
                     boardWriteViewModel = boardWriteViewModel
                 )
 
@@ -137,7 +151,7 @@ fun BoardWriteScreen(
                 // 내용 영역
                 WriteContentSection(
                     placeholder = currentCategory.placeholder,
-                    postContent = postContent,
+                    boardContent = boardContent,
                     boardWriteViewModel = boardWriteViewModel
                 )
             }
@@ -173,7 +187,9 @@ fun BoardWriteScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // 등록 버튼
-                WriteRegisterButton()
+                WriteRegisterButton(
+                    onClick = { boardWriteViewModel.createBoard() }
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -230,7 +246,7 @@ fun CategoryButtonItem(
 
 @Composable
 fun WriteTitleSection(
-    postTitle: String,
+    boardTitle: String,
     boardWriteViewModel: BoardWriteViewModel
 ) {
     RequiredFieldTitle(title = "제목")
@@ -241,7 +257,7 @@ fun WriteTitleSection(
         modifier = Modifier.fillMaxWidth()
     ) {
         CustomTitleTextField(
-            value = postTitle,
+            value = boardTitle,
             onValueChange = { newTitle -> boardWriteViewModel.updatePostTitle(newTitle) }
         )
         Spacer(Modifier.height(4.dp))
@@ -252,7 +268,7 @@ fun WriteTitleSection(
 @Composable
 fun WriteContentSection(
     placeholder: String,
-    postContent: String,
+    boardContent: String,
     boardWriteViewModel: BoardWriteViewModel
 ) {
     RequiredFieldTitle(title = "내용")
@@ -266,7 +282,7 @@ fun WriteContentSection(
             .padding(12.dp),
     ) {
         // 플레이스홀더
-        if (postContent.isEmpty()) {
+        if (boardContent.isEmpty()) {
             Text(
                 text = placeholder,
                 style = HambugTheme.typography.body03,
@@ -274,7 +290,7 @@ fun WriteContentSection(
             )
         }
         CustomContentTextField(
-            value = postContent,
+            value = boardContent,
             onValueChange = { newContent -> boardWriteViewModel.updatePostContent(newContent)}
         )
     }
@@ -362,10 +378,12 @@ fun WriteImageAddButton(
 }
 
 @Composable
-fun WriteRegisterButton() {
+fun WriteRegisterButton(
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
-            .clickable {  }
+            .clickable { onClick() }
             .fillMaxWidth()
             .height(52.dp)
             .background(color = HambugTheme.colors.primRed, shape = RoundedCornerShape(16.dp)),

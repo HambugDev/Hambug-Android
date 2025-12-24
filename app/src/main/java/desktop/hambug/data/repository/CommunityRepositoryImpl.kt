@@ -1,6 +1,7 @@
 package desktop.hambug.data.repository
 
 import desktop.hambug.data.api.HambugApi
+import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.mapper.toEntity
 import desktop.hambug.domain.model.Board
 import desktop.hambug.domain.model.BoardDetail
@@ -39,5 +40,15 @@ class CommunityRepositoryImpl @Inject constructor(
         }
 
         return response.data.toEntity()
+    }
+
+    override suspend fun createBoard(title: String, content: String, category: String): Int {
+        val response = hambugApi.createBoard(CreateBoardRequest(title, content, category))
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+
+        return response.data.id
     }
 }

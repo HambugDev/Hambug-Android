@@ -10,6 +10,8 @@ import desktop.hambug.data.dto.UserInfoResponse
 import desktop.hambug.data.dto.community.BoardDetailResponse
 import desktop.hambug.data.dto.community.BoardsResponse
 import desktop.hambug.data.dto.community.CategoryBoardsResponse
+import desktop.hambug.data.dto.community.CreateBoardRequest
+import desktop.hambug.data.dto.community.CreateBoardResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Body
@@ -50,6 +52,12 @@ interface HambugApi {
     suspend fun getBoardDetail(
         @Path("id") id: Int
     ): BoardDetailResponse
+
+    // 게시물 생성
+    @POST("boards")
+    suspend fun createBoard(
+        @Body request: CreateBoardRequest
+    ): CreateBoardResponse
 
     // JWT 토큰으로 내 정보 조회
     @GET("auth/me")
