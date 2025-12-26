@@ -14,6 +14,7 @@ import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.dto.community.CreateBoardResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -57,6 +58,13 @@ interface HambugApi {
     @POST("boards")
     suspend fun createBoard(
         @Body request: CreateBoardRequest
+    ): CreateBoardResponse
+    // 게시물 생성 (이미지 포함)
+    @Multipart
+    @POST("boards/with-images")
+    suspend fun createBoardWithImages(
+        @Part("request") request: RequestBody,
+        @Part images: List<MultipartBody.Part>
     ): CreateBoardResponse
 
     // JWT 토큰으로 내 정보 조회

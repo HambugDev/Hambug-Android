@@ -91,18 +91,28 @@ class BoardWriteViewModel @Inject constructor(
      * 게시물 생성
      */
     fun createBoard() {
-        viewModelScope.launch {
-            val title = _boardTitle.value
-            val content = _boardContent.value
-            val category = _currentCategory.value.type.name
+        if (_uiState.value.isCreating) return
 
-            createBoardUseCase(title, content, category)
-                .onSuccess { boardId ->
-                    _eventFlow.send(BoardWriteEvent.NavigateToDetail(boardId))
-                }
-                .onFailure {
-                    Log.e("community", "createBoard 실패")
-                }
+        viewModelScope.launch {
+            // 로딩 시작
+            _uiState.update { it.copy(isCreating = true) }
+
+            try {
+                val title = _boardTitle.value.trim()
+                val content = _boardContent.value.trim()
+                val category = _currentCategory.value.type.name
+                val imageUris = _uiState.value.selectedImageUris
+
+                createBoardUseCase(title, content, category, imageUris)
+                    .onSuccess { boardId ->
+                        _eventFlow.send(BoardWriteEvent.NavigateToDetail(boardId))
+                    }
+                    .onFailure { exception ->
+                        Log.e("community", "createBoard 실패: ${exception.message}", exception)
+                    }
+            } finally {
+                _uiState.update { it.copy(isCreating = false) }
+            }
         }
     }
 }
