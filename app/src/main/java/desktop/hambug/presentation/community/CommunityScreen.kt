@@ -86,7 +86,8 @@ fun CommunityScreen(
                     Icon(
                         modifier = Modifier
                             .clickable { navController.navigate("bell") }
-                            .padding(16.dp),
+                            .padding(8.dp)
+                            .size(32.dp),
                         imageVector = AppIcons.BellBorder,
                         contentDescription = null,
                         tint = HambugTheme.colors.bgWhite
