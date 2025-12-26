@@ -10,7 +10,7 @@ import desktop.hambug.domain.model.Board
 import desktop.hambug.domain.model.BoardDetail
 import desktop.hambug.domain.model.BoardPage
 import desktop.hambug.domain.repository.CommunityRepository
-import desktop.hambug.util.createMultipartBodyParts
+import desktop.hambug.util.ImageFileUtil
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
@@ -75,8 +75,8 @@ class CommunityRepositoryImpl @Inject constructor(
 
         val requestBody = requestJson.toRequestBody("application/json".toMediaType())
 
-        // 이미지들을  MultipartBody.Part 리스트로 변환
-        val imageParts = createMultipartBodyParts(
+        // 이미지들을 MultipartBody.Part 리스트로 변환
+        val imageParts = ImageFileUtil.createMultipartBodyParts(
             context = context,
             fileUris = imageUris,
             partName = "images"

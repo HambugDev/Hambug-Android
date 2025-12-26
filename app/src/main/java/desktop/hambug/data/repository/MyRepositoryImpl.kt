@@ -8,7 +8,7 @@ import desktop.hambug.data.dto.NicknameUpdateRequest
 import desktop.hambug.data.mapper.toEntity
 import desktop.hambug.domain.model.UserInfo
 import desktop.hambug.domain.repository.MyRepository
-import desktop.hambug.util.createMultipartBodyPart
+import desktop.hambug.util.ImageFileUtil
 import javax.inject.Inject
 
 class MyRepositoryImpl @Inject constructor(
@@ -38,26 +38,19 @@ class MyRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateUserProfileImage(userId: Int, imageUri: Uri): UserInfo {
-        // Part와 File 객체 받음
-        val (imagePart, tempFile) = createMultipartBodyPart(
+        // 이미지를 MultipartBody.Part로 변환
+        val imagePart = ImageFileUtil.createMultipartBodyPart(
             context = context,
             fileUri = imageUri,
             partName = "file"
         ) ?: throw Exception("이미지를 처리할 수 없습니다")
 
-        return try {
-            val response = hambugApi.putUserProfileImage(id = userId, file = imagePart)
+        val response = hambugApi.putUserProfileImage(userId, imagePart)
 
-            if (!response.success) {
-                throw Exception(response.message)
-            }
-
-            response.data.toEntity()
-        } catch (e: Exception) {
-            throw e
-        } finally {
-            // 임시 파일 삭제
-            tempFile.delete()
+        if (!response.success) {
+            throw Exception(response.message)
         }
+
+        return response.data.toEntity()
     }
 }
