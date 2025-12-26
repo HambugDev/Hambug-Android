@@ -2,7 +2,8 @@ package desktop.hambug.domain.model
 
 enum class CategoryType {
     FREE_TALK,
-    FRANCHISE,
-    HANDMADE,
+//    FRANCHISE,
+//    HANDMADE,
+    REVIEW,
     RECOMMENDATION
 }
