@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import desktop.hambug.domain.model.Board
-import desktop.hambug.domain.model.FilterType
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -27,25 +26,21 @@ fun ListViewContent(
     boards: List<Board>,
     scrollState: LazyListState,
     onClick: (Int) -> Unit,
-    currentFilter: FilterType,
     onLoadMore: () -> Unit,
     isLoadingMore: Boolean
 ) {
-    val isPagination = currentFilter == FilterType.ALL
+    // 스크롤 하단 감지하여 다음 페이지 로드
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            val totalItems = scrollState.layoutInfo.totalItemsCount
+            val lastVisibleItem = scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
 
-    if (isPagination) {
-        LaunchedEffect(Unit) {
-            snapshotFlow {
-                val totalItems = scrollState.layoutInfo.totalItemsCount
-                val lastVisibleItem = scrollState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-
-                // 스크롤이 하단 3개 아이템에 도달했는지 체크
-                totalItems > 5 && lastVisibleItem >= totalItems - 3
-            }
-                .distinctUntilChanged()    // 값이 변경될 때만
-                .filter { it }             // ture일 때만
-                .collect { onLoadMore() }
+            // 스크롤이 하단 3개 아이템에 도달했는지 체크
+            totalItems > 5 && lastVisibleItem >= totalItems - 3
         }
+            .distinctUntilChanged()    // 값이 변경될 때만
+            .filter { it }             // ture일 때만
+            .collect { onLoadMore() }
     }
 
     LazyColumn (
@@ -64,7 +59,8 @@ fun ListViewContent(
             )
         }
 
-        if (isPagination && isLoadingMore) {
+        // 하단 로딩 인디케이터
+        if (isLoadingMore) {
             item(key = "indicator") {
                 Box(
                     modifier = Modifier

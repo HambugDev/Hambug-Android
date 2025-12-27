@@ -155,25 +155,26 @@ fun CommunityScreen(
                         val data = uiState as CommunityUiState.Success
 
                         if (isListView) {
-                            // 리스트형
+                            // 리스트형 (전체, 자유잡담)
                             ListViewContent(
                                 boards = data.boards,
                                 scrollState = scrollState,
                                 onClick = { boardId ->
                                     navController.navigate("community_detail/$boardId")
                                 },
-                                currentFilter = currentFilter,
                                 onLoadMore = { communityViewModel.loadMoreBoards() },
                                 isLoadingMore = isLoadingMore
                             )
                         } else {
-                            // 피드형
+                            // 피드형 (햄버거리뷰, 맛집추천)
                             FeedViewContent(
                                 boards = data.boards,
                                 scrollState = scrollState,
                                 onClick = { boardId ->
                                     navController.navigate("community_detail/$boardId")
-                                }
+                                },
+                                onLoadMore = { communityViewModel.loadMoreBoards() },
+                                isLoadingMore = isLoadingMore
                             )
                         }
                     }

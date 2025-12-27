@@ -9,7 +9,6 @@ import desktop.hambug.data.dto.ProfileImageUpdateResponse
 import desktop.hambug.data.dto.UserInfoResponse
 import desktop.hambug.data.dto.community.BoardDetailResponse
 import desktop.hambug.data.dto.community.BoardsResponse
-import desktop.hambug.data.dto.community.CategoryBoardsResponse
 import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.dto.community.CreateBoardResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
@@ -34,6 +33,7 @@ interface HambugApi {
     // 오늘의 추천 햄버거 조회
     @GET("burgers/recommended")
     suspend fun getHomeBurgers(): HomeBurgerResponse
+
     // 인기 게시물 조회
     @GET("boards/trending")
     suspend fun getHomeBoards(): HomeBoardResponse
@@ -43,11 +43,14 @@ interface HambugApi {
     suspend fun getBoards(
         @Query("lastId") lastId: Int? = null
     ): BoardsResponse
+
     // 카테고리별 게시물 조회
     @GET("boards/category")
     suspend fun getCategoryBoards(
-        @Query("category") category: String
-    ): CategoryBoardsResponse
+        @Query("category") category: String,
+        @Query("lastId") lastId: Int? = null
+    ): BoardsResponse
+
     // 게시물 상세 조회
     @GET("boards/{id}")
     suspend fun getBoardDetail(
@@ -59,6 +62,7 @@ interface HambugApi {
     suspend fun createBoard(
         @Body request: CreateBoardRequest
     ): CreateBoardResponse
+
     // 게시물 생성 (이미지 포함)
     @Multipart
     @POST("boards/with-images")
@@ -70,12 +74,14 @@ interface HambugApi {
     // JWT 토큰으로 내 정보 조회
     @GET("auth/me")
     suspend fun getUserInfo(): UserInfoResponse
+
     // 닉네임 변경
     @PUT("users/{id}/nickname")
     suspend fun putUserNickname(
         @Path("id") id: Int,
         @Body request: NicknameUpdateRequest
     ): NicknameUpdateResponse
+
     // 프로필 이미지 변경
     @Multipart
     @PUT("users/{id}/profile")

@@ -6,7 +6,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import desktop.hambug.data.api.HambugApi
 import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.mapper.toEntity
-import desktop.hambug.domain.model.Board
 import desktop.hambug.domain.model.BoardDetail
 import desktop.hambug.domain.model.BoardPage
 import desktop.hambug.domain.repository.CommunityRepository
@@ -30,14 +29,14 @@ class CommunityRepositoryImpl @Inject constructor(
         return response.data.toEntity()
     }
 
-    override suspend fun getCategoryBoards(category: String): List<Board> {
-        val response = hambugApi.getCategoryBoards(category)
+    override suspend fun getCategoryBoards(category: String, lastId: Int?): BoardPage {
+        val response = hambugApi.getCategoryBoards(category, lastId)
 
         if (!response.success) {
             throw Exception(response.message)
         }
 
-        return response.data.map { it.toEntity() }
+        return response.data.toEntity()
     }
 
     override suspend fun getBoardDetail(boardId: Int): BoardDetail {
