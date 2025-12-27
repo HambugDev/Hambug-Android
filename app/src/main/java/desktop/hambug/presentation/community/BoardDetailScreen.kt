@@ -51,6 +51,7 @@ import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
 import desktop.hambug.presentation.ui.icon.appicons.CommentDetail
 import desktop.hambug.presentation.ui.icon.appicons.Dots
+import desktop.hambug.presentation.ui.icon.appicons.Heart
 import desktop.hambug.presentation.ui.icon.appicons.HeartBorder
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.util.toTimeAgoString
@@ -62,6 +63,7 @@ fun BoardDetailScreen(
     boardDetailViewModel: BoardDetailViewModel = hiltViewModel()
 ) {
     val uiState by boardDetailViewModel.uiState.collectAsStateWithLifecycle()
+    val isLikeProcessing by boardDetailViewModel.isLikeProcessing.collectAsStateWithLifecycle()
 
     var showPostBottomSheet by remember { mutableStateOf(false) }
     var showCommentBottomSheet by remember { mutableStateOf(false) }
@@ -128,7 +130,10 @@ fun BoardDetailScreen(
                     // 아이콘 영역
                     BoardDetailIconSection(
                         likeCount = data.board.likeCount,
-                        commentCount = data.board.commentCount
+                        commentCount = data.board.commentCount,
+                        isLiked = data.board.isLiked,
+                        isLikeProcessing = isLikeProcessing,
+                        onLikeClick = { boardDetailViewModel.likeBoard() }
                     )
 
                     Spacer(modifier = Modifier.height(36.dp))
@@ -347,7 +352,10 @@ fun BoardDetailImageSection(
 @Composable
 fun BoardDetailIconSection(
     likeCount: Int,
-    commentCount: Int
+    commentCount: Int,
+    isLiked: Boolean,
+    isLikeProcessing: Boolean,
+    onLikeClick: () -> Unit
 ) {
     Row(
         modifier = Modifier.padding(horizontal = 16.dp),
@@ -357,7 +365,14 @@ fun BoardDetailIconSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = AppIcons.HeartBorder,
+                modifier = Modifier
+                    .clickable(
+                        // 중복 클릭 방지
+                        enabled = !isLikeProcessing,
+                        onClick = onLikeClick
+                    )
+                    .size(20.dp),
+                imageVector = if (isLiked) AppIcons.Heart else AppIcons.HeartBorder,
                 contentDescription = null,
                 tint = HambugTheme.colors.primRed
             )
@@ -375,6 +390,7 @@ fun BoardDetailIconSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
+                modifier = Modifier.size(20.dp),
                 imageVector = AppIcons.CommentDetail,
                 contentDescription = null,
                 tint = HambugTheme.colors.iconDisabled

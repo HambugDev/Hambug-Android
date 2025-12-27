@@ -11,6 +11,7 @@ import desktop.hambug.data.dto.community.BoardDetailResponse
 import desktop.hambug.data.dto.community.BoardsResponse
 import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.dto.community.CreateBoardResponse
+import desktop.hambug.data.dto.community.LikeBoardResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -70,6 +71,12 @@ interface HambugApi {
         @Part("request") request: RequestBody,
         @Part images: List<MultipartBody.Part>
     ): CreateBoardResponse
+
+    // 좋아요 토글
+    @POST("/api/v1/boards/{boardId}/likes")
+    suspend fun likeBoard(
+        @Path("boardId") boardId: Int
+    ): LikeBoardResponse
 
     // JWT 토큰으로 내 정보 조회
     @GET("auth/me")

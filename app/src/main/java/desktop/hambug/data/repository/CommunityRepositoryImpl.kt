@@ -5,6 +5,7 @@ import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import desktop.hambug.data.api.HambugApi
 import desktop.hambug.data.dto.community.CreateBoardRequest
+import desktop.hambug.data.dto.community.LikeBoardData
 import desktop.hambug.data.mapper.toEntity
 import desktop.hambug.domain.model.BoardDetail
 import desktop.hambug.domain.model.BoardPage
@@ -92,5 +93,15 @@ class CommunityRepositoryImpl @Inject constructor(
         }
 
         return response.data.id
+    }
+
+    override suspend fun likeBoard(boardId: Int): LikeBoardData {
+        val response = hambugApi.likeBoard(boardId)
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+
+        return response.data
     }
 }
