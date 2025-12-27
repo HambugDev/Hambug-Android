@@ -19,10 +19,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,6 +42,7 @@ import desktop.hambug.domain.model.FilterType
 import desktop.hambug.presentation.community.component.CustomFloatingActionButton
 import desktop.hambug.presentation.community.component.FeedViewContent
 import desktop.hambug.presentation.community.component.ListViewContent
+import desktop.hambug.presentation.ui.component.CustomSnackbar
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.theme.CommunityFilterSelected
@@ -67,6 +72,15 @@ fun CommunityScreen(
         communityViewModel.getScrollPositionForFilter(currentFilter)
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        snackbarHostState.showSnackbar(
+            message = "게시물이 삭제되었어요.",
+            duration = SnackbarDuration.Short
+        )
+    }
+
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = Color.White,
@@ -94,6 +108,13 @@ fun CommunityScreen(
                     )
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(
+                    snackbarData = data
+                )
+            }
         },
         floatingActionButton = {
             CustomFloatingActionButton(
