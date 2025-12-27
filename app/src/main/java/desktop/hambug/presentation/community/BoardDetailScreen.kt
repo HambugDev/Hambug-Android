@@ -53,6 +53,7 @@ import desktop.hambug.presentation.ui.icon.appicons.CommentDetail
 import desktop.hambug.presentation.ui.icon.appicons.Dots
 import desktop.hambug.presentation.ui.icon.appicons.HeartBorder
 import desktop.hambug.presentation.ui.theme.HambugTheme
+import desktop.hambug.presentation.util.toTimeAgoString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -108,7 +109,8 @@ fun BoardDetailScreen(
                     // 제목 + 시간 + 내용 영역
                     BoardDetailTextSection(
                         title = data.board.title,
-                        content = data.board.content
+                        content = data.board.content,
+                        createdAt = data.board.createdAt
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -273,7 +275,8 @@ fun BoardDetailProfileSection(
 @Composable
 fun BoardDetailTextSection(
     title: String,
-    content: String
+    content: String,
+    createdAt: String
 ) {
     Column(
         modifier = Modifier
@@ -289,7 +292,7 @@ fun BoardDetailTextSection(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "15분 전",
+            text = createdAt.toTimeAgoString(),
             style = HambugTheme.typography.label02,
             color = HambugTheme.colors.textDisabled
         )

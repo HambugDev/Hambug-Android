@@ -28,6 +28,7 @@ import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Comment
 import desktop.hambug.presentation.ui.icon.appicons.Heart
 import desktop.hambug.presentation.ui.theme.HambugTheme
+import desktop.hambug.presentation.util.toTimeAgoString
 
 @Composable
 fun PostListItem(
@@ -59,7 +60,7 @@ fun PostListItem(
                 )
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
-                    text = "2분 전",
+                    text = board.createdAt.toTimeAgoString(),
                     style = HambugTheme.typography.label02,
                     color = HambugTheme.colors.textDisabled
                 )

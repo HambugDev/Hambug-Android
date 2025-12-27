@@ -25,6 +25,7 @@ import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Comment
 import desktop.hambug.presentation.ui.icon.appicons.Heart
 import desktop.hambug.presentation.ui.theme.HambugTheme
+import desktop.hambug.presentation.util.toTimeAgoString
 
 @Composable
 fun PostFeedItem(
@@ -65,7 +66,7 @@ fun PostFeedItem(
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "2분 전",
+                text = board.createdAt.toTimeAgoString(),
                 modifier = Modifier.padding(start = 10.dp),
                 style = HambugTheme.typography.label02,
                 color = HambugTheme.colors.textDisabled
