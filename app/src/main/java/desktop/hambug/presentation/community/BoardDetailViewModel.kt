@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import desktop.hambug.domain.usecase.CreateCommentUseCase
 import desktop.hambug.domain.usecase.GetBoardDetailUseCase
 import desktop.hambug.domain.usecase.GetCommentsUseCase
 import desktop.hambug.domain.usecase.LikeBoardUseCase
@@ -19,13 +20,14 @@ class BoardDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val boardDetailUseCase: GetBoardDetailUseCase,
     private val likeBoardUseCase: LikeBoardUseCase,
-    private val getCommentsUseCase: GetCommentsUseCase
+    private val getCommentsUseCase: GetCommentsUseCase,
+    private val createCommentUseCase: CreateCommentUseCase
 ) : ViewModel() {
 
     private val boardId: Int = checkNotNull(savedStateHandle["boardId"])
 
     private val _uiState = MutableStateFlow<BoardDetailUiState>(BoardDetailUiState.Loading)
-    val uiState: StateFlow<BoardDetailUiState> =  _uiState.asStateFlow()
+    val uiState: StateFlow<BoardDetailUiState> = _uiState.asStateFlow()
 
     private val _commentsState = MutableStateFlow<CommentsUiState>(CommentsUiState.Loading)
     val commentsState: StateFlow<CommentsUiState> = _commentsState.asStateFlow()
@@ -33,6 +35,10 @@ class BoardDetailViewModel @Inject constructor(
     // 좋아요 처리중 상태
     private val _isLikeProcessing = MutableStateFlow(false)
     val isLikeProcessing: StateFlow<Boolean> = _isLikeProcessing.asStateFlow()
+
+    // 댓글 입력 상태
+    private val _commentText = MutableStateFlow("")
+    val commentText: StateFlow<String> = _commentText.asStateFlow()
 
     init {
         loadBoardDate()
@@ -111,6 +117,29 @@ class BoardDetailViewModel @Inject constructor(
                 }
 
             _isLikeProcessing.value = false
+        }
+    }
+
+    fun onCommentTextChange(text: String) {
+        _commentText.value = text
+    }
+
+    /**
+     * 댓글 생성
+     */
+    fun createComment() {
+        val comment = _commentText.value.trim()
+        if (comment.isEmpty()) return
+
+        viewModelScope.launch {
+            createCommentUseCase(boardId, comment)
+                .onSuccess {
+                    _commentText.value = ""
+                    loadComments()
+                }
+                .onFailure { exception ->
+                    Log.e("community", "댓글 생성 실패: ${exception.message}", exception)
+                }
         }
     }
 }

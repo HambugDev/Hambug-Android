@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -25,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.Comment
+import desktop.hambug.presentation.community.component.CommentInputBar
 import desktop.hambug.presentation.community.component.DetailMyBottomSheet
 import desktop.hambug.presentation.community.component.DetailOtherBottomSheet
 import desktop.hambug.presentation.ui.icon.AppIcons
@@ -64,16 +67,26 @@ fun BoardDetailScreen(
     val uiState by boardDetailViewModel.uiState.collectAsStateWithLifecycle()
     val commentsState by boardDetailViewModel.commentsState.collectAsStateWithLifecycle()
     val isLikeProcessing by boardDetailViewModel.isLikeProcessing.collectAsStateWithLifecycle()
+    val commentText by boardDetailViewModel.commentText.collectAsStateWithLifecycle()
 
     var showPostBottomSheet by remember { mutableStateOf(false) }
     var showCommentBottomSheet by remember { mutableStateOf(false) }
 
-    Surface (
+    Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding(),
-        color = HambugTheme.colors.bgWhite
-    ) {
+            .systemBarsPadding()
+            .imePadding(),
+        containerColor = HambugTheme.colors.bgWhite,
+        bottomBar = {
+            CommentInputBar(
+                commentText = commentText,
+                onTextChange = { boardDetailViewModel.onCommentTextChange(it) },
+                onSubmit = { boardDetailViewModel.createComment() }
+            )
+        }
+    ) { paddingValues ->
+
         when (uiState) {
             is BoardDetailUiState.Loading -> {
                 Box(
@@ -93,7 +106,10 @@ fun BoardDetailScreen(
 
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(top = 20.dp)
+                    contentPadding = PaddingValues(
+                        top = 20.dp,
+                        bottom = paddingValues.calculateBottomPadding()
+                    )
                 ) {
                     // 프로필 영역
                     item {
