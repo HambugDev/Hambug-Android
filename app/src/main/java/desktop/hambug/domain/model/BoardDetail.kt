@@ -9,5 +9,6 @@ data class BoardDetail(
     val authorProfileImageUrl: String,
     val createdAt: String,
     val likeCount: Int,
-    val commentCount: Int
+    val commentCount: Int,
+    val isLiked: Boolean
 )

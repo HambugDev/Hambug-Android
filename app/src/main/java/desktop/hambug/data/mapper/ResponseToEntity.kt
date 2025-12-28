@@ -75,6 +75,7 @@ fun BoardDetailData.toEntity(): BoardDetail {
         authorProfileImageUrl = this.authorProfileImageUrl,
         createdAt = this.createdAt,
         likeCount = this.likeCount,
-        commentCount = this.commentCount
+        commentCount = this.commentCount,
+        isLiked = this.isLiked
     )
 }
