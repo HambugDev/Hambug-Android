@@ -1,10 +1,10 @@
 package desktop.hambug.presentation.community
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -15,14 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -37,14 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import desktop.hambug.R
+import desktop.hambug.domain.model.Comment
 import desktop.hambug.presentation.community.component.DetailMyBottomSheet
 import desktop.hambug.presentation.community.component.DetailOtherBottomSheet
 import desktop.hambug.presentation.ui.icon.AppIcons
@@ -63,6 +62,7 @@ fun BoardDetailScreen(
     boardDetailViewModel: BoardDetailViewModel = hiltViewModel()
 ) {
     val uiState by boardDetailViewModel.uiState.collectAsStateWithLifecycle()
+    val commentsState by boardDetailViewModel.commentsState.collectAsStateWithLifecycle()
     val isLikeProcessing by boardDetailViewModel.isLikeProcessing.collectAsStateWithLifecycle()
 
     var showPostBottomSheet by remember { mutableStateOf(false) }
@@ -89,100 +89,113 @@ fun BoardDetailScreen(
             }
             is BoardDetailUiState.Error -> {}
             is BoardDetailUiState.Success -> {
-                val data = uiState as BoardDetailUiState.Success
+                val board = (uiState as BoardDetailUiState.Success).board
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(top = 20.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // 상단 프로필 영역
-                    BoardDetailProfileSection(
-                        authorNickname = data.board.authorNickname,
-                        authorProfileImageUrl = data.board.authorProfileImageUrl,
-                        onClickBack = { navController.popBackStack() },
-                        onClickMore = { showPostBottomSheet = true }
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
+                    // 프로필 영역
+                    item {
+                        BoardDetailProfileSection(
+                            authorNickname = board.authorNickname,
+                            authorProfileImageUrl = board.authorProfileImageUrl,
+                            onClickBack = { navController.popBackStack() },
+                            onClickMore = { showPostBottomSheet = true }
+                        )
+                        Spacer(Modifier.height(20.dp))
+                    }
 
                     // 제목 + 시간 + 내용 영역
-                    BoardDetailTextSection(
-                        title = data.board.title,
-                        content = data.board.content,
-                        createdAt = data.board.createdAt
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    if (data.board.imageUrls != null) {
-                        // 게시물 이미지 영역
-                        BoardDetailImageSection(
-                            imageUrls = data.board.imageUrls
+                    item {
+                        BoardDetailTextSection(
+                            title = board.title,
+                            content = board.content,
+                            createdAt = board.createdAt
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
-                    } else {
-                        Spacer(modifier = Modifier.height(40.dp))
+                        Spacer(Modifier.height(20.dp))
+                    }
+
+                    // 게시물 이미지 영역
+                    item {
+                        if (board.imageUrls != null) {
+                            BoardDetailImageSection(imageUrls = board.imageUrls)
+                            Spacer(Modifier.height(20.dp))
+                        } else {
+                            Spacer(Modifier.height(40.dp))
+                        }
                     }
 
                     // 아이콘 영역
-                    BoardDetailIconSection(
-                        likeCount = data.board.likeCount,
-                        commentCount = data.board.commentCount,
-                        isLiked = data.board.isLiked,
-                        isLikeProcessing = isLikeProcessing,
-                        onLikeClick = { boardDetailViewModel.likeBoard() }
-                    )
-
-                    Spacer(modifier = Modifier.height(36.dp))
-
-                    // 댓글 영역
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                    ) {
-                        Image(
-                            modifier = Modifier.size(35.dp),
-                            painter = painterResource(id = R.drawable.logo_profile),
-                            contentDescription = null
+                    item {
+                        BoardDetailIconSection(
+                            likeCount = board.likeCount,
+                            commentCount = board.commentCount,
+                            isLiked = board.isLiked,
+                            isLikeProcessing = isLikeProcessing,
+                            onLikeClick = { boardDetailViewModel.likeBoard() }
                         )
+                        Spacer(Modifier.height(20.dp))
+                    }
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                    // 댓글 구분선
+                    item {
+                        HorizontalDivider(
+                            thickness = 8.dp,
+                            color = HambugTheme.colors.bgNormal
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
 
-                        Column {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "상하이버거상하이버거",
-                                    style = HambugTheme.typography.body02,
-                                    color = HambugTheme.colors.textHeadline
-                                )
-                                Icon(
-                                    modifier = Modifier.clickable { showCommentBottomSheet = true },
-                                    imageVector = AppIcons.Dots,
-                                    contentDescription = null,
-                                    tint = Color.Unspecified
-                                )
+                    // 댓글 목록
+                    when (commentsState) {
+                        is CommentsUiState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 40.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(24.dp),
+                                        color = HambugTheme.colors.primRed,
+                                        strokeWidth = 2.dp
+                                    )
+                                }
                             }
+                        }
+                        is CommentsUiState.Error -> {}
+                        is CommentsUiState.Success -> {
+                            val comments = (commentsState as CommentsUiState.Success).comments
 
-                            Text(
-                                text = "15분 전",
-                                style = HambugTheme.typography.label02,
-                                color = HambugTheme.colors.textDisabled
-                            )
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            Text(
-                                text = "와 이 햄버거 진짜 맛있어 보이네요! 패티가 두툼하고 야채 신선해 보여요. 저도 꼭 가봐야겠어요. 혹시 소스는 어떤 맛인가요? 치즈도 듬뿍 들어있는 게 정말 좋아 보입니다. 빵도 촉촉해 보이고 구성이 완벽하네요. 다음 주말에 방문 예정인데 너무 기대되요! 가격대는 어느 정도인가요?",
-                                style = HambugTheme.typography.body03,
-                                color = HambugTheme.colors.textHeadline
-                            )
+                            if (comments.isEmpty()) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 40.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "첫 댓글을 남겨보세요",
+                                            style = HambugTheme.typography.body02,
+                                            color = HambugTheme.colors.borderDefault
+                                        )
+                                    }
+                                }
+                            } else {
+                                items(
+                                    items = comments,
+                                    key = { it.id }
+                                ) { comment ->
+                                    CommentItem(
+                                        comment = comment,
+                                        onClick = { showPostBottomSheet = true }
+                                    )
+                                    Spacer(Modifier.height(20.dp))
+                                }
+                            }
                         }
                     }
                 }
@@ -400,6 +413,62 @@ fun BoardDetailIconSection(
                 text = commentCount.toString(),
                 style = HambugTheme.typography.body01,
                 color = HambugTheme.colors.textDisabled
+            )
+        }
+    }
+}
+
+@Composable
+fun CommentItem(
+    comment: Comment,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+    ) {
+        AsyncImage(
+            modifier = Modifier
+                .size(35.dp)
+                .clip(CircleShape),
+            model = comment.authorProfileImageUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = comment.authorNickname,
+                    style = HambugTheme.typography.body02,
+                    color = HambugTheme.colors.textHeadline
+                )
+                Icon(
+                    modifier = Modifier.clickable { onClick() },
+                    imageVector = AppIcons.Dots,
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
+            }
+
+            Text(
+                text = "15분 전",
+                style = HambugTheme.typography.label02,
+                color = HambugTheme.colors.textDisabled
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = comment.content,
+                style = HambugTheme.typography.body03,
+                color = HambugTheme.colors.textHeadline
             )
         }
     }

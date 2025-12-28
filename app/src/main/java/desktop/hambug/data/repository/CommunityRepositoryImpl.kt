@@ -9,6 +9,7 @@ import desktop.hambug.data.dto.community.LikeBoardData
 import desktop.hambug.data.mapper.toEntity
 import desktop.hambug.domain.model.BoardDetail
 import desktop.hambug.domain.model.BoardPage
+import desktop.hambug.domain.model.Comment
 import desktop.hambug.domain.repository.CommunityRepository
 import desktop.hambug.util.ImageFileUtil
 import okhttp3.MediaType.Companion.toMediaType
@@ -103,5 +104,15 @@ class CommunityRepositoryImpl @Inject constructor(
         }
 
         return response.data
+    }
+
+    override suspend fun getComments(boardId: Int): List<Comment> {
+        val response = hambugApi.getComments(boardId)
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+
+        return response.data.content.map { it.toEntity() }
     }
 }

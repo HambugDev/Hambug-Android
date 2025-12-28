@@ -5,10 +5,12 @@ import desktop.hambug.data.dto.UserInfoData
 import desktop.hambug.data.dto.community.BoardDetailData
 import desktop.hambug.data.dto.community.BoardItem
 import desktop.hambug.data.dto.community.BoardsData
+import desktop.hambug.data.dto.community.CommentItem
 import desktop.hambug.data.dto.home.HomeBoardData
 import desktop.hambug.domain.model.Board
 import desktop.hambug.domain.model.BoardDetail
 import desktop.hambug.domain.model.BoardPage
+import desktop.hambug.domain.model.Comment
 import desktop.hambug.domain.model.HomeBoard
 import desktop.hambug.domain.model.HomeBurger
 import desktop.hambug.domain.model.UserInfo
@@ -77,5 +79,16 @@ fun BoardDetailData.toEntity(): BoardDetail {
         likeCount = this.likeCount,
         commentCount = this.commentCount,
         isLiked = this.isLiked
+    )
+}
+
+fun CommentItem.toEntity(): Comment {
+    return Comment(
+        id = this.id,
+        content = this.content,
+        authorId = this.authorId,
+        authorNickname = this.authorNickname,
+        authorProfileImageUrl = this.authorProfileImageUrl,
+        createdAt = this.createdAt
     )
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.usecase.GetBoardDetailUseCase
+import desktop.hambug.domain.usecase.GetCommentsUseCase
 import desktop.hambug.domain.usecase.LikeBoardUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,8 @@ import javax.inject.Inject
 class BoardDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val boardDetailUseCase: GetBoardDetailUseCase,
-    private val likeBoardUseCase: LikeBoardUseCase
+    private val likeBoardUseCase: LikeBoardUseCase,
+    private val getCommentsUseCase: GetCommentsUseCase
 ) : ViewModel() {
 
     private val boardId: Int = checkNotNull(savedStateHandle["boardId"])
@@ -25,12 +27,16 @@ class BoardDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<BoardDetailUiState>(BoardDetailUiState.Loading)
     val uiState: StateFlow<BoardDetailUiState> =  _uiState.asStateFlow()
 
+    private val _commentsState = MutableStateFlow<CommentsUiState>(CommentsUiState.Loading)
+    val commentsState: StateFlow<CommentsUiState> = _commentsState.asStateFlow()
+
     // 좋아요 처리중 상태
     private val _isLikeProcessing = MutableStateFlow(false)
     val isLikeProcessing: StateFlow<Boolean> = _isLikeProcessing.asStateFlow()
 
     init {
         loadBoardDate()
+        loadComments()
     }
 
     private fun loadBoardDate() {
@@ -42,6 +48,19 @@ class BoardDetailViewModel @Inject constructor(
                 .onFailure { exception ->
                     val exceptionMessage = exception.message ?: "게시물 상세 데이터 로딩 실패"
                     _uiState.value = BoardDetailUiState.Error(exceptionMessage)
+                }
+        }
+    }
+
+    private fun loadComments() {
+        viewModelScope.launch {
+            getCommentsUseCase(boardId)
+                .onSuccess { comments ->
+                    _commentsState.value = CommentsUiState.Success(comments)
+                }
+                .onFailure { exception ->
+                    val exceptionMessage = exception.message ?: "댓글 로딩 실패"
+                    _commentsState.value = CommentsUiState.Error(exceptionMessage)
                 }
         }
     }
