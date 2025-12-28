@@ -9,8 +9,11 @@ import desktop.hambug.data.dto.ProfileImageUpdateResponse
 import desktop.hambug.data.dto.UserInfoResponse
 import desktop.hambug.data.dto.community.BoardDetailResponse
 import desktop.hambug.data.dto.community.BoardsResponse
+import desktop.hambug.data.dto.community.CommentsResponse
 import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.dto.community.CreateBoardResponse
+import desktop.hambug.data.dto.community.CreateCommentRequest
+import desktop.hambug.data.dto.community.CreateCommentResponse
 import desktop.hambug.data.dto.community.LikeBoardResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
 import okhttp3.MultipartBody
@@ -77,6 +80,19 @@ interface HambugApi {
     suspend fun likeBoard(
         @Path("boardId") boardId: Int
     ): LikeBoardResponse
+
+    // 댓글 목록 조회
+    @GET("/api/v1/boards/{boardId}/comments")
+    suspend fun getComments(
+        @Path("boardId") boardId: Int
+    ): CommentsResponse
+
+    // 댓글 생성
+    @POST("boards/{boardId}/comments")
+    suspend fun createComment(
+        @Path("boardId") boardId: Int,
+        @Body request: CreateCommentRequest
+    ): CreateCommentResponse
 
     // JWT 토큰으로 내 정보 조회
     @GET("auth/me")
