@@ -6,6 +6,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import desktop.hambug.data.api.HambugApi
 import desktop.hambug.data.dto.NicknameUpdateRequest
 import desktop.hambug.data.mapper.toEntity
+import desktop.hambug.domain.model.MyBoard
+import desktop.hambug.domain.model.MyComment
 import desktop.hambug.domain.model.UserInfo
 import desktop.hambug.domain.repository.MyRepository
 import desktop.hambug.util.ImageFileUtil
@@ -52,5 +54,25 @@ class MyRepositoryImpl @Inject constructor(
         }
 
         return response.data.toEntity()
+    }
+
+    override suspend fun getMyBoards(): List<MyBoard> {
+        val response = hambugApi.getMyBoards()
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+
+        return response.data.content.map { it.toEntity() }
+    }
+
+    override suspend fun getMyComments(): List<MyComment> {
+        val response = hambugApi.getMyComments()
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+
+        return response.data.content.map { it.toEntity() }
     }
 }

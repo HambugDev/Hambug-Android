@@ -15,6 +15,8 @@ import desktop.hambug.data.dto.community.CreateBoardResponse
 import desktop.hambug.data.dto.community.CreateCommentRequest
 import desktop.hambug.data.dto.community.CreateCommentResponse
 import desktop.hambug.data.dto.community.LikeBoardResponse
+import desktop.hambug.data.dto.community.MyBoardsResponse
+import desktop.hambug.data.dto.community.MyCommentsResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -112,4 +114,12 @@ interface HambugApi {
         @Path("id") id: Int,
         @Part file: MultipartBody.Part
     ): ProfileImageUpdateResponse
+
+    // 내 게시물 목록 조회
+    @GET("my-pages/boards")
+    suspend fun getMyBoards(): MyBoardsResponse
+
+    // 내 댓글 목록 조회
+    @GET("my-pages/comments")
+    suspend fun getMyComments(): MyCommentsResponse
 }

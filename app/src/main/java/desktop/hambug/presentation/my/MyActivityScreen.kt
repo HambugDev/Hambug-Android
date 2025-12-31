@@ -5,15 +5,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -29,19 +36,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import desktop.hambug.presentation.community.component.PostListItem
+import coil3.compose.AsyncImage
+import desktop.hambug.domain.model.MyBoard
+import desktop.hambug.domain.model.MyComment
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
+import desktop.hambug.presentation.ui.icon.appicons.Comment
 import desktop.hambug.presentation.ui.icon.appicons.CommentBorder
+import desktop.hambug.presentation.ui.icon.appicons.Heart
 import desktop.hambug.presentation.ui.theme.HambugTheme
+import desktop.hambug.presentation.util.toTimeAgoString
 
 @Composable
-fun MyActivityScreen(navController: NavHostController) {
+fun MyActivityScreen(
+    navController: NavHostController,
+    myActivityViewModel: MyActivityViewModel = hiltViewModel()
+) {
+    val uiState by myActivityViewModel.uiState.collectAsStateWithLifecycle()
+    val commentsState by myActivityViewModel.commentsSate.collectAsStateWithLifecycle()
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +82,13 @@ fun MyActivityScreen(navController: NavHostController) {
             Spacer(Modifier.height(8.dp))
 
             // 탭 영역 (게시물 / 댓글)
-            TwoTabSection()
+            TwoTabSection(
+                uiState = uiState,
+                commentsState = commentsState,
+                onClick = { boardId ->
+                    navController.navigate("community_detail/$boardId")
+                }
+            )
         }
     }
 }
@@ -91,7 +119,11 @@ fun MyActivityHeaderSection(
 }
 
 @Composable
-fun TwoTabSection() {
+fun TwoTabSection(
+    uiState: MyActivityUiState,
+    commentsState: MyCommentUiState,
+    onClick: (Int) -> Unit
+) {
     val tabs = listOf("게시물", "댓글")
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
@@ -133,48 +165,84 @@ fun TwoTabSection() {
 
         Spacer(Modifier.height(12.dp))
 
-        // 탭 콘텐츠 (개시물 / 댓글)
-        when (selectedTabIndex) {
-            0 -> {
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .fillMaxSize()
-                ) {
-                    Column (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp))
-                            .padding(horizontal = 20.dp)
-                    ) {
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        for (i in 0 until 10) {
-//                            PostListItem(
-//                                onClick = {}
-//                            )
-                            Spacer(modifier = Modifier.height(24.dp))
+        // 콘텐츠 영역 (개시물 / 댓글)
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .fillMaxSize()
+        ) {
+            when (selectedTabIndex) {
+                0 -> {
+                    when (uiState) {
+                        is MyActivityUiState.Loading -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(40.dp),
+                                    color = HambugTheme.colors.primRed,
+                                    strokeWidth = 4.dp
+                                )
+                            }
+                        }
+                        is MyActivityUiState.Error -> {}
+                        is MyActivityUiState.Success -> {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp)),
+                                state = rememberLazyListState(),
+                                contentPadding = PaddingValues(20.dp),
+                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                            ) {
+                                items(
+                                    items = uiState.boards,
+                                    key = { it.id }
+                                ) { board ->
+                                    MyBoardItem(
+                                        board = board,
+                                        onClick = { onClick(board.id) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
-            }
-            1 -> {
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp)
-                        .fillMaxSize()
-                ) {
-                    Column (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp))
-                            .padding(horizontal = 20.dp)
-                    ) {
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        for (i in 0 until 10) {
-                            MyActivityCommentItem()
-                            Spacer(modifier = Modifier.height(24.dp))
+                1 -> {
+                    when (commentsState) {
+                        is MyCommentUiState.Loading -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(40.dp),
+                                    color = HambugTheme.colors.primRed,
+                                    strokeWidth = 4.dp
+                                )
+                            }
+                        }
+                        is MyCommentUiState.Error -> {}
+                        is MyCommentUiState.Success -> {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp)),
+                                state = rememberLazyListState(),
+                                contentPadding = PaddingValues(20.dp),
+                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                            ) {
+                                items(
+                                    items = commentsState.comments,
+                                    key = { it.commentId }
+                                ) { comment ->
+                                    MyCommentItem(
+                                        comment = comment,
+                                        onClick = { onClick(comment.boardId) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -184,11 +252,123 @@ fun TwoTabSection() {
 }
 
 @Composable
-fun MyActivityCommentItem() {
+fun MyBoardItem(
+    board: MyBoard,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .clickable { onClick() }
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    // 제목이 짧은 경우 제목 옆에 시간을 붙이고, 제목이 긴 경우 말줄임 처리
+                    modifier = Modifier.weight(1f, fill = false),
+                    text = board.title,
+                    style = HambugTheme.typography.body02Prominent,
+                    color = HambugTheme.colors.textBody,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    modifier = Modifier.padding(start = 10.dp),
+                    text = board.createdAt.toTimeAgoString(),
+                    style = HambugTheme.typography.label02,
+                    color = HambugTheme.colors.textDisabled
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+//                    text = board.authorNickname,
+                    text = "벅미새",
+                    style = HambugTheme.typography.label02,
+                    color = HambugTheme.colors.textBody
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = AppIcons.Heart,
+                        contentDescription = null,
+                        tint = HambugTheme.colors.primRed
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+//                        text = board.likeCount.toString(),
+                        text = "1",
+                        style = HambugTheme.typography.label02,
+                        color = HambugTheme.colors.textDisabled
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = AppIcons.Comment,
+                        contentDescription = null,
+                        tint = HambugTheme.colors.iconDisabled
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+//                        text = board.commentCount.toString(),
+                        text = "22",
+                        style = HambugTheme.typography.body03,
+                        color = HambugTheme.colors.textBody
+                    )
+                }
+            }
+        }
+
+        if (board.imageUrl != null) {
+            Box(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(color = HambugTheme.colors.bgYellow)
+            ) {
+                AsyncImage(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(RoundedCornerShape(5.dp)),
+                    model = board.imageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MyCommentItem(
+    comment: MyComment,
+    onClick: () -> Unit
+) {
     Column(
         modifier = Modifier
+            .clickable { onClick() }
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -197,14 +377,14 @@ fun MyActivityCommentItem() {
         ) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "맘스터치 싸이버거는 언제나 옳다! 겉바속촉 치킨 패티에 중독성 강한 소스가 대박!",
+                text = comment.boardTitle,
                 style = HambugTheme.typography.body02Prominent,
                 color = HambugTheme.colors.textBody,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "2분 전",
+                text = comment.createdAt.toTimeAgoString(),
                 modifier = Modifier.padding(start = 10.dp),
                 style = HambugTheme.typography.label02,
                 color = HambugTheme.colors.textDisabled
@@ -223,7 +403,7 @@ fun MyActivityCommentItem() {
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "내가 작성한 댓글 내가 작성한 댓글 내가 작성한 댓글 내가 작성한 댓글 ",
+                text = comment.commentContent,
                 style = HambugTheme.typography.body03,
                 color = HambugTheme.colors.textHeadline,
                 maxLines = 1,
