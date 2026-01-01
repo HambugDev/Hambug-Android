@@ -135,4 +135,12 @@ class CommunityRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
     }
+
+    override suspend fun deleteComment(boardId: Int, commentId: Int) {
+        val response = hambugApi.deleteComment(boardId, commentId)
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+    }
 }

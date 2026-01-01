@@ -35,8 +35,10 @@ data class CommentItem(
     val authorNickname: String,
     @SerialName("authorProfileImageUrl")
     val authorProfileImageUrl: String,
+    @SerialName("isAuthor")
+    val isAuthor: Boolean,
     @SerialName("createdAt")
-    val createdAt: String?,
+    val createdAt: String,
     @SerialName("updatedAt")
-    val updatedAt: String?
+    val updatedAt: String
 )

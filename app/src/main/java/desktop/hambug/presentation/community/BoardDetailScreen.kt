@@ -27,8 +27,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +52,7 @@ import desktop.hambug.domain.model.Comment
 import desktop.hambug.presentation.community.component.CommentInputBar
 import desktop.hambug.presentation.community.component.DetailMyBottomSheet
 import desktop.hambug.presentation.community.component.DetailOtherBottomSheet
+import desktop.hambug.presentation.ui.component.CustomSnackbar
 import desktop.hambug.presentation.ui.component.TwoButtonDialog
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
@@ -72,12 +77,28 @@ fun BoardDetailScreen(
 
     val uiState by boardDetailViewModel.uiState.collectAsStateWithLifecycle()
     val commentsState by boardDetailViewModel.commentsState.collectAsStateWithLifecycle()
+    val selectedComment by boardDetailViewModel.selectedComment.collectAsStateWithLifecycle()
+    val showCommentDeleteSnackbar by boardDetailViewModel.showCommentDeleteSnackbar.collectAsStateWithLifecycle()
     val isLikeProcessing by boardDetailViewModel.isLikeProcessing.collectAsStateWithLifecycle()
     val commentText by boardDetailViewModel.commentText.collectAsStateWithLifecycle()
 
     var showBoardBottomSheet by remember { mutableStateOf(false) }
     var showCommentBottomSheet by remember { mutableStateOf(false) }
     var showBoardRemoveDialog by remember { mutableStateOf(false) }
+    var showCommentRemoveDialog by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 댓글 삭제 스낵바
+    LaunchedEffect(showCommentDeleteSnackbar) {
+        if (showCommentDeleteSnackbar) {
+            snackbarHostState.showSnackbar(
+                message = "댓글이 삭제되었어요.",
+                duration = SnackbarDuration.Short
+            )
+            boardDetailViewModel.onCommentDeleteSnackbarShown()
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -91,6 +112,11 @@ fun BoardDetailScreen(
                 onTextChange = { boardDetailViewModel.onCommentTextChange(it) },
                 onSubmit = { boardDetailViewModel.createComment() }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(snackbarData = data)
+            }
         }
     ) { paddingValues ->
 
@@ -214,7 +240,10 @@ fun BoardDetailScreen(
                                 ) { comment ->
                                     CommentItem(
                                         comment = comment,
-                                        onClick = { showCommentBottomSheet = true }
+                                        onIconClick = {
+                                            boardDetailViewModel.onCommentClicked(comment)
+                                            showCommentBottomSheet = true
+                                        }
                                     )
                                     Spacer(Modifier.height(20.dp))
                                 }
@@ -257,20 +286,41 @@ fun BoardDetailScreen(
     }
 
     // 댓글 바텀시트
-    if (showCommentBottomSheet) {
-        // 자신의 댓글
-
-        // 타인의 댓글
-        ModalBottomSheet(
-            onDismissRequest = { showCommentBottomSheet = false },
-            dragHandle = null,
-            containerColor = HambugTheme.colors.bgWhite,
-            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-        ) {
-            DetailOtherBottomSheet(
-                onReport = {},
-                onCancel = { showCommentBottomSheet = false }
-            )
+    selectedComment?.let { comment ->
+        if (showCommentBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showCommentBottomSheet = false
+                    boardDetailViewModel.clearSelectedComment()
+               },
+                dragHandle = null,
+                containerColor = HambugTheme.colors.bgWhite,
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            ) {
+                if (comment.isAuthor) {
+                    // 내 댓글인 경우
+                    DetailMyBottomSheet(
+                        onEdit = {},
+                        onDelete = {
+                            showCommentRemoveDialog = true
+                            showCommentBottomSheet = false
+                        },
+                        onCancel = {
+                            showCommentBottomSheet = false
+                            boardDetailViewModel.clearSelectedComment()
+                        }
+                    )
+                } else {
+                    // 타인의 댓글인 경우
+                    DetailOtherBottomSheet(
+                        onReport = {},
+                        onCancel = {
+                            showCommentBottomSheet = false
+                            boardDetailViewModel.clearSelectedComment()
+                        }
+                    )
+                }
+            }
         }
     }
 
@@ -289,6 +339,27 @@ fun BoardDetailScreen(
                         showBoardRemoveDialog = false
                         navController.popBackStack()
                     }
+                )
+            }
+        )
+    }
+
+    // 댓글 삭제 모달
+    if (showCommentRemoveDialog) {
+        TwoButtonDialog(
+            title = "댓글을 삭제하시겠어요?",
+            content = "삭제한 댓글은 되돌릴 수 없습니다.",
+            onDismiss = {
+                showCommentRemoveDialog = false
+                boardDetailViewModel.clearSelectedComment()
+            },
+            onCancel = {
+                showCommentRemoveDialog = false
+                boardDetailViewModel.clearSelectedComment()
+            },
+            onConfirm = {
+                boardDetailViewModel.deleteComment(
+                    onSuccess = { showCommentRemoveDialog = false }
                 )
             }
         )
@@ -476,7 +547,7 @@ fun BoardDetailIconSection(
 @Composable
 fun CommentItem(
     comment: Comment,
-    onClick: () -> Unit
+    onIconClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -505,7 +576,7 @@ fun CommentItem(
                     color = HambugTheme.colors.textHeadline
                 )
                 Icon(
-                    modifier = Modifier.clickable { onClick() },
+                    modifier = Modifier.clickable { onIconClick() },
                     imageVector = AppIcons.Dots,
                     contentDescription = null,
                     tint = Color.Unspecified
@@ -513,7 +584,7 @@ fun CommentItem(
             }
 
             Text(
-                text = "15분 전",
+                text = comment.createdAt.toTimeAgoString(),
                 style = HambugTheme.typography.label02,
                 color = HambugTheme.colors.textDisabled
             )

@@ -91,9 +91,9 @@ fun CommentItem.toEntity(): Comment {
     return Comment(
         id = this.id,
         content = this.content,
-        authorId = this.authorId,
         authorNickname = this.authorNickname,
         authorProfileImageUrl = this.authorProfileImageUrl,
+        isAuthor = this.isAuthor,
         createdAt = this.createdAt
     )
 }

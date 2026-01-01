@@ -15,6 +15,7 @@ import desktop.hambug.data.dto.community.CreateBoardResponse
 import desktop.hambug.data.dto.community.CreateCommentRequest
 import desktop.hambug.data.dto.community.CreateCommentResponse
 import desktop.hambug.data.dto.community.DeleteBoardResponse
+import desktop.hambug.data.dto.community.DeleteCommentResponse
 import desktop.hambug.data.dto.community.LikeBoardResponse
 import desktop.hambug.data.dto.community.MyBoardsResponse
 import desktop.hambug.data.dto.community.MyCommentsResponse
@@ -103,6 +104,13 @@ interface HambugApi {
         @Path("boardId") boardId: Int,
         @Body request: CreateCommentRequest
     ): CreateCommentResponse
+
+    // 댓글 삭제
+    @DELETE("boards/{boardId}/comments/{commentId}")
+    suspend fun deleteComment(
+        @Path("boardId") boardId: Int,
+        @Path("commentId") commentId: Int
+    ): DeleteCommentResponse
 
     // JWT 토큰으로 내 정보 조회
     @GET("auth/me")
