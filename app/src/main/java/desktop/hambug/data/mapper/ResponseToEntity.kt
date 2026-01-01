@@ -101,6 +101,8 @@ fun MyBoardItem.toEntity(): MyBoard {
     return MyBoard(
         id = this.id,
         title = this.title,
+        likeCount = this.likeCount,
+        commentCount = this.commentCount,
         imageUrl = if (this.imageUrls.isEmpty()) null else this.imageUrls[0],
         createdAt = this.createAt
     )

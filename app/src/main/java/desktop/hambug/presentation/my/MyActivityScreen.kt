@@ -311,8 +311,7 @@ fun MyBoardItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-//                        text = board.likeCount.toString(),
-                        text = "1",
+                        text = board.likeCount.toString(),
                         style = HambugTheme.typography.label02,
                         color = HambugTheme.colors.textDisabled
                     )
@@ -330,8 +329,7 @@ fun MyBoardItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-//                        text = board.commentCount.toString(),
-                        text = "22",
+                        text = board.commentCount.toString(),
                         style = HambugTheme.typography.body03,
                         color = HambugTheme.colors.textBody
                     )

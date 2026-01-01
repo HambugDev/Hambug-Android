@@ -31,6 +31,12 @@ data class MyBoardItem(
     val title: String,
     @SerialName("content")
     val content: String,
+    @SerialName("viewCount")
+    val viewCount: Int,
+    @SerialName("commentCount")
+    val commentCount: Int,
+    @SerialName("likeCount")
+    val likeCount: Int,
     @SerialName("category")
     val category: String,
     @SerialName("imageUrls")

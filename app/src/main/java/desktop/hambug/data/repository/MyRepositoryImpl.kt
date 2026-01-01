@@ -52,7 +52,6 @@ class MyRepositoryImpl @Inject constructor(
             ) ?: throw Exception("이미지를 처리할 수 없습니다")
         } else {
             // 이미지가 없는 경우 (기본 프로필 이미지로 변경)
-//            val emptyRequestBody = "".toByteArray().toRequestBody("image/*".toMediaTypeOrNull())
             val emptyRequestBody = ByteArray(0).toRequestBody("image/*".toMediaTypeOrNull())
             MultipartBody.Part.createFormData("file", "", emptyRequestBody)
         }
