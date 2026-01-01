@@ -27,7 +27,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,6 +48,7 @@ import desktop.hambug.domain.model.Comment
 import desktop.hambug.presentation.community.component.CommentInputBar
 import desktop.hambug.presentation.community.component.DetailMyBottomSheet
 import desktop.hambug.presentation.community.component.DetailOtherBottomSheet
+import desktop.hambug.presentation.ui.component.TwoButtonDialog
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
 import desktop.hambug.presentation.ui.icon.appicons.CommentDetail
@@ -64,13 +64,20 @@ fun BoardDetailScreen(
     navController: NavHostController,
     boardDetailViewModel: BoardDetailViewModel = hiltViewModel()
 ) {
+    // CommunityScreen과 동일한 viewModelStoreOwner 사용
+    val parentEntry = remember(navController.currentBackStackEntry) {
+        navController.getBackStackEntry("main_graph")
+    }
+    val communityViewModel: CommunityViewModel = hiltViewModel(parentEntry)
+
     val uiState by boardDetailViewModel.uiState.collectAsStateWithLifecycle()
     val commentsState by boardDetailViewModel.commentsState.collectAsStateWithLifecycle()
     val isLikeProcessing by boardDetailViewModel.isLikeProcessing.collectAsStateWithLifecycle()
     val commentText by boardDetailViewModel.commentText.collectAsStateWithLifecycle()
 
-    var showPostBottomSheet by remember { mutableStateOf(false) }
+    var showBoardBottomSheet by remember { mutableStateOf(false) }
     var showCommentBottomSheet by remember { mutableStateOf(false) }
+    var showBoardRemoveDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier
@@ -117,7 +124,7 @@ fun BoardDetailScreen(
                             authorNickname = board.authorNickname,
                             authorProfileImageUrl = board.authorProfileImageUrl,
                             onClickBack = { navController.popBackStack() },
-                            onClickMore = { showPostBottomSheet = true }
+                            onClickMore = { showBoardBottomSheet = true }
                         )
                         Spacer(Modifier.height(20.dp))
                     }
@@ -207,7 +214,7 @@ fun BoardDetailScreen(
                                 ) { comment ->
                                     CommentItem(
                                         comment = comment,
-                                        onClick = { showPostBottomSheet = true }
+                                        onClick = { showCommentBottomSheet = true }
                                     )
                                     Spacer(Modifier.height(20.dp))
                                 }
@@ -220,20 +227,32 @@ fun BoardDetailScreen(
     }
 
     // 게시물 바텀시트
-    if (showPostBottomSheet) {
+    if (showBoardBottomSheet) {
+        val isAuthor = (uiState as BoardDetailUiState.Success).board.isAuthor
+
         ModalBottomSheet(
-            onDismissRequest = { showPostBottomSheet = false },
+            onDismissRequest = { showBoardBottomSheet = false },
             dragHandle = null,
             containerColor = HambugTheme.colors.bgWhite,
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
-            // 자신의 게시물
-            DetailMyBottomSheet(
-                onEdit = {},
-                onDelete = {},
-                onCancel = { showPostBottomSheet = false }
-            )
-            // 타인의 게시물
+            if (isAuthor) {
+                // 내 게시물인 경우
+                DetailMyBottomSheet(
+                    onEdit = {},
+                    onDelete = {
+                        showBoardRemoveDialog = true
+                        showBoardBottomSheet = false
+                    },
+                    onCancel = { showBoardBottomSheet = false }
+                )
+            } else {
+                // 타인의 게시물인 경우
+                DetailOtherBottomSheet(
+                    onReport = {},
+                    onCancel = { showBoardBottomSheet = false }
+                )
+            }
         }
     }
 
@@ -253,6 +272,26 @@ fun BoardDetailScreen(
                 onCancel = { showCommentBottomSheet = false }
             )
         }
+    }
+
+    // 게시물 삭제 모달
+    if (showBoardRemoveDialog) {
+        TwoButtonDialog(
+            title = "게시물을 삭제하시겠어요?",
+            content = null,
+            onDismiss = { showBoardRemoveDialog = false },
+            onCancel = { showBoardRemoveDialog = false },
+            onConfirm = {
+                boardDetailViewModel.deleteBoard(
+                    onSuccess = {
+                        communityViewModel.resetAllCache()
+
+                        showBoardRemoveDialog = false
+                        navController.popBackStack()
+                    }
+                )
+            }
+        )
     }
 }
 

@@ -82,7 +82,8 @@ fun BoardDetailData.toEntity(): BoardDetail {
         createdAt = this.createdAt,
         likeCount = this.likeCount,
         commentCount = this.commentCount,
-        isLiked = this.isLiked
+        isLiked = this.isLiked,
+        isAuthor = this.isAuthor
     )
 }
 

@@ -14,6 +14,7 @@ import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.dto.community.CreateBoardResponse
 import desktop.hambug.data.dto.community.CreateCommentRequest
 import desktop.hambug.data.dto.community.CreateCommentResponse
+import desktop.hambug.data.dto.community.DeleteBoardResponse
 import desktop.hambug.data.dto.community.LikeBoardResponse
 import desktop.hambug.data.dto.community.MyBoardsResponse
 import desktop.hambug.data.dto.community.MyCommentsResponse
@@ -21,6 +22,7 @@ import desktop.hambug.data.dto.home.HomeBoardResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -76,6 +78,12 @@ interface HambugApi {
         @Part("request") request: RequestBody,
         @Part images: List<MultipartBody.Part>
     ): CreateBoardResponse
+
+    // 게시물 삭제
+    @DELETE("boards/{id}")
+    suspend fun deleteBoard(
+        @Path("id") id: Int
+    ): DeleteBoardResponse
 
     // 좋아요 토글
     @POST("/api/v1/boards/{boardId}/likes")

@@ -97,6 +97,14 @@ class CommunityRepositoryImpl @Inject constructor(
         return response.data.id
     }
 
+    override suspend fun deleteBoard(boardId: Int) {
+        val response = hambugApi.deleteBoard(boardId)
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+    }
+
     override suspend fun likeBoard(boardId: Int): LikeBoardData {
         val response = hambugApi.likeBoard(boardId)
 

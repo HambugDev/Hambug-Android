@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.usecase.CreateCommentUseCase
+import desktop.hambug.domain.usecase.DeleteBoardUseCase
 import desktop.hambug.domain.usecase.GetBoardDetailUseCase
 import desktop.hambug.domain.usecase.GetCommentsUseCase
 import desktop.hambug.domain.usecase.LikeBoardUseCase
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class BoardDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val boardDetailUseCase: GetBoardDetailUseCase,
+    private val deleteBoardUseCase: DeleteBoardUseCase,
     private val likeBoardUseCase: LikeBoardUseCase,
     private val getCommentsUseCase: GetCommentsUseCase,
     private val createCommentUseCase: CreateCommentUseCase
@@ -67,6 +69,21 @@ class BoardDetailViewModel @Inject constructor(
                 .onFailure { exception ->
                     val exceptionMessage = exception.message ?: "댓글 로딩 실패"
                     _commentsState.value = CommentsUiState.Error(exceptionMessage)
+                }
+        }
+    }
+
+    /**
+     * 게시물 삭제
+     */
+    fun deleteBoard(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            deleteBoardUseCase(boardId)
+                .onSuccess {
+                    onSuccess()
+                }
+                .onFailure { exception ->
+                    Log.e("my", "게시물 삭제 실패: ${exception.message}", exception)
                 }
         }
     }

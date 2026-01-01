@@ -179,4 +179,14 @@ class CommunityViewModel @Inject constructor(
             FilterType.RECOMMENDATION -> "RECOMMENDATION"
         }
     }
+
+    /**
+     * 모든 캐시 삭제, 현재 탭만 재조회
+     */
+    fun resetAllCache() {
+        _paginationState.clear()
+        val currentFilterType = _currentFilter.value
+        _currentUiState.value = CommunityUiState.Loading
+        loadFilterData(currentFilterType)
+    }
 }

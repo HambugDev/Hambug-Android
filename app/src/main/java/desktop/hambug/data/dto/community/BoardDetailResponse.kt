@@ -42,5 +42,7 @@ data class BoardDetailData(
     @SerialName("commentCount")
     val commentCount: Int,
     @SerialName("isLiked")
-    val isLiked: Boolean
+    val isLiked: Boolean,
+    @SerialName("isAuthor")
+    val isAuthor: Boolean
 )
