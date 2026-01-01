@@ -11,6 +11,9 @@ import desktop.hambug.domain.model.MyComment
 import desktop.hambug.domain.model.UserInfo
 import desktop.hambug.domain.repository.MyRepository
 import desktop.hambug.util.ImageFileUtil
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 class MyRepositoryImpl @Inject constructor(
@@ -39,13 +42,20 @@ class MyRepositoryImpl @Inject constructor(
         return response.data.toEntity()
     }
 
-    override suspend fun updateUserProfileImage(userId: Int, imageUri: Uri): UserInfo {
-        // 이미지를 MultipartBody.Part로 변환
-        val imagePart = ImageFileUtil.createMultipartBodyPart(
-            context = context,
-            fileUri = imageUri,
-            partName = "file"
-        ) ?: throw Exception("이미지를 처리할 수 없습니다")
+    override suspend fun updateUserProfileImage(userId: Int, imageUri: Uri?): UserInfo {
+        val imagePart = if (imageUri != null) {
+            // 이미지가 있는 경우
+            ImageFileUtil.createMultipartBodyPart(
+                context = context,
+                fileUri = imageUri,
+                partName = "file"
+            ) ?: throw Exception("이미지를 처리할 수 없습니다")
+        } else {
+            // 이미지가 없는 경우 (기본 프로필 이미지로 변경)
+//            val emptyRequestBody = "".toByteArray().toRequestBody("image/*".toMediaTypeOrNull())
+            val emptyRequestBody = ByteArray(0).toRequestBody("image/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("file", "", emptyRequestBody)
+        }
 
         val response = hambugApi.putUserProfileImage(userId, imagePart)
 

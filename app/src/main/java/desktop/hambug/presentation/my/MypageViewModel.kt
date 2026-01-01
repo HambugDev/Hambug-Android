@@ -156,37 +156,42 @@ class MypageViewModel @Inject constructor(
     }
 
     /**
-     * Photo Picker에서 선택된 Uri 업데이트
+     * 프로필 이미지 업데이트 공통 로직
      */
-    fun onImageSelected(uri: Uri?) {
-
-        if (uri == null) {
-            return
-        }
-
-        val currentUiState = _uiState.value
-        val userId = when (currentUiState) {
-            is MyUiState.Success -> currentUiState.userInfo.userId
-            else -> {
-                Log.e("my", "onImageSelected - currentUiState: $currentUiState")
-                return
-            }
-        }
-
+    private fun updateProfileImage(uri: Uri?) {
         viewModelScope.launch {
-            // 로딩 시작
+            val userId = getUserId() ?: return@launch
+
             _uiState.value = MyUiState.Loading
 
             updateUserProfileImageUseCase(userId = userId, imageUri = uri)
                 .onSuccess { userInfo ->
-                    Log.d("my", "updateUserProfileImage 성공")
+                    Log.d("my", "프로필 업데이트 성공")
                     _uiState.value = MyUiState.Success(userInfo)
                 }
                 .onFailure { exception ->
-                    Log.e("my", "updateUserProfileImage 실패: ${exception.message}", exception)
-                    val exceptionMessage = exception.message ?: "프로필 이미지 업로드 실패"
-                    _uiState.value = MyUiState.Error(exceptionMessage)
+                    Log.e("my", "프로필 업데이트 실패: ${exception.message}", exception)
+                    _uiState.value = MyUiState.Error(exception.message ?: "프로필 업데이트 실패")
                 }
         }
+    }
+
+    /**
+     * Photo Picker에서 선택된 Uri 업데이트
+     */
+    fun onImageSelected(uri: Uri?) {
+        if (uri == null) return
+        updateProfileImage(uri)
+    }
+
+    /**
+     * 기본 프로필 이미지로 변경
+     */
+    fun onResetToDefaultImage() {
+        updateProfileImage(null)
+    }
+
+    private fun getUserId(): Int? {
+        return (uiState.value as? MyUiState.Success)?.userInfo?.userId
     }
 }

@@ -48,6 +48,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.svg.SvgDecoder
 import desktop.hambug.domain.model.UserInfo
 import desktop.hambug.presentation.my.component.NicknameUpdateDialog
 import desktop.hambug.presentation.my.component.UserRemoveDialog
@@ -185,6 +188,10 @@ fun MypageScreen(
                     showBottomSheet = false
                     mypageViewModel.onProfileImageClicked()
                 },
+                onDefaultImageClick = {
+                    showBottomSheet = false
+                    mypageViewModel.onResetToDefaultImage()
+                },
                 onDismiss = { showBottomSheet = false }
             )
         }
@@ -269,7 +276,10 @@ fun MypageProfileImage(
                 .size(130.dp)
                 .align(Alignment.Center)
                 .clip(CircleShape),
-            model = profileImageUrl,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(profileImageUrl)
+                .decoderFactory(SvgDecoder.Factory())  // SVG 처리를 위한 디코더 추가
+                .build(),
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -375,6 +385,7 @@ fun MypageMenuButton(
 fun ProfileBottomSheetContent(
     onNicknameClick: () -> Unit,
     onProfileImageClick: () -> Unit,
+    onDefaultImageClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Column(
@@ -404,7 +415,7 @@ fun ProfileBottomSheetContent(
 
         MypageBottomSheetButton(
             buttonText = "기본 이미지 적용",
-            onClick = {},
+            onClick = { onDefaultImageClick() },
             modifier = Modifier
                 .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
                 .padding(16.dp)
