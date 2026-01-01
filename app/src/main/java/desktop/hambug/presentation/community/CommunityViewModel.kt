@@ -36,6 +36,10 @@ class CommunityViewModel @Inject constructor(
     private val _isLoadingMore = MutableStateFlow(false)
     val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
 
+    // 게시물 삭제 스낵바
+    private val _showDeleteSnackbar = MutableStateFlow(false)
+    val showDeleteSnackbar: StateFlow<Boolean> = _showDeleteSnackbar.asStateFlow()
+
     // 필터별 페이지네이션 상태 관리
     private val _paginationState = mutableMapOf<FilterType, PaginationState>()
 
@@ -188,5 +192,15 @@ class CommunityViewModel @Inject constructor(
         val currentFilterType = _currentFilter.value
         _currentUiState.value = CommunityUiState.Loading
         loadFilterData(currentFilterType)
+
+        // 스낵바 표시
+        _showDeleteSnackbar.value = true
+    }
+
+    /**
+     * 스낵바 표시 완료 처리
+     */
+    fun onFinishSnackbar() {
+        _showDeleteSnackbar.value = false
     }
 }

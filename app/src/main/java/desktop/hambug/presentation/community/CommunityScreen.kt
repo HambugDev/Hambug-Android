@@ -57,6 +57,7 @@ fun CommunityScreen(
     )
 ) {
     val uiState by communityViewModel.currentUiState.collectAsStateWithLifecycle()
+    val showDeleteSnackbar by communityViewModel.showDeleteSnackbar.collectAsStateWithLifecycle()
 
     // 필터링 목록 (전체, 자유잡담, 햄버거리뷰, 맛집추천)
     val filterList = communityViewModel.filterList
@@ -74,11 +75,14 @@ fun CommunityScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        snackbarHostState.showSnackbar(
-            message = "게시물이 삭제되었어요.",
-            duration = SnackbarDuration.Short
-        )
+    LaunchedEffect(showDeleteSnackbar) {
+        if (showDeleteSnackbar) {
+            snackbarHostState.showSnackbar(
+                message = "게시물이 삭제되었어요.",
+                duration = SnackbarDuration.Short
+            )
+            communityViewModel.onFinishSnackbar()
+        }
     }
 
     Scaffold(
