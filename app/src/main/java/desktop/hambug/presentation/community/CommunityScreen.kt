@@ -47,6 +47,7 @@ import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.theme.CommunityFilterSelected
 import desktop.hambug.presentation.ui.theme.HambugTheme
+import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +58,7 @@ fun CommunityScreen(
     )
 ) {
     val uiState by communityViewModel.currentUiState.collectAsStateWithLifecycle()
+    val showDeleteSnackbar by communityViewModel.showDeleteSnackbar.collectAsStateWithLifecycle()
 
     // 필터링 목록 (전체, 자유잡담, 햄버거리뷰, 맛집추천)
     val filterList = communityViewModel.filterList
@@ -74,11 +76,27 @@ fun CommunityScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        snackbarHostState.showSnackbar(
-            message = "게시물이 삭제되었어요.",
-            duration = SnackbarDuration.Short
-        )
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+
+    LaunchedEffect(showDeleteSnackbar) {
+        if (showDeleteSnackbar) {
+            snackbarHostState.showSnackbar(
+                message = "게시물이 삭제되었어요.",
+                duration = SnackbarDuration.Short
+            )
+            communityViewModel.onFinishSnackbar()
+        }
+    }
+
+    // 게시물 작성 결과 수신
+    LaunchedEffect(savedStateHandle) {
+        savedStateHandle?.getStateFlow("board_created", false)
+            ?.collect { isCreated ->
+                if (isCreated) {
+                    communityViewModel.refreshCurrentFilter()
+                    savedStateHandle["board_created"] = false
+                }
+            }
     }
 
     Scaffold(

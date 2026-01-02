@@ -36,6 +36,10 @@ class CommunityViewModel @Inject constructor(
     private val _isLoadingMore = MutableStateFlow(false)
     val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
 
+    // 게시물 삭제 스낵바
+    private val _showDeleteSnackbar = MutableStateFlow(false)
+    val showDeleteSnackbar: StateFlow<Boolean> = _showDeleteSnackbar.asStateFlow()
+
     // 필터별 페이지네이션 상태 관리
     private val _paginationState = mutableMapOf<FilterType, PaginationState>()
 
@@ -178,5 +182,35 @@ class CommunityViewModel @Inject constructor(
             FilterType.REVIEW -> "REVIEW"
             FilterType.RECOMMENDATION -> "RECOMMENDATION"
         }
+    }
+
+    /**
+     * 모든 캐시 삭제, 현재 탭만 재조회
+     */
+    fun resetAllCache() {
+        _paginationState.clear()
+        val currentFilterType = _currentFilter.value
+        _currentUiState.value = CommunityUiState.Loading
+        loadFilterData(currentFilterType)
+
+        // 스낵바 표시
+        _showDeleteSnackbar.value = true
+    }
+
+    /**
+     * 스낵바 표시 완료 처리
+     */
+    fun onFinishSnackbar() {
+        _showDeleteSnackbar.value = false
+    }
+
+    /**
+     * 현재 필터의 데이터만 갱신
+     */
+    fun refreshCurrentFilter() {
+        val currentFilterType = _currentFilter.value
+        _paginationState.remove(currentFilterType)
+        _currentUiState.value = CommunityUiState.Loading
+        loadFilterData(currentFilterType)
     }
 }

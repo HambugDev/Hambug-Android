@@ -82,7 +82,8 @@ fun BoardDetailData.toEntity(): BoardDetail {
         createdAt = this.createdAt,
         likeCount = this.likeCount,
         commentCount = this.commentCount,
-        isLiked = this.isLiked
+        isLiked = this.isLiked,
+        isAuthor = this.isAuthor
     )
 }
 
@@ -90,9 +91,9 @@ fun CommentItem.toEntity(): Comment {
     return Comment(
         id = this.id,
         content = this.content,
-        authorId = this.authorId,
         authorNickname = this.authorNickname,
         authorProfileImageUrl = this.authorProfileImageUrl,
+        isAuthor = this.isAuthor,
         createdAt = this.createdAt
     )
 }

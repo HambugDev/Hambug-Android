@@ -5,7 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import desktop.hambug.domain.model.Comment
 import desktop.hambug.domain.usecase.CreateCommentUseCase
+import desktop.hambug.domain.usecase.DeleteBoardUseCase
+import desktop.hambug.domain.usecase.DeleteCommentUseCase
 import desktop.hambug.domain.usecase.GetBoardDetailUseCase
 import desktop.hambug.domain.usecase.GetCommentsUseCase
 import desktop.hambug.domain.usecase.LikeBoardUseCase
@@ -19,18 +22,24 @@ import javax.inject.Inject
 class BoardDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val boardDetailUseCase: GetBoardDetailUseCase,
+    private val deleteBoardUseCase: DeleteBoardUseCase,
     private val likeBoardUseCase: LikeBoardUseCase,
     private val getCommentsUseCase: GetCommentsUseCase,
-    private val createCommentUseCase: CreateCommentUseCase
+    private val createCommentUseCase: CreateCommentUseCase,
+    private val deleteCommentUseCase: DeleteCommentUseCase
 ) : ViewModel() {
 
     private val boardId: Int = checkNotNull(savedStateHandle["boardId"])
+    val isNewBoard: Boolean = savedStateHandle["isNewBoard"] ?: false
 
     private val _uiState = MutableStateFlow<BoardDetailUiState>(BoardDetailUiState.Loading)
     val uiState: StateFlow<BoardDetailUiState> = _uiState.asStateFlow()
 
     private val _commentsState = MutableStateFlow<CommentsUiState>(CommentsUiState.Loading)
     val commentsState: StateFlow<CommentsUiState> = _commentsState.asStateFlow()
+
+    private val _selectedComment = MutableStateFlow<Comment?>(null)
+    val selectedComment = _selectedComment.asStateFlow()
 
     // 좋아요 처리중 상태
     private val _isLikeProcessing = MutableStateFlow(false)
@@ -39,6 +48,10 @@ class BoardDetailViewModel @Inject constructor(
     // 댓글 입력 상태
     private val _commentText = MutableStateFlow("")
     val commentText: StateFlow<String> = _commentText.asStateFlow()
+
+    // 댓글 삭제 스낵바
+    private val _showCommentDeleteSnackbar = MutableStateFlow(false)
+    val showCommentDeleteSnackbar: StateFlow<Boolean> = _showCommentDeleteSnackbar.asStateFlow()
 
     init {
         loadBoardDate()
@@ -67,6 +80,21 @@ class BoardDetailViewModel @Inject constructor(
                 .onFailure { exception ->
                     val exceptionMessage = exception.message ?: "댓글 로딩 실패"
                     _commentsState.value = CommentsUiState.Error(exceptionMessage)
+                }
+        }
+    }
+
+    /**
+     * 게시물 삭제
+     */
+    fun deleteBoard(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            deleteBoardUseCase(boardId)
+                .onSuccess {
+                    onSuccess()
+                }
+                .onFailure { exception ->
+                    Log.e("my", "게시물 삭제 실패: ${exception.message}", exception)
                 }
         }
     }
@@ -141,5 +169,46 @@ class BoardDetailViewModel @Inject constructor(
                     Log.e("community", "댓글 생성 실패: ${exception.message}", exception)
                 }
         }
+    }
+
+    /**
+     * 선택된 댓글 저장
+     */
+    fun onCommentClicked(comment: Comment) {
+        _selectedComment.value = comment
+    }
+
+    /**
+     * 댓글 삭제
+     */
+    fun deleteComment(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            val comment = _selectedComment.value ?: return@launch
+
+            deleteCommentUseCase(boardId = boardId, commentId = comment.id)
+                .onSuccess {
+                    clearSelectedComment()
+                    loadComments()
+                    onSuccess()
+                    _showCommentDeleteSnackbar.value = true
+                }
+                .onFailure { exception ->
+                    Log.e("community", "댓글 삭제 실패: ${exception.message}", exception)
+                }
+        }
+    }
+
+    /**
+     * 스낵바 표시 완료 처리
+     */
+    fun onCommentDeleteSnackbarShown() {
+        _showCommentDeleteSnackbar.value = false
+    }
+
+    /**
+     * 선택된 댓글 초기화
+     */
+    fun clearSelectedComment() {
+        _selectedComment.value = null
     }
 }
