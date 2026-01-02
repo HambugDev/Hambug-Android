@@ -28,11 +28,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +51,7 @@ import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.Category
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
 import desktop.hambug.presentation.ui.component.CustomContentTextField
+import desktop.hambug.presentation.ui.component.CustomSnackbar
 import desktop.hambug.presentation.ui.component.CustomTitleTextField
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
@@ -77,6 +82,8 @@ fun BoardWriteScreen(
         }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     // 이벤트 구독하여 화면 이동 처리
     LaunchedEffect(true) {
         boardWriteViewModel.eventFlow.collect { event ->
@@ -87,6 +94,16 @@ fun BoardWriteScreen(
                     }
                 }
             }
+        }
+    }
+
+    // 메시지 발행을 수집하여 스낵바 표시
+    LaunchedEffect(Unit) {
+        boardWriteViewModel.snackbarMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message.message,
+                duration = SnackbarDuration.Short
+            )
         }
     }
 
@@ -115,7 +132,14 @@ fun BoardWriteScreen(
                     containerColor = HambugTheme.colors.bgWhite
                 )
             )
-
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 148.dp)
+            ) { data ->
+                CustomSnackbar(snackbarData = data)
+            }
         }
     ) { paddingValues ->
         Column(

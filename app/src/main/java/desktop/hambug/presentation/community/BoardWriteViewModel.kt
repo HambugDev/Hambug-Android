@@ -8,9 +8,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Category
 import desktop.hambug.domain.model.CategoryType
 import desktop.hambug.domain.usecase.CreateBoardUseCase
+import desktop.hambug.presentation.common.SnackbarMessage
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -47,6 +50,10 @@ class BoardWriteViewModel @Inject constructor(
 
     private val _eventFlow = Channel<BoardWriteEvent>()
     val eventFlow = _eventFlow.receiveAsFlow()
+
+    // 최근에 발행된 메시지 1개 저장
+    private val _snackbarMessage = MutableSharedFlow<SnackbarMessage>(replay = 1)
+    val snackbarMessage = _snackbarMessage.asSharedFlow()
 
     /**
      * 카테고리 설정
@@ -91,6 +98,14 @@ class BoardWriteViewModel @Inject constructor(
      * 게시물 생성
      */
     fun createBoard() {
+        // 필수 항목 미입력 시, 메시지 발행 후 종료
+        getSnackbarMessage(_boardTitle.value, _boardContent.value)?.let { message ->
+            viewModelScope.launch {
+                _snackbarMessage.emit(message)
+            }
+            return
+        }
+
         if (_uiState.value.isCreating) return
 
         viewModelScope.launch {
@@ -114,5 +129,19 @@ class BoardWriteViewModel @Inject constructor(
                 _uiState.update { it.copy(isCreating = false) }
             }
         }
+    }
+
+    private fun getSnackbarMessage(title: String, content: String): SnackbarMessage? {
+        if (title.isBlank()) {
+            return SnackbarMessage(
+                message = WriteMessage.TITLE_EMPTY
+            )
+        }
+        if (content.isBlank()) {
+            return SnackbarMessage(
+                message = WriteMessage.CONTENT_EMPTY
+            )
+        }
+        return null
     }
 }
