@@ -142,9 +142,13 @@ fun HambugApp(
                 BoardWriteScreen(navController = navController)
             }
             composable(
-                route = "community_detail/{boardId}",
+                route = "community_detail/{boardId}?isNewBoard={isNewBoard}",
                 arguments = listOf(
-                    navArgument("boardId") { type = NavType.IntType }
+                    navArgument("boardId") { type = NavType.IntType },
+                    navArgument("isNewBoard") {
+                        type = NavType.BoolType
+                        defaultValue = false
+                    }
                 )
             ) {
                 BoardDetailScreen(navController = navController)

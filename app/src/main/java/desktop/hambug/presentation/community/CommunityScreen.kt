@@ -47,6 +47,7 @@ import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.theme.CommunityFilterSelected
 import desktop.hambug.presentation.ui.theme.HambugTheme
+import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +76,8 @@ fun CommunityScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+
     LaunchedEffect(showDeleteSnackbar) {
         if (showDeleteSnackbar) {
             snackbarHostState.showSnackbar(
@@ -83,6 +86,17 @@ fun CommunityScreen(
             )
             communityViewModel.onFinishSnackbar()
         }
+    }
+
+    // 게시물 작성 결과 수신
+    LaunchedEffect(savedStateHandle) {
+        savedStateHandle?.getStateFlow("board_created", false)
+            ?.collect { isCreated ->
+                if (isCreated) {
+                    communityViewModel.refreshCurrentFilter()
+                    savedStateHandle["board_created"] = false
+                }
+            }
     }
 
     Scaffold(

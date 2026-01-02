@@ -82,7 +82,7 @@ fun BoardWriteScreen(
         boardWriteViewModel.eventFlow.collect { event ->
             when(event) {
                 is BoardWriteEvent.NavigateToDetail -> {
-                    navController.navigate("community_detail/${event.boardId}") {
+                    navController.navigate("community_detail/${event.boardId}?isNewBoard=true") {
                         popUpTo("write") { inclusive = true }
                     }
                 }

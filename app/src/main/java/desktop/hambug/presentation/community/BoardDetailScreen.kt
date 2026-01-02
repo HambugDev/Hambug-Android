@@ -1,5 +1,6 @@
 package desktop.hambug.presentation.community
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,6 +101,21 @@ fun BoardDetailScreen(
         }
     }
 
+    // 공통 뒤로가기 처리 함수
+    val handleBack = {
+        if (boardDetailViewModel.isNewBoard) {
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("board_created", true)
+        }
+        navController.popBackStack()
+    }
+
+    // 뒤로가기 처리
+    BackHandler {
+        handleBack()
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -149,7 +165,8 @@ fun BoardDetailScreen(
                         BoardDetailProfileSection(
                             authorNickname = board.authorNickname,
                             authorProfileImageUrl = board.authorProfileImageUrl,
-                            onClickBack = { navController.popBackStack() },
+//                            onClickBack = { navController.popBackStack() },
+                            onClickBack = { handleBack() },
                             onClickMore = { showBoardBottomSheet = true }
                         )
                         Spacer(Modifier.height(20.dp))

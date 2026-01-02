@@ -30,6 +30,7 @@ class BoardDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val boardId: Int = checkNotNull(savedStateHandle["boardId"])
+    val isNewBoard: Boolean = savedStateHandle["isNewBoard"] ?: false
 
     private val _uiState = MutableStateFlow<BoardDetailUiState>(BoardDetailUiState.Loading)
     val uiState: StateFlow<BoardDetailUiState> = _uiState.asStateFlow()

@@ -203,4 +203,14 @@ class CommunityViewModel @Inject constructor(
     fun onFinishSnackbar() {
         _showDeleteSnackbar.value = false
     }
+
+    /**
+     * 현재 필터의 데이터만 갱신
+     */
+    fun refreshCurrentFilter() {
+        val currentFilterType = _currentFilter.value
+        _paginationState.remove(currentFilterType)
+        _currentUiState.value = CommunityUiState.Loading
+        loadFilterData(currentFilterType)
+    }
 }
