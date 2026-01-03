@@ -1,5 +1,9 @@
 package desktop.hambug.presentation.login
 
+import android.Manifest
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,6 +38,7 @@ import desktop.hambug.presentation.ui.icon.appicons.Kakao
 import desktop.hambug.presentation.ui.theme.Gray1000
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.ui.theme.KakaoYellow
+import desktop.hambug.util.NotificationPermissionHelper
 
 @Composable
 fun LoginScreen(
@@ -41,6 +46,24 @@ fun LoginScreen(
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+
+    // 알림 권한 요청 런처
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Log.d("noti", "알림 권한 허용됨")
+        } else {
+            Log.d("noti", "알림 권한 거부됨")
+        }
+    }
+
+    // 권한 요청
+    LaunchedEffect(Unit) {
+        if (!NotificationPermissionHelper.hasNotificationPermission(context)) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 
     LaunchedEffect(Unit) {
         loginViewModel.loginEvent.collect { event ->

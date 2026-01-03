@@ -1,5 +1,7 @@
 package desktop.hambug
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -53,6 +55,9 @@ class MainActivity : ComponentActivity() {
         // 콘텐츠를 화면 끝까지 확장
         enableEdgeToEdge()
 
+        // 알림 채널 생성 (Android 8.0 이상)
+        createNotificationChannel()
+
         lifecycleScope.launch {
             delay(1500)
             isLoading = false
@@ -67,6 +72,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(
+            "hambug_default_channel",
+            "햄버그 알림",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            enableVibration(true)
+        }
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
     }
 }
 
