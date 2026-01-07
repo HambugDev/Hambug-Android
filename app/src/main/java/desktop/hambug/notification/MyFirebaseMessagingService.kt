@@ -12,9 +12,23 @@ import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import desktop.hambug.MainActivity
 import desktop.hambug.R
+import desktop.hambug.data.local.HambugTokenManager
+import desktop.hambug.domain.usecase.fcm.UpdateFcmTokenUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyFirebaseMessagingService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var updateFcmTokenUseCase: UpdateFcmTokenUseCase
+
+    @Inject
+    lateinit var tokenManager: HambugTokenManager
+
     override fun onMessageReceived(message: RemoteMessage) {
         Log.d("fcm", "fcm 메시지 수신 - data: ${message.data}")
         Log.d("fcm", "fcm 메시지 수신 - notification: ${message.notification}")
@@ -33,7 +47,26 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         Log.d("fcm", "fcm 새로운 토큰 발급: $token")
 
-        // TODO: 서버에 토큰 전송
+        CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
+            try {
+                // 로컬에 토큰 저장
+                tokenManager.saveFcmToken(token)
+
+                if (tokenManager.isLogin()) {
+                    updateFcmTokenUseCase(token)
+                        .onSuccess {
+                            Log.d("fcm", "새 fcm 토큰 서버 전송 성공")
+                        }
+                        .onFailure { exception ->
+                            Log.e("fcm", "새 fcm 토큰 서버 전송 실패", exception)
+                        }
+                } else {
+                    Log.d("fcm", "onNewToken - 로그인 전이므로 FCM 토근을 로컬에만 저장")
+                }
+            } catch (e: Exception) {
+                Log.e("fcm", "fcm 토큰 처리 중 오류", e)
+            }
+        }
     }
 
     private fun showNotification(title: String, body: String) {

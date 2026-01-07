@@ -15,6 +15,7 @@ import javax.inject.Singleton
 // datastore 키 정의
 private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
 private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
+private val FCM_TOKEN_KEY = stringPreferencesKey("fcm_token")
 
 @Singleton
 class HambugTokenManager @Inject constructor(
@@ -53,11 +54,42 @@ class HambugTokenManager @Inject constructor(
             }.firstOrNull()
     }
 
+    /**
+     * 로그인 상태 확인
+     */
+    suspend fun isLogin(): Boolean {
+        val accessToken = getAccessToken()
+        val refreshToken = getRefreshToken()
+        return !accessToken.isNullOrEmpty() && !refreshToken.isNullOrEmpty()
+    }
+
+    /**
+     * FCM 토큰 저장
+     */
+    suspend fun saveFcmToken(token: String) {
+        dataStore.edit { preferences ->
+            preferences[FCM_TOKEN_KEY] = token
+        }
+    }
+
+    /**
+     * FCM 토큰 조회
+     */
+    suspend fun getFcmToken(): String? {
+        return dataStore.data
+            .map { preferences ->
+                preferences[FCM_TOKEN_KEY]
+            }.firstOrNull()
+    }
+
+    /**
+     * 로그아웃 (모든 토큰 제거)
+     */
     suspend fun logout() {
-        // 토큰 제거
         dataStore.edit { preferences ->
             preferences.remove(ACCESS_TOKEN_KEY)
             preferences.remove(REFRESH_TOKEN_KEY)
+            preferences.remove(FCM_TOKEN_KEY)
         }
 
         // 로그아웃이 필요함을 알림

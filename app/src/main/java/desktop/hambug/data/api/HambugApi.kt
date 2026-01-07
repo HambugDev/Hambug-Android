@@ -19,6 +19,8 @@ import desktop.hambug.data.dto.community.DeleteCommentResponse
 import desktop.hambug.data.dto.community.LikeBoardResponse
 import desktop.hambug.data.dto.community.MyBoardsResponse
 import desktop.hambug.data.dto.community.MyCommentsResponse
+import desktop.hambug.data.dto.fcm.FcmTokenRequest
+import desktop.hambug.data.dto.fcm.FcmTokenResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -138,4 +140,10 @@ interface HambugApi {
     // 내 댓글 목록 조회
     @GET("my-pages/comments")
     suspend fun getMyComments(): MyCommentsResponse
+
+    // FCM 토큰 등록/갱신
+    @POST("fcm/tokens")
+    suspend fun updateFcmToken(
+        @Body request: FcmTokenRequest
+    ): FcmTokenResponse
 }

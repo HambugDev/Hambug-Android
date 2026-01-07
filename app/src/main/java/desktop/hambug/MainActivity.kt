@@ -26,8 +26,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import desktop.hambug.data.local.HambugTokenManager
+import desktop.hambug.domain.usecase.fcm.SyncFcmTokenUseCase
 import desktop.hambug.presentation.community.CommunityScreen
 import desktop.hambug.presentation.community.BoardDetailScreen
 import desktop.hambug.presentation.community.BoardWriteScreen
@@ -42,9 +43,17 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var syncFcmTokenUseCase: SyncFcmTokenUseCase
+
+    @Inject
+    lateinit var tokenManager: HambugTokenManager
+
     private var isLoading by mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,9 +67,6 @@ class MainActivity : ComponentActivity() {
 
         // 알림 채널 생성 (Android 8.0 이상)
         createNotificationChannel()
-
-        // FCM 토큰 가져오기
-//        getFcmToken()
 
         lifecycleScope.launch {
             delay(1500)
@@ -90,17 +96,6 @@ class MainActivity : ComponentActivity() {
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
     }
-
-//    private fun getFcmToken() {
-//        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-//            if (task.isSuccessful) {
-//                val token = task.result
-//                Log.d("fcm", "현재 fcm 토큰: $token")
-//            } else {
-//                Log.e("fcm", "fcm 토큰 가져오기 실패", task.exception)
-//            }
-//        }
-//    }
 }
 
 @Composable
