@@ -52,6 +52,14 @@
         </service>
 
         <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_noti" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/noti_bg" />
+
+        <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="hambug_default_channel" />
     </application>
