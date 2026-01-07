@@ -1,5 +1,7 @@
 package desktop.hambug
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -25,6 +27,8 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
+import desktop.hambug.data.local.HambugTokenManager
+import desktop.hambug.domain.usecase.fcm.SyncFcmTokenUseCase
 import desktop.hambug.presentation.community.CommunityScreen
 import desktop.hambug.presentation.community.BoardDetailScreen
 import desktop.hambug.presentation.community.BoardWriteScreen
@@ -39,9 +43,17 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var syncFcmTokenUseCase: SyncFcmTokenUseCase
+
+    @Inject
+    lateinit var tokenManager: HambugTokenManager
+
     private var isLoading by mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,6 +64,9 @@ class MainActivity : ComponentActivity() {
 
         // 콘텐츠를 화면 끝까지 확장
         enableEdgeToEdge()
+
+        // 알림 채널 생성 (Android 8.0 이상)
+        createNotificationChannel()
 
         lifecycleScope.launch {
             delay(1500)
@@ -67,6 +82,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(
+            "hambug_default_channel",
+            "햄버그 알림",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            enableVibration(true)
+        }
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
     }
 }
 

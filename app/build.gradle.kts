@@ -85,6 +85,7 @@ dependencies {
     // firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
     // hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

@@ -8,4 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="splash_bg">#FFF7EEDA</color>
+    <color name="noti_bg">#FFE64A19</color>
 </resources>

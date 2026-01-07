@@ -5,10 +5,12 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import desktop.hambug.data.repository.CommunityRepositoryImpl
+import desktop.hambug.data.repository.FcmRepositoryImpl
 import desktop.hambug.data.repository.HomeRepositoryImpl
 import desktop.hambug.data.repository.KakaoLoginRepositoryImpl
 import desktop.hambug.data.repository.MyRepositoryImpl
 import desktop.hambug.domain.repository.CommunityRepository
+import desktop.hambug.domain.repository.FcmRepository
 import desktop.hambug.domain.repository.HomeRepository
 import desktop.hambug.domain.repository.KakaoLoginRepository
 import desktop.hambug.domain.repository.MyRepository
@@ -41,4 +43,10 @@ abstract class RepositoryModule {
     abstract fun bindCommunityRepository(
         communityRepositoryImpl: CommunityRepositoryImpl
     ): CommunityRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFcmRepository(
+        fcmRepositoryImpl: FcmRepositoryImpl
+    ): FcmRepository
 }
