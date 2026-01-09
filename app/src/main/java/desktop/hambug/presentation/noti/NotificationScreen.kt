@@ -60,30 +60,51 @@ fun NotificationScreen(navController: NavHostController) {
             )
         }
     ) { paddingValues ->
-        // 알림 아이템 1개 이상인 경우
         Column(
             modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = 20.dp)
+                .fillMaxSize()
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            for (idx in 0 until 3) {
-                NotiItem(
-                    content = "라떼님이 내 게시물을 좋아합니다.",
-                    onClick = {},
-                    modifier = Modifier.padding(vertical = 14.dp)
-                )
-                NotiItem(
-                    content = "사랑에빠진햄버거피자님이 내 게시물을 좋아합니다.",
-                    onClick = {},
-                    modifier = Modifier.padding(vertical = 14.dp)
-                )
-                NotiItem(
-                    content = "사랑에빠진햄버거피자님이 내 게시물에 댓글을 달았습니다.",
-                    onClick = {},
-                    modifier = Modifier.padding(vertical = 14.dp)
-                )
-            }
+            Image(
+                modifier = Modifier.size(96.dp),
+                painter = painterResource(id = R.drawable.logo_login),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(HambugTheme.colors.borderDisabled)
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "아직 받은 알림이 없어요.",
+                style = HambugTheme.typography.body02,
+                color = HambugTheme.colors.borderDefault
+            )
         }
+
+        // 알림 아이템 1개 이상인 경우
+//        Column(
+//            modifier = Modifier
+//                .padding(paddingValues)
+//                .padding(horizontal = 20.dp)
+//        ) {
+//            for (idx in 0 until 3) {
+//                NotiItem(
+//                    content = "라떼님이 내 게시물을 좋아합니다.",
+//                    onClick = {},
+//                    modifier = Modifier.padding(vertical = 14.dp)
+//                )
+//                NotiItem(
+//                    content = "사랑에빠진햄버거피자님이 내 게시물을 좋아합니다.",
+//                    onClick = {},
+//                    modifier = Modifier.padding(vertical = 14.dp)
+//                )
+//                NotiItem(
+//                    content = "사랑에빠진햄버거피자님이 내 게시물에 댓글을 달았습니다.",
+//                    onClick = {},
+//                    modifier = Modifier.padding(vertical = 14.dp)
+//                )
+//            }
+//        }
 
         // 알림 아이템 없는 경우
 //        Column(

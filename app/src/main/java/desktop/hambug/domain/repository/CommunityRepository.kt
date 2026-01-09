@@ -17,4 +17,5 @@ interface CommunityRepository {
     suspend fun getComments(boardId: Int): List<Comment>
     suspend fun createComment(boardId: Int, content: String)
     suspend fun deleteComment(boardId: Int, commentId: Int)
+    suspend fun report(targetId: Int, reportType: String, reportContent: String)
 }

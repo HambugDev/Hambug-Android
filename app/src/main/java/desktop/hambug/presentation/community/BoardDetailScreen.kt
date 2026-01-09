@@ -90,6 +90,25 @@ fun BoardDetailScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // 신고 성공 처리
+    LaunchedEffect(Unit) {
+        navController.currentBackStackEntry
+            ?.savedStateHandle
+            ?.getStateFlow("report_success", false)
+            ?.collect { isReportSuccess ->
+                if (isReportSuccess) {
+                    snackbarHostState.showSnackbar(
+                        message = "신고가 접수되었습니다.",
+                        duration = SnackbarDuration.Short
+                    )
+                    // 소비 후 초기화
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("report_success", false)
+                }
+            }
+    }
+
     // 댓글 삭제 스낵바
     LaunchedEffect(showCommentDeleteSnackbar) {
         if (showCommentDeleteSnackbar) {
@@ -130,7 +149,10 @@ fun BoardDetailScreen(
             )
         },
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 20.dp)
+            ) { data ->
                 CustomSnackbar(snackbarData = data)
             }
         }
@@ -165,7 +187,6 @@ fun BoardDetailScreen(
                         BoardDetailProfileSection(
                             authorNickname = board.authorNickname,
                             authorProfileImageUrl = board.authorProfileImageUrl,
-//                            onClickBack = { navController.popBackStack() },
                             onClickBack = { handleBack() },
                             onClickMore = { showBoardBottomSheet = true }
                         )
@@ -275,6 +296,7 @@ fun BoardDetailScreen(
     // 게시물 바텀시트
     if (showBoardBottomSheet) {
         val isAuthor = (uiState as BoardDetailUiState.Success).board.isAuthor
+        val board = (uiState as BoardDetailUiState.Success).board
 
         ModalBottomSheet(
             onDismissRequest = { showBoardBottomSheet = false },
@@ -295,7 +317,10 @@ fun BoardDetailScreen(
             } else {
                 // 타인의 게시물인 경우
                 DetailOtherBottomSheet(
-                    onReport = {},
+                    onReport = {
+                        showBoardBottomSheet = false
+                        navController.navigate("report/BOARD/${board.id}")
+                    },
                     onCancel = { showBoardBottomSheet = false }
                 )
             }
@@ -330,7 +355,10 @@ fun BoardDetailScreen(
                 } else {
                     // 타인의 댓글인 경우
                     DetailOtherBottomSheet(
-                        onReport = {},
+                        onReport = {
+                            showCommentBottomSheet = false
+                            navController.navigate("report/COMMENT/${comment.id}")
+                        },
                         onCancel = {
                             showCommentBottomSheet = false
                             boardDetailViewModel.clearSelectedComment()

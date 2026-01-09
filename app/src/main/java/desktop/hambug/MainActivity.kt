@@ -32,6 +32,7 @@ import desktop.hambug.domain.usecase.fcm.SyncFcmTokenUseCase
 import desktop.hambug.presentation.community.CommunityScreen
 import desktop.hambug.presentation.community.BoardDetailScreen
 import desktop.hambug.presentation.community.BoardWriteScreen
+import desktop.hambug.presentation.community.ReportScreen
 import desktop.hambug.presentation.ui.component.HambugBottomNav
 import desktop.hambug.presentation.ui.component.SplashScreen
 import desktop.hambug.presentation.home.HomeScreen
@@ -183,6 +184,15 @@ fun HambugApp(
             }
             composable("my_activity") {
                 MyActivityScreen(navController = navController)
+            }
+            composable(
+                route = "report/{reportType}/{targetId}",
+                arguments = listOf(
+                    navArgument("reportType") { type = NavType.StringType },
+                    navArgument("targetId") { type = NavType.IntType }
+                )
+            ) {
+                ReportScreen(navController = navController)
             }
         }
     }
