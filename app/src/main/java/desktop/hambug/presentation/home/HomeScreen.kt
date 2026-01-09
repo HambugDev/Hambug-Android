@@ -45,6 +45,7 @@ import desktop.hambug.domain.model.HomeBoard
 import desktop.hambug.domain.model.HomeBurger
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Bell
+import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.icon.appicons.Comment
 import desktop.hambug.presentation.ui.icon.appicons.Hambug
 import desktop.hambug.presentation.ui.icon.appicons.Heart
@@ -78,8 +79,11 @@ fun HomeScreen(
                     Icon(
                         modifier = Modifier
                             .clickable { navController.navigate("bell") }
-                            .padding(16.dp),
-                        imageVector = AppIcons.Bell,
+//                            .padding(16.dp)
+                            .padding(8.dp)
+                            .size(32.dp),
+//                        imageVector = AppIcons.Bell,
+                        imageVector = AppIcons.BellBorder,
                         contentDescription = null,
                         tint = HambugTheme.colors.iconDefault
                     )
