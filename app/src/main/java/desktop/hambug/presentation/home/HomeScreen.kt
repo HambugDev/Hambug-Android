@@ -121,7 +121,12 @@ fun HomeScreen(
                     Spacer(Modifier.height(30.dp))
 
                     // 인기글 영역
-                    HomeBoardSection(data.boards)
+                    HomeBoardSection(
+                        boards = data.boards,
+                        onClick = { boardId ->
+                            navController.navigate("community_detail/$boardId")
+                        }
+                    )
 
                     Spacer(Modifier.height(20.dp))
                 }
@@ -232,7 +237,8 @@ fun RecommendBurgerItem(
 
 @Composable
 fun HomeBoardSection(
-    boards: List<HomeBoard>
+    boards: List<HomeBoard>,
+    onClick: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -253,7 +259,10 @@ fun HomeBoardSection(
                 .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(16.dp))
         ) {
             boards.forEachIndexed { idx, board ->
-                HomePostItem(board)
+                HomePostItem(
+                    board = board,
+                    onClick = { onClick(board.id) }
+                )
 
                 if (idx < 4) {
                     HorizontalDivider(thickness = 0.5.dp, color = HambugTheme.colors.bgNormal)
@@ -265,10 +274,12 @@ fun HomeBoardSection(
 
 @Composable
 fun HomePostItem(
-    board: HomeBoard
+    board: HomeBoard,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
+            .clickable { onClick() }
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
