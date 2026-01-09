@@ -31,6 +31,8 @@ data class MyBoardItem(
     val title: String,
     @SerialName("content")
     val content: String,
+    @SerialName("authorNickname")
+    val authorNickname: String,
     @SerialName("viewCount")
     val viewCount: Int,
     @SerialName("commentCount")
