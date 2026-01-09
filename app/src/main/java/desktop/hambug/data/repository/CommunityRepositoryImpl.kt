@@ -7,6 +7,7 @@ import desktop.hambug.data.api.HambugApi
 import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.dto.community.CreateCommentRequest
 import desktop.hambug.data.dto.community.LikeBoardData
+import desktop.hambug.data.dto.report.ReportRequest
 import desktop.hambug.data.mapper.toEntity
 import desktop.hambug.domain.model.BoardDetail
 import desktop.hambug.domain.model.BoardPage
@@ -138,6 +139,14 @@ class CommunityRepositoryImpl @Inject constructor(
 
     override suspend fun deleteComment(boardId: Int, commentId: Int) {
         val response = hambugApi.deleteComment(boardId, commentId)
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+    }
+
+    override suspend fun report(targetId: Int, reportType: String, reportContent: String) {
+        val response = hambugApi.report(ReportRequest(targetId, reportType, reportContent))
 
         if (!response.success) {
             throw Exception(response.message)

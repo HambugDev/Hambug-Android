@@ -22,6 +22,8 @@ import desktop.hambug.data.dto.community.MyCommentsResponse
 import desktop.hambug.data.dto.fcm.FcmTokenRequest
 import desktop.hambug.data.dto.fcm.FcmTokenResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
+import desktop.hambug.data.dto.report.ReportRequest
+import desktop.hambug.data.dto.report.ReportResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -113,6 +115,12 @@ interface HambugApi {
         @Path("boardId") boardId: Int,
         @Path("commentId") commentId: Int
     ): DeleteCommentResponse
+
+    // 게시물/댓글 신고
+    @POST("reports")
+    suspend fun report(
+        @Body request: ReportRequest
+    ): ReportResponse
 
     // JWT 토큰으로 내 정보 조회
     @GET("auth/me")
