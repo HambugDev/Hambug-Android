@@ -35,7 +35,7 @@ class MainViewModel @Inject constructor(
 
     init {
         checkLoginStatus()
-        collectAuthStatus()
+        observeLogoutEvent()
     }
 
     // 앱 시작 시 토큰 유무 확인
@@ -57,13 +57,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    // 로그아웃 신호가 오면 이벤트 방출
-    private fun collectAuthStatus() {
+    private fun observeLogoutEvent() {
         viewModelScope.launch {
-            tokenManager.authStatus.collectLatest { isLogoutRequired ->
-                if (isLogoutRequired) {
-                    _logoutEvent.emit(Unit)
-                }
+            tokenManager.logoutEvent.collectLatest {
+                _logoutEvent.emit(Unit)
             }
         }
     }

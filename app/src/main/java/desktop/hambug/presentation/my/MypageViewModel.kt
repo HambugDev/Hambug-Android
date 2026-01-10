@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.usecase.GetUserInfoUseCase
 import desktop.hambug.domain.usecase.UpdateUserNicknameUseCase
 import desktop.hambug.domain.usecase.UpdateUserProfileImageUseCase
+import desktop.hambug.domain.usecase.auth.LogoutUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -26,7 +27,8 @@ sealed class MypageEvent {
 class MypageViewModel @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val updateUserNicknameUseCase: UpdateUserNicknameUseCase,
-    private val updateUserProfileImageUseCase: UpdateUserProfileImageUseCase
+    private val updateUserProfileImageUseCase: UpdateUserProfileImageUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MyUiState>(MyUiState.Loading)
@@ -193,5 +195,20 @@ class MypageViewModel @Inject constructor(
 
     private fun getUserId(): Int? {
         return (uiState.value as? MyUiState.Success)?.userInfo?.userId
+    }
+
+    /**
+     * 로그아웃
+     */
+    fun logout() {
+        viewModelScope.launch {
+            logoutUseCase()
+                .onSuccess {
+                    Log.d("auth", "로그아웃 성공")
+                }
+                .onFailure { exception ->
+                    Log.e("auth", "로그아웃 실패: ${exception.message}", exception)
+                }
+        }
     }
 }

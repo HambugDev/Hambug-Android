@@ -3,7 +3,6 @@ package desktop.hambug
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -102,10 +101,9 @@ fun HambugApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
-    // 로그아웃 이벤트 구독
+    // 로그아웃 이벤트 처리
     LaunchedEffect(Unit) {
         mainViewModel.logoutEvent.collectLatest {
-            Log.d("auth", "로그아웃 이벤트 수신. 로그인 화면으로 이동")
             navController.navigate("login") {
                 // 스택 모두 제거
                 popUpTo(navController.graph.id) { inclusive = true }

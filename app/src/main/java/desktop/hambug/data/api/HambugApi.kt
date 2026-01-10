@@ -1,5 +1,6 @@
 package desktop.hambug.data.api
 
+import desktop.hambug.data.dto.CommonResponse
 import desktop.hambug.data.dto.home.HomeBurgerResponse
 import desktop.hambug.data.dto.LoginRequest
 import desktop.hambug.data.dto.LoginResponse
@@ -37,11 +38,20 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface HambugApi {
+    // JWT 토큰으로 내 정보 조회
+    @GET("auth/me")
+    suspend fun getUserInfo(): UserInfoResponse
+
+    // 소셜 로그인
     @POST("auth/login/{provider}")
     suspend fun login(
         @Path("provider") provider: String,
         @Body request: LoginRequest
     ): LoginResponse
+
+    // 로그아웃
+    @POST("auth/logout")
+    suspend fun logout(): CommonResponse
 
     // 오늘의 추천 햄버거 조회
     @GET("burgers/recommended")
@@ -121,10 +131,6 @@ interface HambugApi {
     suspend fun report(
         @Body request: ReportRequest
     ): ReportResponse
-
-    // JWT 토큰으로 내 정보 조회
-    @GET("auth/me")
-    suspend fun getUserInfo(): UserInfoResponse
 
     // 닉네임 변경
     @PUT("users/{id}/nickname")

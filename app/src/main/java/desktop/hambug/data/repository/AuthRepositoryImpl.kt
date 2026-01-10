@@ -8,14 +8,14 @@ import desktop.hambug.data.api.HambugApi
 import desktop.hambug.data.dto.LoginData
 import desktop.hambug.data.dto.LoginRequest
 import desktop.hambug.data.local.HambugTokenManager
-import desktop.hambug.domain.repository.KakaoLoginRepository
+import desktop.hambug.domain.repository.AuthRepository
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 
-class KakaoLoginRepositoryImpl @Inject constructor(
+class AuthRepositoryImpl @Inject constructor(
     private val hambugApi: HambugApi,
     private val tokenManager: HambugTokenManager
-) : KakaoLoginRepository {
+) : AuthRepository {
 
     override suspend fun login(context: Context): LoginData {
         return suspendCancellableCoroutine { continuation ->
@@ -65,6 +65,14 @@ class KakaoLoginRepositoryImpl @Inject constructor(
             } else {
                 throw Exception("서버 로그인 실패: ${response.message}")
             }
+        }
+    }
+
+    override suspend fun logout() {
+        val response = hambugApi.logout()
+
+        if (!response.success) {
+            throw Exception(response.message)
         }
     }
 }

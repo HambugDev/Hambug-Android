@@ -22,8 +22,8 @@ class HambugTokenManager @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     // 로그아웃 이벤트를 외부에 알리기 위해 사용
-    private val _authStatus = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
-    val authStatus: SharedFlow<Boolean> = _authStatus.asSharedFlow()
+    private val _logoutEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val logoutEvent: SharedFlow<Unit> = _logoutEvent.asSharedFlow()
 
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
         dataStore.edit { preferences ->
@@ -91,8 +91,6 @@ class HambugTokenManager @Inject constructor(
             preferences.remove(REFRESH_TOKEN_KEY)
             preferences.remove(FCM_TOKEN_KEY)
         }
-
-        // 로그아웃이 필요함을 알림
-        _authStatus.emit(true)
+        _logoutEvent.emit(Unit)
     }
 }

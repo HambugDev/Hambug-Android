@@ -2,11 +2,11 @@ package desktop.hambug.domain.usecase
 
 import android.content.Context
 import desktop.hambug.data.dto.LoginData
-import desktop.hambug.domain.repository.KakaoLoginRepository
+import desktop.hambug.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class KakaoLoginUseCase @Inject constructor(
-    private val repository: KakaoLoginRepository
+    private val repository: AuthRepository
 ) {
     suspend operator fun invoke(context: Context): LoginData {
         return repository.login(context)

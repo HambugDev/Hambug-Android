@@ -164,6 +164,7 @@ fun MypageScreen(
                     // 메뉴 선택 영역
                     MypageMenuSection(
                         onActivityClick = { navController.navigate("my_activity") },
+                        onLogoutClick = { mypageViewModel.logout() },
                         onUserRemove = { showUserRemoveSuccessDialog = true }
                     )
                 }
@@ -304,6 +305,7 @@ fun MypageProfileImage(
 @Composable
 fun MypageMenuSection(
     onActivityClick: () -> Unit,
+    onLogoutClick: () -> Unit,
     onUserRemove: () -> Unit
 ) {
     Column(
@@ -325,7 +327,7 @@ fun MypageMenuSection(
         MypageMenuButton(
             menuIcon = AppIcons.Logout,
             menuText = "로그아웃",
-            onClick = {},
+            onClick = { onLogoutClick() },
             modifier = Modifier
                 .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                 .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 10.dp)
