@@ -3,22 +3,20 @@ package desktop.hambug
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,8 +25,6 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
-import desktop.hambug.data.local.HambugTokenManager
-import desktop.hambug.domain.usecase.fcm.SyncFcmTokenUseCase
 import desktop.hambug.presentation.community.CommunityScreen
 import desktop.hambug.presentation.community.BoardDetailScreen
 import desktop.hambug.presentation.community.BoardWriteScreen
@@ -41,24 +37,14 @@ import desktop.hambug.presentation.my.MyActivityScreen
 import desktop.hambug.presentation.my.MypageScreen
 import desktop.hambug.presentation.noti.NotificationScreen
 import desktop.hambug.presentation.ui.theme.HambugTheme
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var syncFcmTokenUseCase: SyncFcmTokenUseCase
-
-    @Inject
-    lateinit var tokenManager: HambugTokenManager
-
-    private var isLoading by mutableStateOf(true)
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 스플래시 화면 설정
         val splashScreen = installSplashScreen()
 
         super.onCreate(savedInstanceState)
@@ -69,17 +55,24 @@ class MainActivity : ComponentActivity() {
         // 알림 채널 생성 (Android 8.0 이상)
         createNotificationChannel()
 
-        lifecycleScope.launch {
-            delay(1500)
-            isLoading = false
+        splashScreen.setKeepOnScreenCondition {
+            mainViewModel.showNativeSplash.value
         }
 
         setContent {
             HambugTheme {
-                if (isLoading) {
-                    SplashScreen()
-                } else {
-                    HambugApp()
+                val showNativeSplash by mainViewModel.showNativeSplash.collectAsStateWithLifecycle()
+                val startDestination by mainViewModel.startDestination.collectAsStateWithLifecycle()
+
+                // 기본 스플래시가 끝난 후에 화면 그림
+                if (!showNativeSplash) {
+                    val destination = startDestination
+
+                    if (destination == null) {
+                        SplashScreen()  // 커스텀 스플래시
+                    } else {
+                        HambugApp(startDestination = destination)
+                    }
                 }
             }
         }
@@ -101,16 +94,16 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HambugApp(
+    startDestination: String,
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
-    // 로그아웃 이벤트 구독
+    // 로그아웃 이벤트 처리
     LaunchedEffect(Unit) {
         mainViewModel.logoutEvent.collectLatest {
-            Log.d("auth", "로그아웃 이벤트 수신. 로그인 화면으로 이동")
             navController.navigate("login") {
                 // 스택 모두 제거
                 popUpTo(navController.graph.id) { inclusive = true }
@@ -143,7 +136,7 @@ fun HambugApp(
         NavHost(
             modifier = Modifier.padding(innerPadding),
             navController = navController,
-            startDestination = "login"
+            startDestination = startDestination
         ) {
             // 메인 그래프
             navigation(

@@ -46,7 +46,8 @@ fun UserInfoData.toEntity(): UserInfo {
     return UserInfo(
         userId = this.userId,
         nickname = this.nickname,
-        profileImageUrl = this.profileImageUrl
+        profileImageUrl = this.profileImageUrl,
+        loginType = this.loginType
     )
 }
 

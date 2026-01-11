@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,88 +23,106 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import desktop.hambug.R
 import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @Composable
 fun UserRemoveDialog(
+    isLoading: Boolean,
     onDismiss: () -> Unit,
     onCancel: () -> Unit,
     onConfirm: () -> Unit
 ) {
     Dialog(
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = !isLoading,    // 로딩 중에 뒤로가기 막기
+            dismissOnClickOutside = !isLoading  // 로딩 중에 dialog 외부 클릭 막기
+        )
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             color = HambugTheme.colors.bgWhite
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 36.dp, bottom = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(R.drawable.logo_modal),
-                    contentDescription = null
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                Text(
-                    text = "정말 탈퇴하시겠어요?",
-                    style = HambugTheme.typography.title02,
-                    color = HambugTheme.colors.textHeadline
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                Text(
-                    text = "회원탈퇴 후 계정 복구가 불가능하며, \n작성한 게시물과 댓글은 유지됩니다. \n탈퇴하시겠습니까?",
-                    style = HambugTheme.typography.body03,
-                    color = HambugTheme.colors.textDisabled,
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(Modifier.height(24.dp))
-
-                // 버튼 영역
-                Row(
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 36.dp, bottom = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clickable { onCancel() }
-                            .weight(1f)
-                            .background(color = HambugTheme.colors.bgDarker, shape = RoundedCornerShape(12.dp))
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "취소",
-                            style = HambugTheme.typography.body02Prominent,
-                            color = HambugTheme.colors.textBody
-                        )
-                    }
+                    Image(
+                        painter = painterResource(R.drawable.logo_modal),
+                        contentDescription = null
+                    )
 
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                    Box(
-                        modifier = Modifier
-                            .clickable { onConfirm() }
-                            .weight(1f)
-                            .background(color = HambugTheme.colors.primRed, shape = RoundedCornerShape(12.dp))
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
+                    Text(
+                        text = "정말 탈퇴하시겠어요?",
+                        style = HambugTheme.typography.title02,
+                        color = HambugTheme.colors.textHeadline
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
+                        text = "회원탈퇴 후 계정 복구가 불가능하며, \n작성한 게시물과 댓글은 유지됩니다. \n탈퇴하시겠습니까?",
+                        style = HambugTheme.typography.body03,
+                        color = HambugTheme.colors.textDisabled,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    Spacer(Modifier.height(24.dp))
+
+                    // 버튼 영역
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = "탈퇴",
-                            style = HambugTheme.typography.body02Prominent,
-                            color = HambugTheme.colors.bgWhite
-                        )
+                        Box(
+                            modifier = Modifier
+                                .clickable { onCancel() }
+                                .weight(1f)
+                                .background(color = HambugTheme.colors.bgDarker, shape = RoundedCornerShape(12.dp))
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "취소",
+                                style = HambugTheme.typography.body02Prominent,
+                                color = HambugTheme.colors.textBody
+                            )
+                        }
+
+                        Spacer(Modifier.width(8.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .clickable { onConfirm() }
+                                .weight(1f)
+                                .background(color = HambugTheme.colors.primRed, shape = RoundedCornerShape(12.dp))
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "탈퇴",
+                                style = HambugTheme.typography.body02Prominent,
+                                color = HambugTheme.colors.bgWhite
+                            )
+                        }
                     }
+                }
+
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(40.dp),
+                        color = HambugTheme.colors.primRed,
+                        strokeWidth = 4.dp
+                    )
                 }
             }
         }

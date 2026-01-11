@@ -7,12 +7,12 @@ import dagger.hilt.components.SingletonComponent
 import desktop.hambug.data.repository.CommunityRepositoryImpl
 import desktop.hambug.data.repository.FcmRepositoryImpl
 import desktop.hambug.data.repository.HomeRepositoryImpl
-import desktop.hambug.data.repository.KakaoLoginRepositoryImpl
+import desktop.hambug.data.repository.AuthRepositoryImpl
 import desktop.hambug.data.repository.MyRepositoryImpl
 import desktop.hambug.domain.repository.CommunityRepository
 import desktop.hambug.domain.repository.FcmRepository
 import desktop.hambug.domain.repository.HomeRepository
-import desktop.hambug.domain.repository.KakaoLoginRepository
+import desktop.hambug.domain.repository.AuthRepository
 import desktop.hambug.domain.repository.MyRepository
 import javax.inject.Singleton
 
@@ -22,9 +22,9 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindKakaoLoginRepository(
-        kakaoLoginRepositoryImpl: KakaoLoginRepositoryImpl
-    ): KakaoLoginRepository
+    abstract fun bindAuthRepository(
+        authRepositoryImpl: AuthRepositoryImpl
+    ): AuthRepository
 
     @Binds
     @Singleton
