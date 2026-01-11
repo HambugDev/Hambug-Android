@@ -53,6 +53,12 @@ interface HambugApi {
     @POST("auth/logout")
     suspend fun logout(): CommonResponse
 
+    // 회원탈퇴
+    @POST("auth/unlink/{provider}")
+    suspend fun unlink(
+        @Path("provider") provider: String
+    ): CommonResponse
+
     // 오늘의 추천 햄버거 조회
     @GET("burgers/recommended")
     suspend fun getHomeBurgers(): HomeBurgerResponse

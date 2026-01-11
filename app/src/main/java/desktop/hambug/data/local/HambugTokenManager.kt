@@ -83,14 +83,21 @@ class HambugTokenManager @Inject constructor(
     }
 
     /**
-     * 로그아웃 (모든 토큰 제거)
+     * 모든 토큰 제거
      */
-    suspend fun logout() {
+    suspend fun clearAllToken() {
         dataStore.edit { preferences ->
             preferences.remove(ACCESS_TOKEN_KEY)
             preferences.remove(REFRESH_TOKEN_KEY)
             preferences.remove(FCM_TOKEN_KEY)
         }
+    }
+
+    /**
+     * 로그아웃
+     */
+    suspend fun logout() {
+        clearAllToken()
         _logoutEvent.emit(Unit)
     }
 }

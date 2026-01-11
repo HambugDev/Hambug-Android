@@ -49,7 +49,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import coil3.request.crossfade
 import coil3.svg.SvgDecoder
 import desktop.hambug.domain.model.UserInfo
 import desktop.hambug.presentation.my.component.NicknameUpdateDialog
@@ -68,13 +67,12 @@ import desktop.hambug.presentation.ui.theme.RemoveRed
 @Composable
 fun MypageScreen(
     navController: NavHostController,
-    mypageViewModel: MypageViewModel = hiltViewModel(
-        viewModelStoreOwner = navController.getBackStackEntry("main_graph")
-    )
+    mypageViewModel: MypageViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val uiState by mypageViewModel.uiState.collectAsStateWithLifecycle()
     val nicknameState by mypageViewModel.nicknameState.collectAsStateWithLifecycle()
+    val isUnlinking by mypageViewModel.isUnlinking.collectAsStateWithLifecycle()
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var showUserRemoveDialog by remember { mutableStateOf(false) }
@@ -165,7 +163,7 @@ fun MypageScreen(
                     MypageMenuSection(
                         onActivityClick = { navController.navigate("my_activity") },
                         onLogoutClick = { mypageViewModel.logout() },
-                        onUserRemove = { showUserRemoveSuccessDialog = true }
+                        onUserRemove = { showUserRemoveDialog = true }
                     )
                 }
             }
@@ -218,17 +216,32 @@ fun MypageScreen(
     // 회원탈퇴 확인 모달창
     if (showUserRemoveDialog) {
         UserRemoveDialog(
+            isLoading = isUnlinking,
             onDismiss = { showUserRemoveDialog = false },
-            onCancel = { showUserRemoveDialog = false },
-            onConfirm = {}
+            onCancel = { if (!isUnlinking) showUserRemoveDialog = false },
+            onConfirm = {
+                mypageViewModel.unlinkUser(
+                    onSuccess = {
+                        showUserRemoveDialog = false
+                        showUserRemoveSuccessDialog = true
+                    },
+                    onFailure = { showUserRemoveDialog = false }
+                )
+            }
         )
     }
 
     // 회원탈퇴 완료 모달창
     if (showUserRemoveSuccessDialog) {
         UserRemoveSuccessDialog (
-            onDismiss = { showUserRemoveSuccessDialog = false},
-            onConfirm = { showUserRemoveSuccessDialog = false }
+            onDismiss = {
+                showUserRemoveSuccessDialog = false
+                navigateToLogin(navController)
+            },
+            onConfirm = {
+                showUserRemoveSuccessDialog = false
+                navigateToLogin(navController)
+            }
         )
     }
 }
@@ -458,6 +471,13 @@ fun MypageBottomSheetButton(
             style = HambugTheme.typography.body02,
             color = HambugTheme.colors.textBody
         )
+    }
+}
+
+private fun navigateToLogin(navController: NavHostController) {
+    navController.navigate("login") {
+        popUpTo(0) { inclusive = true }
+        launchSingleTop = true
     }
 }
 

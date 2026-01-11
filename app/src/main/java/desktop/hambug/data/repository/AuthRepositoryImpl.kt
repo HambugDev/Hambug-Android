@@ -75,4 +75,12 @@ class AuthRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
     }
+
+    override suspend fun unlink(provider: String) {
+        val response = hambugApi.unlink(provider.lowercase())
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+    }
 }

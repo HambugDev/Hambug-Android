@@ -9,6 +9,7 @@ import desktop.hambug.domain.usecase.GetUserInfoUseCase
 import desktop.hambug.domain.usecase.UpdateUserNicknameUseCase
 import desktop.hambug.domain.usecase.UpdateUserProfileImageUseCase
 import desktop.hambug.domain.usecase.auth.LogoutUseCase
+import desktop.hambug.domain.usecase.auth.UnlinkUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -28,7 +29,8 @@ class MypageViewModel @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val updateUserNicknameUseCase: UpdateUserNicknameUseCase,
     private val updateUserProfileImageUseCase: UpdateUserProfileImageUseCase,
-    private val logoutUseCase: LogoutUseCase
+    private val logoutUseCase: LogoutUseCase,
+    private val unlinkUseCase: UnlinkUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MyUiState>(MyUiState.Loading)
@@ -36,6 +38,9 @@ class MypageViewModel @Inject constructor(
 
     private val _nicknameState = MutableStateFlow(NicknameValidationState())
     val nicknameState: StateFlow<NicknameValidationState> = _nicknameState
+
+    private val _isUnlinking = MutableStateFlow(false)
+    val isUnlinking = _isUnlinking.asStateFlow()
 
     // Photo Picker 실행 이벤트
     private val _mypageEvent = MutableSharedFlow<MypageEvent>()
@@ -208,6 +213,26 @@ class MypageViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     Log.e("auth", "로그아웃 실패: ${exception.message}", exception)
+                }
+        }
+    }
+
+    /**
+     * 회원탈퇴
+     */
+    fun unlinkUser(onSuccess: () -> Unit, onFailure: () -> Unit) {
+        val currentState = _uiState.value as? MyUiState.Success ?: return
+
+        viewModelScope.launch {
+            _isUnlinking.value = true
+            unlinkUseCase(currentState.userInfo.loginType)
+                .onSuccess {
+                    _isUnlinking.value = false
+                    onSuccess()
+                }
+                .onFailure {
+                    _isUnlinking.value = false
+                    onFailure()
                 }
         }
     }
