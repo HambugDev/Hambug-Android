@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -53,6 +52,7 @@ import desktop.hambug.presentation.community.component.RequiredFieldTitle
 import desktop.hambug.presentation.ui.component.CustomContentTextField
 import desktop.hambug.presentation.ui.component.CustomSnackbar
 import desktop.hambug.presentation.ui.component.CustomTitleTextField
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
 import desktop.hambug.presentation.ui.icon.appicons.Camera
@@ -225,11 +225,7 @@ fun BoardWriteScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(40.dp),
-                    color = HambugTheme.colors.primRed,
-                    strokeWidth = 4.dp
-                )
+                HambugLoadingIndicator()
             }
         }
     }

@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -38,6 +36,7 @@ import androidx.navigation.NavHostController
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
 import desktop.hambug.presentation.ui.component.CustomContentTextField
 import desktop.hambug.presentation.ui.component.CustomSnackbar
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Back
 import desktop.hambug.presentation.ui.theme.HambugTheme
@@ -166,11 +165,7 @@ fun ReportScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(40.dp),
-                    color = HambugTheme.colors.primRed,
-                    strokeWidth = 4.dp
-                )
+                HambugLoadingIndicator()
             }
         }
     }

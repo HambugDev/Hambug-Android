@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -54,6 +53,8 @@ import desktop.hambug.presentation.community.component.CommentInputBar
 import desktop.hambug.presentation.community.component.DetailMyBottomSheet
 import desktop.hambug.presentation.community.component.DetailOtherBottomSheet
 import desktop.hambug.presentation.ui.component.CustomSnackbar
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
+import desktop.hambug.presentation.ui.component.IndicatorSize
 import desktop.hambug.presentation.ui.component.TwoButtonDialog
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
@@ -164,11 +165,7 @@ fun BoardDetailScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(40.dp),
-                        color = HambugTheme.colors.primRed,
-                        strokeWidth = 4.dp
-                    )
+                    HambugLoadingIndicator()
                 }
             }
             is BoardDetailUiState.Error -> {}
@@ -244,11 +241,7 @@ fun BoardDetailScreen(
                                         .padding(vertical = 40.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(24.dp),
-                                        color = HambugTheme.colors.primRed,
-                                        strokeWidth = 2.dp
-                                    )
+                                    HambugLoadingIndicator(indicatorSize = IndicatorSize.Small)
                                 }
                             }
                         }

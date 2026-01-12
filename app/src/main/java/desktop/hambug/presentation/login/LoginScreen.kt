@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import desktop.hambug.R
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Apple
 import desktop.hambug.presentation.ui.icon.appicons.Kakao
@@ -112,11 +112,7 @@ fun LoginScreen(
                         .background(color = Color.Black.copy(alpha = 0.8f), shape = CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(40.dp),
-                        color = HambugTheme.colors.primRed,
-                        strokeWidth = 4.dp
-                    )
+                    HambugLoadingIndicator()
                 }
             }
         }

@@ -20,7 +20,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -43,6 +42,7 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.HomeBoard
 import desktop.hambug.domain.model.HomeBurger
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Bell
 import desktop.hambug.presentation.ui.icon.appicons.BellBorder
@@ -98,11 +98,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(40.dp),
-                        color = HambugTheme.colors.primRed,
-                        strokeWidth = 4.dp
-                    )
+                    HambugLoadingIndicator()
                 }
             }
             is HomeUiState.Error -> {

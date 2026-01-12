@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -47,6 +46,7 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.MyBoard
 import desktop.hambug.domain.model.MyComment
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
 import desktop.hambug.presentation.ui.icon.appicons.Comment
@@ -178,11 +178,7 @@ fun TwoTabSection(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(40.dp),
-                                    color = HambugTheme.colors.primRed,
-                                    strokeWidth = 4.dp
-                                )
+                                HambugLoadingIndicator()
                             }
                         }
                         is MyActivityUiState.Error -> {}
@@ -215,11 +211,7 @@ fun TwoTabSection(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(40.dp),
-                                    color = HambugTheme.colors.primRed,
-                                    strokeWidth = 4.dp
-                                )
+                                HambugLoadingIndicator()
                             }
                         }
                         is MyCommentUiState.Error -> {}
