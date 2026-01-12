@@ -39,12 +39,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            manifestPlaceholders["appName"] = "@string/app_name_dev"
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            manifestPlaceholders["appName"] = "@string/app_name"
         }
     }
     compileOptions {
@@ -109,6 +113,8 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.okhttp)
     implementation(libs.coil.svg)
+    // timber
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
