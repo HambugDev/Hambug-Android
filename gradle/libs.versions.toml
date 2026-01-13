@@ -9,6 +9,7 @@ lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
 #composeBom = "2024.09.00"
 composeBom = "2025.05.00"
+crashlytics = "3.0.6"
 ktlint = "12.3.0"
 nav = "2.9.3"
 google = "4.4.3"
@@ -44,6 +45,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "nav" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -72,3 +74,4 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
