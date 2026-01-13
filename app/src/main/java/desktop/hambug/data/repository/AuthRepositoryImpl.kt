@@ -1,7 +1,6 @@
 package desktop.hambug.data.repository
 
 import android.content.Context
-import android.util.Log
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import desktop.hambug.data.api.HambugApi
@@ -10,6 +9,7 @@ import desktop.hambug.data.dto.LoginRequest
 import desktop.hambug.data.local.HambugTokenManager
 import desktop.hambug.domain.repository.AuthRepository
 import kotlinx.coroutines.suspendCancellableCoroutine
+import timber.log.Timber
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -24,12 +24,12 @@ class AuthRepositoryImpl @Inject constructor(
             // UserApiClient 콜백 정의
             val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
                 if (error != null) {
-                    Log.e("auth", "카카오 로그인 실패", error)
+                    Timber.e(error, "카카오 로그인 실패")
                     if (continuation.isActive) {
                         continuation.resumeWith(Result.failure(error))
                     }
                 } else if (token != null) {
-                    Log.d("auth", "카카오 access token: ${token.accessToken}")
+                    Timber.d("카카오 access token: ${token.accessToken}")
                     if (continuation.isActive) {
                         continuation.resumeWith(Result.success(token.accessToken))
                     }

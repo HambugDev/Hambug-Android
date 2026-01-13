@@ -1,4 +1,4 @@
-package desktop.hambug.domain.usecase
+package desktop.hambug.domain.usecase.my
 
 import android.net.Uri
 import desktop.hambug.domain.model.UserInfo

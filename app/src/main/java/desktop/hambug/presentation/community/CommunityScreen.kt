@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -43,11 +42,11 @@ import desktop.hambug.presentation.community.component.CustomFloatingActionButto
 import desktop.hambug.presentation.community.component.FeedViewContent
 import desktop.hambug.presentation.community.component.ListViewContent
 import desktop.hambug.presentation.ui.component.CustomSnackbar
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.theme.CommunityFilterSelected
 import desktop.hambug.presentation.ui.theme.HambugTheme
-import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -182,11 +181,7 @@ fun CommunityScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(40.dp),
-                                color = HambugTheme.colors.primRed,
-                                strokeWidth = 4.dp
-                            )
+                            HambugLoadingIndicator()
                         }
                     }
                     is CommunityUiState.Error -> {}

@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -54,6 +53,7 @@ import desktop.hambug.domain.model.UserInfo
 import desktop.hambug.presentation.my.component.NicknameUpdateDialog
 import desktop.hambug.presentation.my.component.UserRemoveDialog
 import desktop.hambug.presentation.my.component.UserRemoveSuccessDialog
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Activity
 import desktop.hambug.presentation.ui.icon.appicons.ArrowRight
@@ -131,11 +131,7 @@ fun MypageScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(40.dp),
-                        color = HambugTheme.colors.primRed,
-                        strokeWidth = 4.dp
-                    )
+                    HambugLoadingIndicator()
                 }
             }
             is MyUiState.Error -> {

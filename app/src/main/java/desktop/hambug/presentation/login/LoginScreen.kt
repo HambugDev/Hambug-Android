@@ -1,7 +1,6 @@
 package desktop.hambug.presentation.login
 
 import android.Manifest
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import desktop.hambug.R
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Apple
 import desktop.hambug.presentation.ui.icon.appicons.Kakao
@@ -45,6 +44,7 @@ import desktop.hambug.presentation.ui.theme.Gray1000
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.ui.theme.KakaoYellow
 import desktop.hambug.util.NotificationPermissionHelper
+import timber.log.Timber
 
 @Composable
 fun LoginScreen(
@@ -59,9 +59,9 @@ fun LoginScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            Log.d("noti", "알림 권한 허용됨")
+            Timber.d("알림 권한 허용됨")
         } else {
-            Log.d("noti", "알림 권한 거부됨")
+            Timber.d("알림 권한 거부됨")
         }
     }
 
@@ -112,11 +112,7 @@ fun LoginScreen(
                         .background(color = Color.Black.copy(alpha = 0.8f), shape = CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(40.dp),
-                        color = HambugTheme.colors.primRed,
-                        strokeWidth = 4.dp
-                    )
+                    HambugLoadingIndicator()
                 }
             }
         }

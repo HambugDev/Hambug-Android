@@ -1,13 +1,12 @@
 package desktop.hambug.presentation.community
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Category
 import desktop.hambug.domain.model.CategoryType
-import desktop.hambug.domain.usecase.CreateBoardUseCase
+import desktop.hambug.domain.usecase.community.CreateBoardUseCase
 import desktop.hambug.presentation.common.SnackbarMessage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 sealed interface BoardWriteEvent {
@@ -123,7 +123,7 @@ class BoardWriteViewModel @Inject constructor(
                         _eventFlow.send(BoardWriteEvent.NavigateToDetail(boardId))
                     }
                     .onFailure { exception ->
-                        Log.e("community", "createBoard 실패: ${exception.message}", exception)
+                        Timber.e(exception, "게시물 생성 실패")
                     }
             } finally {
                 _uiState.update { it.copy(isCreating = false) }

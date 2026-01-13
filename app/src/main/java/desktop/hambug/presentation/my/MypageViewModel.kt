@@ -1,13 +1,12 @@
 package desktop.hambug.presentation.my
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import desktop.hambug.domain.usecase.GetUserInfoUseCase
-import desktop.hambug.domain.usecase.UpdateUserNicknameUseCase
-import desktop.hambug.domain.usecase.UpdateUserProfileImageUseCase
+import desktop.hambug.domain.usecase.my.GetUserInfoUseCase
+import desktop.hambug.domain.usecase.my.UpdateUserNicknameUseCase
+import desktop.hambug.domain.usecase.my.UpdateUserProfileImageUseCase
 import desktop.hambug.domain.usecase.auth.LogoutUseCase
 import desktop.hambug.domain.usecase.auth.UnlinkUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 sealed class MypageEvent {
@@ -60,11 +60,10 @@ class MypageViewModel @Inject constructor(
         viewModelScope.launch {
             getUserInfoUseCase()
                 .onSuccess { userInfo ->
-                    Log.d("my", "getUserInfo 성공")
                     _uiState.value = MyUiState.Success(userInfo)
                 }
                 .onFailure { exception ->
-                    Log.e("my", "getUserInfo 실패: ${exception.message}", exception)
+                    Timber.e(exception, "내 정보 조회 실패")
                     val exceptionMessage = exception.message ?: "데이터 로딩 중 오류 발생"
                     _uiState.value = MyUiState.Error(exceptionMessage)
                 }
@@ -82,7 +81,6 @@ class MypageViewModel @Inject constructor(
         } else {
             newInput
         }
-        Log.d("my", "onNicknameChange finalInput: $finalInput")
 
         val (isValid, errorMessage) = validateNickname(finalInput)
 
@@ -138,13 +136,12 @@ class MypageViewModel @Inject constructor(
             viewModelScope.launch {
                 updateUserNicknameUseCase(userId = userId, nickname = newNickname)
                     .onSuccess { userInfo ->
-                        Log.d("my", "updateUserNickname 성공")
                         _uiState.value = MyUiState.Success(userInfo)
                         onSuccess()
                     }
                     .onFailure { exception ->
-                        Log.e("my", "updateUserNickname 실패: ${exception.message}", exception)
-                        val exceptionMessage = exception.message ?: "updateUserNickname 오류 발생"
+                        Timber.e(exception, "닉네임 변경 실패")
+                        val exceptionMessage = exception.message ?: "닉네임 변경 실패"
                         _uiState.value = MyUiState.Error(exceptionMessage)
                     }
 
@@ -173,11 +170,10 @@ class MypageViewModel @Inject constructor(
 
             updateUserProfileImageUseCase(userId = userId, imageUri = uri)
                 .onSuccess { userInfo ->
-                    Log.d("my", "프로필 업데이트 성공")
                     _uiState.value = MyUiState.Success(userInfo)
                 }
                 .onFailure { exception ->
-                    Log.e("my", "프로필 업데이트 실패: ${exception.message}", exception)
+                    Timber.e(exception, "프로필 업데이트 실패")
                     _uiState.value = MyUiState.Error(exception.message ?: "프로필 업데이트 실패")
                 }
         }
@@ -209,10 +205,10 @@ class MypageViewModel @Inject constructor(
         viewModelScope.launch {
             logoutUseCase()
                 .onSuccess {
-                    Log.d("auth", "로그아웃 성공")
+                    Timber.d("로그아웃 성공")
                 }
                 .onFailure { exception ->
-                    Log.e("auth", "로그아웃 실패: ${exception.message}", exception)
+                    Timber.e(exception, "로그아웃 실패")
                 }
         }
     }
@@ -230,7 +226,8 @@ class MypageViewModel @Inject constructor(
                     _isUnlinking.value = false
                     onSuccess()
                 }
-                .onFailure {
+                .onFailure { exception ->
+                    Timber.e(exception, "회원탈퇴 실패")
                     _isUnlinking.value = false
                     onFailure()
                 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">햄버그</string>
+    <string name="app_name_dev">햄버그(Dev)</string>
 </resources>

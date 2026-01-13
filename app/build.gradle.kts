@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
@@ -39,12 +40,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            manifestPlaceholders["appName"] = "@string/app_name_dev"
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            manifestPlaceholders["appName"] = "@string/app_name"
         }
     }
     compileOptions {
@@ -84,6 +89,7 @@ dependencies {
 
     // firebase
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.messaging)
     // hilt
@@ -109,6 +115,8 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.okhttp)
     implementation(libs.coil.svg)
+    // timber
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

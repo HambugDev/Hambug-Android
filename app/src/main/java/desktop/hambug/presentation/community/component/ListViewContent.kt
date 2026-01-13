@@ -5,11 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
@@ -17,7 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import desktop.hambug.domain.model.Board
-import desktop.hambug.presentation.ui.theme.HambugTheme
+import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
+import desktop.hambug.presentation.ui.component.IndicatorSize
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 
@@ -68,11 +67,7 @@ fun ListViewContent(
                         .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = HambugTheme.colors.primRed,
-                        strokeWidth = 2.dp
-                    )
+                    HambugLoadingIndicator(indicatorSize = IndicatorSize.Small)
                 }
             }
         }

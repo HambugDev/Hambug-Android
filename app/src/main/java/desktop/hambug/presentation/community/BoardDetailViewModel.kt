@@ -1,21 +1,21 @@
 package desktop.hambug.presentation.community
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Comment
-import desktop.hambug.domain.usecase.CreateCommentUseCase
-import desktop.hambug.domain.usecase.DeleteBoardUseCase
-import desktop.hambug.domain.usecase.DeleteCommentUseCase
-import desktop.hambug.domain.usecase.GetBoardDetailUseCase
-import desktop.hambug.domain.usecase.GetCommentsUseCase
-import desktop.hambug.domain.usecase.LikeBoardUseCase
+import desktop.hambug.domain.usecase.community.CreateCommentUseCase
+import desktop.hambug.domain.usecase.community.DeleteBoardUseCase
+import desktop.hambug.domain.usecase.community.DeleteCommentUseCase
+import desktop.hambug.domain.usecase.community.GetBoardDetailUseCase
+import desktop.hambug.domain.usecase.community.GetCommentsUseCase
+import desktop.hambug.domain.usecase.community.LikeBoardUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,7 +65,8 @@ class BoardDetailViewModel @Inject constructor(
                     _uiState.value = BoardDetailUiState.Success(board)
                 }
                 .onFailure { exception ->
-                    val exceptionMessage = exception.message ?: "게시물 상세 데이터 로딩 실패"
+                    Timber.e(exception, "게시물 상세 조회 실패")
+                    val exceptionMessage = exception.message ?: "게시물 상세 조회 실패"
                     _uiState.value = BoardDetailUiState.Error(exceptionMessage)
                 }
         }
@@ -78,7 +79,8 @@ class BoardDetailViewModel @Inject constructor(
                     _commentsState.value = CommentsUiState.Success(comments)
                 }
                 .onFailure { exception ->
-                    val exceptionMessage = exception.message ?: "댓글 로딩 실패"
+                    Timber.e(exception, "댓글 목록 조회 실패")
+                    val exceptionMessage = exception.message ?: "댓글 목록 조회 실패"
                     _commentsState.value = CommentsUiState.Error(exceptionMessage)
                 }
         }
@@ -94,7 +96,7 @@ class BoardDetailViewModel @Inject constructor(
                     onSuccess()
                 }
                 .onFailure { exception ->
-                    Log.e("my", "게시물 삭제 실패: ${exception.message}", exception)
+                    Timber.e(exception, "게시물 삭제 실패")
                 }
         }
     }
@@ -136,12 +138,11 @@ class BoardDetailViewModel @Inject constructor(
                             likeCount = response.likeCount
                         )
                     )
-                    Log.d("community", "likeBoard 성공")
                 }
                 .onFailure { exception ->
+                    Timber.e(exception, "좋아요 토글 실패")
                     // 실패 시 이전 상태로
                     _uiState.value = BoardDetailUiState.Success(previousBoard)
-                    Log.e("community", "likeBoard 실패: ${exception.message}", exception)
                 }
 
             _isLikeProcessing.value = false
@@ -166,7 +167,7 @@ class BoardDetailViewModel @Inject constructor(
                     loadComments()
                 }
                 .onFailure { exception ->
-                    Log.e("community", "댓글 생성 실패: ${exception.message}", exception)
+                    Timber.e(exception, "댓글 생성 실패")
                 }
         }
     }
@@ -193,7 +194,7 @@ class BoardDetailViewModel @Inject constructor(
                     _showCommentDeleteSnackbar.value = true
                 }
                 .onFailure { exception ->
-                    Log.e("community", "댓글 삭제 실패: ${exception.message}", exception)
+                    Timber.e(exception, "댓글 삭제 실패")
                 }
         }
     }

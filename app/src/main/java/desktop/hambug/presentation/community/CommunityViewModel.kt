@@ -1,14 +1,13 @@
 package desktop.hambug.presentation.community
 
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Filter
 import desktop.hambug.domain.model.FilterType
-import desktop.hambug.domain.usecase.GetBoardsUseCase
-import desktop.hambug.domain.usecase.GetCategoryBoardsUseCase
+import desktop.hambug.domain.usecase.community.GetBoardsUseCase
+import desktop.hambug.domain.usecase.community.GetCategoryBoardsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -125,7 +125,7 @@ class CommunityViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    Log.e("community", "추가 조회 실패: ${exception.message}", exception)
+                    Timber.e(exception, "${currentFilterType.name} 필터의 데이터 추가 조회 실패")
                 }
 
             // 로딩 종료
@@ -166,7 +166,7 @@ class CommunityViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    Log.e("community", "${filterType.name} 데이터 조회 실패: ${exception.message}", exception)
+                    Timber.e(exception, "${filterType.name} 필터의 데이터 조회 실패")
                     if (_currentFilter.value == filterType) {
                         val message = exception.message ?: "데이터 조회 실패"
                         _currentUiState.value = CommunityUiState.Error(message)

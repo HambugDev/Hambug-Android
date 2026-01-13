@@ -4,7 +4,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -18,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,8 +30,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     lateinit var tokenManager: HambugTokenManager
 
     override fun onMessageReceived(message: RemoteMessage) {
-        Log.d("fcm", "fcm 메시지 수신 - data: ${message.data}")
-        Log.d("fcm", "fcm 메시지 수신 - notification: ${message.notification}")
+        Timber.d("fcm 메시지 수신 - data: ${message.data}")
+        Timber.d("fcm 메시지 수신 - notification: ${message.notification}")
 
         val title = message.notification?.title
             ?: message.data["title"]
@@ -45,7 +45,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        Log.d("fcm", "fcm 새로운 토큰 발급: $token")
+        Timber.d("fcm 새로운 토큰 발급: $token")
 
         CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
             try {
@@ -55,16 +55,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 if (tokenManager.isLogin()) {
                     updateFcmTokenUseCase(token)
                         .onSuccess {
-                            Log.d("fcm", "새 fcm 토큰 서버 전송 성공")
+                            Timber.d("새 fcm 토큰 서버 전송 성공")
                         }
                         .onFailure { exception ->
-                            Log.e("fcm", "새 fcm 토큰 서버 전송 실패", exception)
+                            Timber.e(exception, "새 fcm 토큰 서버 전송 실패")
                         }
                 } else {
-                    Log.d("fcm", "onNewToken - 로그인 전이므로 FCM 토근을 로컬에만 저장")
+                    Timber.d("로그인 전이므로 FCM 토근을 로컬에만 저장")
                 }
             } catch (e: Exception) {
-                Log.e("fcm", "fcm 토큰 처리 중 오류", e)
+                Timber.e(e, "fcm 토큰 처리 중 오류 발생")
             }
         }
     }
