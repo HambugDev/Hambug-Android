@@ -1,4 +1,4 @@
-package desktop.hambug.domain.usecase
+package desktop.hambug.domain.usecase.my
 
 import desktop.hambug.domain.model.UserInfo
 import desktop.hambug.domain.repository.MyRepository

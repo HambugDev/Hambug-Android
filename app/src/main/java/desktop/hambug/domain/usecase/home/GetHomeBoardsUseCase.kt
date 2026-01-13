@@ -1,4 +1,4 @@
-package desktop.hambug.domain.usecase
+package desktop.hambug.domain.usecase.home
 
 import desktop.hambug.domain.model.HomeBoard
 import desktop.hambug.domain.repository.HomeRepository

@@ -2,10 +2,10 @@ package desktop.hambug.util
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import timber.log.Timber
 
 object ImageFileUtil {
     /**
@@ -58,7 +58,7 @@ object ImageFileUtil {
             // MultipartBody.Part 생성
             MultipartBody.Part.createFormData(partName, fileName, requestBody)
         } catch (e: Exception) {
-            Log.e("community", "createMultipartBodyPartFromUri 실패: ${e.message}", e)
+            Timber.e(e, "createMultipartBodyPartFromUri 실패")
             null
         }
     }

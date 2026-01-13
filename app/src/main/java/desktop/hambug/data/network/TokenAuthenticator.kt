@@ -1,6 +1,5 @@
 package desktop.hambug.data.network
 
-import android.util.Log
 import desktop.hambug.data.api.RefreshApi
 import desktop.hambug.data.local.HambugTokenManager
 import kotlinx.coroutines.runBlocking
@@ -11,6 +10,7 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 import retrofit2.Retrofit
+import timber.log.Timber
 
 class TokenAuthenticator(
     private val tokenManager: HambugTokenManager,
@@ -22,8 +22,7 @@ class TokenAuthenticator(
     private val refreshApi = refreshRetrofit.create(RefreshApi::class.java)
 
     override fun authenticate(route: Route?, response: Response): Request? {
-
-        Log.d("auth", "HTTP 메서드: ${response.code}")
+        Timber.d("HTTP 메서드: ${response.code}")
 
         // HTTP 401일 때만 실행
         if (response.code != 401) {
@@ -35,7 +34,7 @@ class TokenAuthenticator(
         val currentAccessToken = runBlocking { tokenManager.getAccessToken() }
         // 현재 요청의 토큰이 최신 토큰과 다르면, 이미 다른 요청에 의해 토큰 갱신된 상태
         if (response.request.header("Authorization") != "Bearer $currentAccessToken") {
-            Log.d("auth", "토큰 이미 갱신됨. 새 토큰으로 재시도")
+            Timber.d("JWT 토큰 이미 갱신됨. 새 토큰으로 재시도")
             return response.request.newBuilder()
                 .header("Authorization", "Bearer $currentAccessToken")
                 .build()
@@ -45,7 +44,7 @@ class TokenAuthenticator(
             val oldRefreshToken = tokenManager.getRefreshToken()
 
             if (oldRefreshToken == null) {
-                Log.e("auth", "refresh token 없음")
+                Timber.e("refresh token 없음")
                 tokenManager.logout()
                 return@runBlocking null
             }
@@ -57,7 +56,7 @@ class TokenAuthenticator(
                 // 2차 체크 (Mutex 락 내부)
                 // 갱신이 진행되는 동안 대기했던 요청이 중복 호출 되지 않도록 확인
                 if (response.request.header("Authorization") != "Bearer $currentAccessTokenInLock") {
-                    Log.d("auth", "토큰 이미 갱신됨. 새 토큰 반환")
+                    Timber.d("JWT 토큰 이미 갱신됨. 새 토큰 반환")
                     return@withLock currentAccessTokenInLock
                 }
 
@@ -66,17 +65,17 @@ class TokenAuthenticator(
                     val refreshResponse = refreshApi.refreshToken("Bearer $oldRefreshToken")
 
                     if (refreshResponse.success) {
+                        Timber.d("access token 갱신 성공")
                         val newToken = refreshResponse.data
                         tokenManager.saveAccessToken(newToken)
-                        Log.d("auth", "access token 갱신 성공")
                         newToken
                     } else {
-                        Log.e("auth", "refresh token 만료 or 갱신 실패: ${refreshResponse.message}")
+                        Timber.e("refresh token 만료 or 갱신 실패: ${refreshResponse.message}")
                         tokenManager.logout()
                         null
                     }
                 } catch (e: Exception) {
-                    Log.e("auth", "refresh API 호출 중 예외발생", e)
+                    Timber.e(e, "refresh API 호출 중 예외 발생")
                     tokenManager.logout()
                     null
                 }

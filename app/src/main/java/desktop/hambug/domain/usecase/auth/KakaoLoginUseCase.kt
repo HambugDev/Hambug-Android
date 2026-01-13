@@ -1,4 +1,4 @@
-package desktop.hambug.domain.usecase
+package desktop.hambug.domain.usecase.auth
 
 import android.content.Context
 import desktop.hambug.data.dto.LoginData

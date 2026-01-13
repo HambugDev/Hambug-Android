@@ -1,4 +1,4 @@
-package desktop.hambug.domain.usecase
+package desktop.hambug.domain.usecase.my
 
 import desktop.hambug.domain.model.UserInfo
 import desktop.hambug.domain.repository.MyRepository
@@ -9,7 +9,7 @@ class UpdateUserNicknameUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(userId: Int, nickname: String): Result<UserInfo> {
         return runCatching {
-            repository.updateUserNickname(userId = userId, nickname = nickname)
+            repository.updateUserNickname(userId, nickname)
         }
     }
 }

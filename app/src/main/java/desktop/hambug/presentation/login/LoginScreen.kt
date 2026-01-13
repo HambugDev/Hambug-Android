@@ -1,7 +1,6 @@
 package desktop.hambug.presentation.login
 
 import android.Manifest
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -45,6 +44,7 @@ import desktop.hambug.presentation.ui.theme.Gray1000
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.ui.theme.KakaoYellow
 import desktop.hambug.util.NotificationPermissionHelper
+import timber.log.Timber
 
 @Composable
 fun LoginScreen(
@@ -59,9 +59,9 @@ fun LoginScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            Log.d("noti", "알림 권한 허용됨")
+            Timber.d("알림 권한 허용됨")
         } else {
-            Log.d("noti", "알림 권한 거부됨")
+            Timber.d("알림 권한 거부됨")
         }
     }
 

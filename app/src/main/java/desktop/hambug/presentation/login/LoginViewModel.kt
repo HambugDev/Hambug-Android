@@ -1,11 +1,10 @@
 package desktop.hambug.presentation.login
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import desktop.hambug.domain.usecase.KakaoLoginUseCase
+import desktop.hambug.domain.usecase.auth.KakaoLoginUseCase
 import desktop.hambug.domain.usecase.fcm.SyncFcmTokenUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 sealed class LoginEvent {
@@ -40,14 +40,14 @@ class LoginViewModel @Inject constructor(
             kakaoLoginUseCase(context)
                 .onSuccess {
                     syncFcmTokenUseCase()
-                        .onSuccess { Log.d("fcm", "로그인 후 FCM 토큰 동기화 성공") }
-                        .onFailure { Log.e("fcm", "로그인 후 FCM 토큰 동기화 실패", it) }
+                        .onSuccess { Timber.d("로그인 후 FCM 토큰 동기화 성공") }
+                        .onFailure { Timber.e(it, "로그인 후 FCM 토큰 동기화 실패") }
 
                     _uiState.update { it.copy(isLoading = false) }
                     _loginEvent.emit(LoginEvent.NavigateToHome)
                 }
                 .onFailure { exception ->
-                    Log.e("auth", "카카오 로그인 실패: ${exception.message}", exception)
+                    Timber.e(exception, "카카오 로그인 실패")
                     _uiState.update {
                         it.copy(
                             isLoading = false,

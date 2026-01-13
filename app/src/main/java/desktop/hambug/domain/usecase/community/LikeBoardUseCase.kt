@@ -1,4 +1,4 @@
-package desktop.hambug.domain.usecase
+package desktop.hambug.domain.usecase.community
 
 import desktop.hambug.data.dto.community.LikeBoardData
 import desktop.hambug.domain.repository.CommunityRepository

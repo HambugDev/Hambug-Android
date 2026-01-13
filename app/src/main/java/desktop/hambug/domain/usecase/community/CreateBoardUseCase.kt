@@ -1,4 +1,4 @@
-package desktop.hambug.domain.usecase
+package desktop.hambug.domain.usecase.community
 
 import android.net.Uri
 import desktop.hambug.domain.repository.CommunityRepository
