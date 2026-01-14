@@ -145,8 +145,8 @@ class CommunityRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun report(targetId: Int, reportType: String, reportContent: String) {
-        val response = hambugApi.report(ReportRequest(targetId, reportType, reportContent))
+    override suspend fun report(targetId: Int, reportType: String, title: String, content: String) {
+        val response = hambugApi.report(ReportRequest(targetId, reportType, title, content))
 
         if (!response.success) {
             throw Exception(response.message)

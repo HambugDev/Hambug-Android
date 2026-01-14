@@ -35,6 +35,9 @@ class ReportViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ReportUiState())
     val uiState: StateFlow<ReportUiState> = _uiState.asStateFlow()
 
+    private val _reportTitle = MutableStateFlow("")
+    val reportTitle: StateFlow<String> = _reportTitle.asStateFlow()
+
     private val _reportContent = MutableStateFlow("")
     val reportContent: StateFlow<String> = _reportContent.asStateFlow()
 
@@ -43,6 +46,13 @@ class ReportViewModel @Inject constructor(
 
     private val _snackbarMessage = MutableSharedFlow<SnackbarMessage>(replay = 1)
     val snackbarMessage = _snackbarMessage.asSharedFlow()
+
+    /**
+     * 제목 업데이트
+     */
+    fun updateReportTitle(newTitle: String) {
+        _reportTitle.value = newTitle
+    }
 
     /**
      * 내용 업데이트
@@ -55,7 +65,7 @@ class ReportViewModel @Inject constructor(
      * 게시물/댓글 신고
      */
     fun submitReport() {
-        getSnackbarMessage(_reportContent.value)?.let { message ->
+        getSnackbarMessage(_reportTitle.value, _reportContent.value)?.let { message ->
             viewModelScope.launch {
                 _snackbarMessage.emit(message)
             }
@@ -68,9 +78,10 @@ class ReportViewModel @Inject constructor(
             _uiState.update { it.copy(isReporting = true) }
 
             try {
+                val title = _reportTitle.value.trim()
                 val content = _reportContent.value.trim()
 
-                reportUseCase(targetId, reportType, content)
+                reportUseCase(targetId, reportType, title, content)
                     .onSuccess {
                         _eventFlow.send(ReportEvent.NavigateToDetail)
                     }
@@ -83,8 +94,9 @@ class ReportViewModel @Inject constructor(
         }
     }
 
-    private fun getSnackbarMessage(content: String): SnackbarMessage? {
+    private fun getSnackbarMessage(title: String, content: String): SnackbarMessage? {
         return when {
+            title.isBlank() -> SnackbarMessage(message = WriteMessage.TITLE_EMPTY)
             content.isBlank() -> SnackbarMessage(message = WriteMessage.CONTENT_EMPTY)
             else -> null
         }
