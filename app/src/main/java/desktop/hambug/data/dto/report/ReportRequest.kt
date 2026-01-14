@@ -9,6 +9,8 @@ data class ReportRequest(
     val targetId: Int,
     @SerialName("targetType")
     val targetType: String,
+    @SerialName("title")
+    val title: String,
     @SerialName("reason")
     val reason: String
 )

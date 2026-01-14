@@ -49,19 +49,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
             try {
-                // 로컬에 토큰 저장
-                tokenManager.saveFcmToken(token)
-
                 if (tokenManager.isLogin()) {
+                    // 저장 + 서버 전송
+                    tokenManager.saveFcmToken(token)
+
                     updateFcmTokenUseCase(token)
-                        .onSuccess {
-                            Timber.d("새 fcm 토큰 서버 전송 성공")
-                        }
-                        .onFailure { exception ->
-                            Timber.e(exception, "새 fcm 토큰 서버 전송 실패")
-                        }
+                        .onSuccess { Timber.d("새 fcm 토큰 서버 전송 성공") }
+                        .onFailure { Timber.e(it, "새 fcm 토큰 서버 전송 실패") }
                 } else {
-                    Timber.d("로그인 전이므로 FCM 토근을 로컬에만 저장")
+                    Timber.d("로그인 전 - FCM 토근 처리 대기중")
                 }
             } catch (e: Exception) {
                 Timber.e(e, "fcm 토큰 처리 중 오류 발생")

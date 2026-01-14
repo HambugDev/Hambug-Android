@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -36,6 +37,7 @@ import androidx.navigation.NavHostController
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
 import desktop.hambug.presentation.ui.component.CustomContentTextField
 import desktop.hambug.presentation.ui.component.CustomSnackbar
+import desktop.hambug.presentation.ui.component.CustomTitleTextField
 import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Back
@@ -49,6 +51,7 @@ fun ReportScreen(
     reportViewModel: ReportViewModel = hiltViewModel()
 ) {
     val uiState by reportViewModel.uiState.collectAsStateWithLifecycle()
+    val reportTitle by reportViewModel.reportTitle.collectAsStateWithLifecycle()
     val reportContent by reportViewModel.reportContent.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -122,12 +125,16 @@ fun ReportScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // 내용 입력 영역
+            // 제목 + 내용
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Spacer(Modifier.height(20.dp))
-
+                ReportTitleSection(
+                    title = reportTitle,
+                    reportViewModel = reportViewModel
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 ReportContentSection(
                     reportContent = reportContent,
                     reportViewModel = reportViewModel
@@ -172,11 +179,32 @@ fun ReportScreen(
 }
 
 @Composable
+fun ReportTitleSection(
+    title: String,
+    reportViewModel: ReportViewModel
+) {
+    RequiredFieldTitle(title = "제목")
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        CustomTitleTextField(
+            value = title,
+            onValueChange = { newTitle -> reportViewModel.updateReportTitle(newTitle) }
+        )
+        Spacer(Modifier.height(4.dp))
+        HorizontalDivider(thickness = 1.dp, color = HambugTheme.colors.borderDefault)
+    }
+}
+
+@Composable
 fun ReportContentSection(
     reportContent: String,
     reportViewModel: ReportViewModel
 ) {
-    RequiredFieldTitle(title = "상세 내용")
+    RequiredFieldTitle(title = "내용")
 
     Spacer(modifier = Modifier.height(12.dp))
 

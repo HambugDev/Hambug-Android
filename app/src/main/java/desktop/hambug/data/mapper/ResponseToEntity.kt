@@ -57,7 +57,7 @@ fun BoardItem.toEntity(): Board {
         title = this.title,
         content = this.content,
         imageUrl = if (this.imageUrls.isEmpty()) null else this.imageUrls[0],
-        authorNickname = this.authorNickname,
+        authorNickname = this.authorNickname ?: "햄린이_0123456789",
         createdAt = this.createdAt,
         likeCount = this.likeCount,
         commentCount = this.commentCount
@@ -67,7 +67,7 @@ fun BoardItem.toEntity(): Board {
 fun BoardsData.toEntity(): BoardPage {
     return BoardPage(
         content = this.content.map { it.toEntity() },
-        nextCursorId = this.netCursorId,
+        nextCursorId = this.nextCursorId,
         nextPage = this.nextPage
     )
 }
@@ -92,7 +92,7 @@ fun CommentItem.toEntity(): Comment {
     return Comment(
         id = this.id,
         content = this.content,
-        authorNickname = this.authorNickname,
+        authorNickname = this.authorNickname ?: "햄린이_0123456789",
         authorProfileImageUrl = this.authorProfileImageUrl,
         isAuthor = this.isAuthor,
         createdAt = this.createdAt

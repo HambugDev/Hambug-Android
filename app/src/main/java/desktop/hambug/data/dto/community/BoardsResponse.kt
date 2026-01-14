@@ -17,8 +17,8 @@ data class BoardsResponse(
 data class BoardsData(
     @SerialName("content")
     val content: List<BoardItem>,
-    @SerialName("netCursorId")
-    val netCursorId: Int,
+    @SerialName("nextCursorId")
+    val nextCursorId: Int,
     @SerialName("nextPage")
     val nextPage: Boolean
 )
@@ -36,9 +36,9 @@ data class BoardItem(
     @SerialName("imageUrls")
     val imageUrls: List<String>,
     @SerialName("authorNickname")
-    val authorNickname: String,
+    val authorNickname: String?,
     @SerialName("authorId")
-    val authorId: Int,
+    val authorId: Int?,
     @SerialName("createdAt")
     val createdAt: String,
     @SerialName("updatedAt")
