@@ -30,9 +30,9 @@ data class CommentItem(
     @SerialName("content")
     val content: String,
     @SerialName("authorId")
-    val authorId: Int,
+    val authorId: Int?,
     @SerialName("authorNickname")
-    val authorNickname: String,
+    val authorNickname: String?,
     @SerialName("authorProfileImageUrl")
     val authorProfileImageUrl: String,
     @SerialName("isAuthor")
