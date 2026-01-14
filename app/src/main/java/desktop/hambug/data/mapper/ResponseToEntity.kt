@@ -67,7 +67,7 @@ fun BoardItem.toEntity(): Board {
 fun BoardsData.toEntity(): BoardPage {
     return BoardPage(
         content = this.content.map { it.toEntity() },
-        nextCursorId = this.netCursorId,
+        nextCursorId = this.nextCursorId,
         nextPage = this.nextPage
     )
 }

@@ -17,8 +17,8 @@ data class BoardsResponse(
 data class BoardsData(
     @SerialName("content")
     val content: List<BoardItem>,
-    @SerialName("netCursorId")
-    val netCursorId: Int,
+    @SerialName("nextCursorId")
+    val nextCursorId: Int,
     @SerialName("nextPage")
     val nextPage: Boolean
 )

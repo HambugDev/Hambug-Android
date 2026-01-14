@@ -17,8 +17,8 @@ data class CommentsResponse(
 data class CommentsData(
     @SerialName("content")
     val content: List<CommentItem> = emptyList(),
-    @SerialName("netCursorId")
-    val netCursorId: Int?,
+    @SerialName("nextCursorId")
+    val nextCursorId: Int?,
     @SerialName("nextPage")
     val nextPage: Boolean
 )
