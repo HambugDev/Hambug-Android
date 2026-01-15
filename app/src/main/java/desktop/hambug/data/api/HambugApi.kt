@@ -23,6 +23,7 @@ import desktop.hambug.data.dto.community.MyCommentsResponse
 import desktop.hambug.data.dto.fcm.FcmTokenRequest
 import desktop.hambug.data.dto.fcm.FcmTokenResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
+import desktop.hambug.data.dto.fcm.NotisResponse
 import desktop.hambug.data.dto.report.ReportRequest
 import desktop.hambug.data.dto.report.ReportResponse
 import okhttp3.MultipartBody
@@ -166,4 +167,8 @@ interface HambugApi {
     suspend fun updateFcmToken(
         @Body request: FcmTokenRequest
     ): FcmTokenResponse
+
+    // 알림 목록 조회
+    @GET("notifications")
+    suspend fun getNotis(): NotisResponse
 }

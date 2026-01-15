@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import desktop.hambug.R
 import desktop.hambug.presentation.noti.component.NotiItem
@@ -32,7 +33,10 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen(navController: NavHostController) {
+fun NotificationScreen(
+    navController: NavHostController,
+    notificationViewModel: NotificationViewModel = hiltViewModel()
+) {
     Scaffold(
         containerColor = Color.White,
         topBar = {
