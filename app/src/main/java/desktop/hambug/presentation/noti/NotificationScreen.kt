@@ -101,10 +101,11 @@ fun NotificationScreen(
                             key = { it.notiId }
                         ) { noti ->
                             NotiItem(
-                                content = noti.content,
-                                createdAt = noti.createdAt,
+                                noti = noti,
                                 onClick = {
-                                    navController.navigate("community_detail/${noti.targetId}")
+                                    if (noti.targetId != -1) {
+                                        navController.navigate("community_detail/${noti.targetId}")
+                                    }
                                 }
                             )
                             Spacer(Modifier.height(16.dp))

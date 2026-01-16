@@ -125,10 +125,12 @@ fun MyCommentItem.toEntity(): MyComment {
 
 fun NotiItem.toEntity(): Noti {
     return Noti(
-        notiId = this.id,
-        content = this.content,
-        type = this.type,
-        targetId = this.targetId,
-        createdAt = this.createdAt
+        notiId = this.id ?: -1,
+        title = this.title ?: "",
+        content = this.content ?: "",
+        type = this.type ?: "",
+        targetId = this.targetId ?: -1,
+        thumbnailUrl = this.thumbnailUrl ?: "",
+        createdAt = this.createdAt ?: ""
     )
 }

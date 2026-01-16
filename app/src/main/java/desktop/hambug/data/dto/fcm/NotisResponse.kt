@@ -16,27 +16,29 @@ data class NotisResponse(
 @Serializable
 data class NotisData(
     @SerialName("content")
-    val content: List<NotiItem>,
+    val content: List<NotiItem> = emptyList(),
     @SerialName("lastId")
-    val lastId: Int,
+    val lastId: Int? = null,
     @SerialName("hasNext")
-    val hasNext: Boolean
+    val hasNext: Boolean = false
 )
 
 @Serializable
 data class NotiItem(
     @SerialName("id")
-    val id: Int,
+    val id: Int? = null,
     @SerialName("title")
-    val title: String,
+    val title: String? = null,
     @SerialName("content")
-    val content: String,
+    val content: String? = null,
     @SerialName("type")
-    val type: String,
+    val type: String? = null,
     @SerialName("targetId")
-    val targetId: Int,
+    val targetId: Int? = null,
+    @SerialName("thumbnailUrl")
+    val thumbnailUrl: String? = null,
     @SerialName("isRead")
-    val isRead: Boolean,
+    val isRead: Boolean? = null,
     @SerialName("createdAt")
-    val createdAt: String
+    val createdAt: String? = null
 )
