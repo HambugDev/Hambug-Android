@@ -36,13 +36,19 @@ import desktop.hambug.presentation.login.LoginScreen
 import desktop.hambug.presentation.my.MyActivityScreen
 import desktop.hambug.presentation.my.MypageScreen
 import desktop.hambug.presentation.noti.NotificationScreen
+import desktop.hambug.presentation.ui.component.ForceUpdateDialog
 import desktop.hambug.presentation.ui.theme.HambugTheme
+import desktop.hambug.util.VersionManager
 import kotlinx.coroutines.flow.collectLatest
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
+
+    @Inject
+    lateinit var versionManager: VersionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -55,6 +61,7 @@ class MainActivity : ComponentActivity() {
         // 알림 채널 생성 (Android 8.0 이상)
         createNotificationChannel()
 
+        // showNativeSplash가 true인 동안 계속 표시됨 (기본 스플래시)
         splashScreen.setKeepOnScreenCondition {
             mainViewModel.showNativeSplash.value
         }
@@ -63,15 +70,22 @@ class MainActivity : ComponentActivity() {
             HambugTheme {
                 val showNativeSplash by mainViewModel.showNativeSplash.collectAsStateWithLifecycle()
                 val startDestination by mainViewModel.startDestination.collectAsStateWithLifecycle()
+                val needForceUpdate by mainViewModel.needForceUpdate.collectAsStateWithLifecycle()
 
-                // 기본 스플래시가 끝난 후에 화면 그림
-                if (!showNativeSplash) {
-                    val destination = startDestination
+                if (needForceUpdate) {
+                    ForceUpdateDialog(
+                        onUpdateClick = { versionManager.openPlayStore(this) }
+                    )
+                } else {
+                    // 기본 스플래시가 끝난 후에 화면 그림
+                    if (!showNativeSplash) {
+                        val destination = startDestination
 
-                    if (destination == null) {
-                        SplashScreen()  // 커스텀 스플래시
-                    } else {
-                        HambugApp(startDestination = destination)
+                        if (destination == null) {
+                            SplashScreen()  // 커스텀 스플래시
+                        } else {
+                            HambugApp(startDestination = destination)
+                        }
                     }
                 }
             }
