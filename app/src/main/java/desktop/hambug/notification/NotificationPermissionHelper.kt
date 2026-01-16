@@ -1,4 +1,4 @@
-package desktop.hambug.util
+package desktop.hambug.notification
 
 import android.Manifest
 import android.content.Context

@@ -46,6 +46,7 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.MyBoard
 import desktop.hambug.domain.model.MyComment
+import desktop.hambug.presentation.component.EmptyStateView
 import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
@@ -183,22 +184,28 @@ fun TwoTabSection(
                         }
                         is MyActivityUiState.Error -> {}
                         is MyActivityUiState.Success -> {
-                            LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp)),
-                                state = rememberLazyListState(),
-                                contentPadding = PaddingValues(20.dp),
-                                verticalArrangement = Arrangement.spacedBy(24.dp)
-                            ) {
-                                items(
-                                    items = uiState.boards,
-                                    key = { it.id }
-                                ) { board ->
-                                    MyBoardItem(
-                                        board = board,
-                                        onClick = { onClick(board.id) }
-                                    )
+                            val boards = uiState.boards
+
+                            if (boards.isEmpty()) {
+                                EmptyStateView(message = "작성한 게시물이 없어요.")
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp)),
+                                    state = rememberLazyListState(),
+                                    contentPadding = PaddingValues(20.dp),
+                                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                                ) {
+                                    items(
+                                        items = uiState.boards,
+                                        key = { it.id }
+                                    ) { board ->
+                                        MyBoardItem(
+                                            board = board,
+                                            onClick = { onClick(board.id) }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -216,22 +223,28 @@ fun TwoTabSection(
                         }
                         is MyCommentUiState.Error -> {}
                         is MyCommentUiState.Success -> {
-                            LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp)),
-                                state = rememberLazyListState(),
-                                contentPadding = PaddingValues(20.dp),
-                                verticalArrangement = Arrangement.spacedBy(24.dp)
-                            ) {
-                                items(
-                                    items = commentsState.comments,
-                                    key = { it.commentId }
-                                ) { comment ->
-                                    MyCommentItem(
-                                        comment = comment,
-                                        onClick = { onClick(comment.boardId) }
-                                    )
+                            val comments = commentsState.comments
+
+                            if (comments.isEmpty()) {
+                                EmptyStateView(message = "작성한 댓글이 없어요.")
+                            } else {
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(color = HambugTheme.colors.bgWhite, shape = RoundedCornerShape(6.dp)),
+                                    state = rememberLazyListState(),
+                                    contentPadding = PaddingValues(20.dp),
+                                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                                ) {
+                                    items(
+                                        items = commentsState.comments,
+                                        key = { it.commentId }
+                                    ) { comment ->
+                                        MyCommentItem(
+                                            comment = comment,
+                                            onClick = { onClick(comment.boardId) }
+                                        )
+                                    }
                                 }
                             }
                         }

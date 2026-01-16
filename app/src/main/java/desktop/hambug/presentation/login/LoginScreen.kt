@@ -43,7 +43,7 @@ import desktop.hambug.presentation.ui.icon.appicons.Kakao
 import desktop.hambug.presentation.ui.theme.Gray1000
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.ui.theme.KakaoYellow
-import desktop.hambug.util.NotificationPermissionHelper
+import desktop.hambug.notification.NotificationPermissionHelper
 import timber.log.Timber
 
 @Composable

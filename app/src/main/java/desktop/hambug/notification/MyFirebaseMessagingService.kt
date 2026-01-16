@@ -31,7 +31,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         Timber.d("fcm 메시지 수신 - data: ${message.data}")
-        Timber.d("fcm 메시지 수신 - notification: ${message.notification}")
+
+        val data = message.data
+        val boardId = data["boardId"]
 
         val title = message.notification?.title
             ?: message.data["title"]
@@ -41,7 +43,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             ?: "새로운 알림이 도착했습니다"
 
         // 시스템 알림 표시
-        showNotification(title, body)
+        showNotification(title, body, boardId)
     }
 
     override fun onNewToken(token: String) {
@@ -65,12 +67,17 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-    private fun showNotification(title: String, body: String) {
+    private fun showNotification(title: String, body: String, boardId: String?) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // 알림 클릭 시 앱 실행
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+
+            // Intent에 boardId 담기
+            boardId?.toIntOrNull()?.let {
+                putExtra("boardId", it)
+            }
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -91,7 +98,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
             .build()
 
-        // 각 알림에 고유한 ID 부여
+        // 알림을 화면에 띄움
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 }
