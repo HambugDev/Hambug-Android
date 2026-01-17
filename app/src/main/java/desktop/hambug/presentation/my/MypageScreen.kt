@@ -50,6 +50,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
 import desktop.hambug.domain.model.UserInfo
+import desktop.hambug.presentation.component.HambugDialog
 import desktop.hambug.presentation.my.component.NicknameUpdateDialog
 import desktop.hambug.presentation.my.component.UserRemoveDialog
 import desktop.hambug.presentation.my.component.UserRemoveSuccessDialog
@@ -75,6 +76,7 @@ fun MypageScreen(
     val isUnlinking by mypageViewModel.isUnlinking.collectAsStateWithLifecycle()
 
     var showBottomSheet by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
     var showUserRemoveDialog by remember { mutableStateOf(false) }
     var showUserRemoveSuccessDialog by remember { mutableStateOf(false) }
     var showNicknameUpdateDialog by remember { mutableStateOf(false) }
@@ -158,7 +160,7 @@ fun MypageScreen(
                     // 메뉴 선택 영역
                     MypageMenuSection(
                         onActivityClick = { navController.navigate("my_activity") },
-                        onLogoutClick = { mypageViewModel.logout() },
+                        onLogoutClick = { showLogoutDialog = true },
                         onUserRemove = { showUserRemoveDialog = true }
                     )
                 }
@@ -206,6 +208,17 @@ fun MypageScreen(
                     onSuccess = { showNicknameUpdateDialog = false }
                 )
             }
+        )
+    }
+
+    // 로그아웃 확인
+    if (showLogoutDialog) {
+        HambugDialog(
+            title = "로그아웃 하시겠어요?",
+            buttonText = "확인",
+            onDismiss = { showLogoutDialog = false },
+            onCancel = { showLogoutDialog = false },
+            onConfirm = { mypageViewModel.logout() }
         )
     }
 
@@ -339,7 +352,7 @@ fun MypageMenuSection(
             onClick = { onLogoutClick() },
             modifier = Modifier
                 .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 10.dp)
+                .padding(20.dp)
         )
 
         MypageMenuButton(
@@ -348,7 +361,7 @@ fun MypageMenuSection(
             onClick = { onUserRemove() },
             modifier = Modifier
                 .background(color = HambugTheme.colors.bgNormal, shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 20.dp)
+                .padding(20.dp)
         )
     }
 }
