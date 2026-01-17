@@ -2,10 +2,12 @@ package desktop.hambug.presentation.util
 
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeParseException
 
 /**
- * 게시물 생성시간 기준 상대시간으로 변환
+ * 아이템 생성시간 기준 상대시간으로 변환
  *
  * @return (예: "5분 전", "2시간 전")
  */
@@ -14,15 +16,16 @@ fun String.toTimeAgoString(): String {
 
     val createdInstant: Instant
     try {
-        createdInstant = Instant.parse(this + "Z")
+        // LocalDateTime으로 파싱 후 시스템 타임존으로 변환
+        createdInstant = LocalDateTime.parse(this)
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
     } catch (e: DateTimeParseException) {
         return "날짜 형식 오류"
     }
 
-    // 함수 실행 시점의 UTC 시간
     val now = Instant.now()
-    // 두 Instant 객체 간의 시간 차이
-    val duration = Duration.between(createdInstant, now)
+    val duration = Duration.between(createdInstant, now)  // 시간 차이
 
     val minutes = duration.toMinutes()
     val hours = duration.toHours()
