@@ -22,10 +22,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -50,8 +48,9 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.Comment
 import desktop.hambug.presentation.community.component.CommentInputBar
-import desktop.hambug.presentation.community.component.DetailMyBottomSheet
-import desktop.hambug.presentation.community.component.DetailOtherBottomSheet
+import desktop.hambug.presentation.component.ActionListBottomSheet
+import desktop.hambug.presentation.component.model.BottomSheetAction
+import desktop.hambug.presentation.component.model.CornerType
 import desktop.hambug.presentation.ui.component.CustomSnackbar
 import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.component.IndicatorSize
@@ -65,7 +64,6 @@ import desktop.hambug.presentation.ui.icon.appicons.HeartBorder
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.util.toTimeAgoString
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoardDetailScreen(
     navController: NavHostController,
@@ -288,77 +286,95 @@ fun BoardDetailScreen(
 
     // 게시물 바텀시트
     if (showBoardBottomSheet) {
-        val isAuthor = (uiState as BoardDetailUiState.Success).board.isAuthor
         val board = (uiState as BoardDetailUiState.Success).board
 
-        ModalBottomSheet(
-            onDismissRequest = { showBoardBottomSheet = false },
-            dragHandle = null,
-            containerColor = HambugTheme.colors.bgWhite,
-            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-        ) {
-            if (isAuthor) {
-                // 내 게시물인 경우
-                DetailMyBottomSheet(
-                    onEdit = {},
-                    onDelete = {
+        val actions = if (board.isAuthor) {
+            // 내 게시물인 경우
+            listOf(
+                BottomSheetAction(
+                    text = "수정",
+                    onClick = { },
+                    cornerType = CornerType.TOP
+                ),
+                BottomSheetAction(
+                    text = "삭제",
+                    onClick = {
                         showBoardRemoveDialog = true
                         showBoardBottomSheet = false
                     },
-                    onCancel = { showBoardBottomSheet = false }
-                )
-            } else {
-                // 타인의 게시물인 경우
-                DetailOtherBottomSheet(
-                    onReport = {
+                    isNegative = true,
+                    cornerType = CornerType.BOTTOM
+                ),
+                BottomSheetAction("취소", { showBoardBottomSheet = false })
+            )
+        } else {
+            // 타인의 게시물인 경우
+            listOf(
+                BottomSheetAction(
+                    text = "신고",
+                    onClick = {
                         showBoardBottomSheet = false
                         navController.navigate("report/BOARD/${board.id}")
                     },
-                    onCancel = { showBoardBottomSheet = false }
-                )
-            }
+                    isNegative = true
+                ),
+                BottomSheetAction("취소", { showBoardBottomSheet = false })
+            )
         }
+
+        ActionListBottomSheet(
+            actions = actions,
+            onDismiss = { showBoardBottomSheet = false }
+        )
     }
 
     // 댓글 바텀시트
     selectedComment?.let { comment ->
         if (showCommentBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showCommentBottomSheet = false
-                    boardDetailViewModel.clearSelectedComment()
-               },
-                dragHandle = null,
-                containerColor = HambugTheme.colors.bgWhite,
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-            ) {
-                if (comment.isAuthor) {
-                    // 내 댓글인 경우
-                    DetailMyBottomSheet(
-                        onEdit = {},
-                        onDelete = {
+            val actions = if (comment.isAuthor) {
+                // 내 댓글인 경우
+                listOf(
+                    BottomSheetAction(
+                        text = "삭제",
+                        onClick = {
                             showCommentRemoveDialog = true
                             showCommentBottomSheet = false
                         },
-                        onCancel = {
+                        isNegative = true
+                    ),
+                    BottomSheetAction(
+                        text = "취소",
+                        onClick = {
                             showCommentBottomSheet = false
                             boardDetailViewModel.clearSelectedComment()
                         }
                     )
-                } else {
-                    // 타인의 댓글인 경우
-                    DetailOtherBottomSheet(
-                        onReport = {
+                )
+            } else {
+                // 타인의 댓글인 경우
+                listOf(
+                    BottomSheetAction(
+                        text = "신고",
+                        onClick = {
                             showCommentBottomSheet = false
                             navController.navigate("report/COMMENT/${comment.id}")
                         },
-                        onCancel = {
+                        isNegative = true
+                    ),
+                    BottomSheetAction(
+                        text = "취소",
+                        onClick = {
                             showCommentBottomSheet = false
                             boardDetailViewModel.clearSelectedComment()
                         }
                     )
-                }
+                )
             }
+
+            ActionListBottomSheet(
+                actions = actions,
+                onDismiss = { showCommentBottomSheet = false }
+            )
         }
     }
 
