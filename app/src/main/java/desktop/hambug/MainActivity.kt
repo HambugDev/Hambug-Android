@@ -30,14 +30,14 @@ import desktop.hambug.presentation.community.CommunityScreen
 import desktop.hambug.presentation.community.BoardDetailScreen
 import desktop.hambug.presentation.community.BoardWriteScreen
 import desktop.hambug.presentation.community.ReportScreen
-import desktop.hambug.presentation.ui.component.HambugBottomNav
-import desktop.hambug.presentation.ui.component.SplashScreen
+import desktop.hambug.presentation.navigation.AppBottomBar
+import desktop.hambug.presentation.splash.SplashScreen
 import desktop.hambug.presentation.home.HomeScreen
 import desktop.hambug.presentation.login.LoginScreen
 import desktop.hambug.presentation.my.MyActivityScreen
 import desktop.hambug.presentation.my.MypageScreen
 import desktop.hambug.presentation.noti.NotificationScreen
-import desktop.hambug.presentation.ui.component.ForceUpdateDialog
+import desktop.hambug.presentation.component.ForceUpdateDialog
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.util.VersionManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -176,7 +176,7 @@ fun HambugApp(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
-                HambugBottomNav(
+                AppBottomBar(
                     currentRoute = currentRoute,
                     onNavItemClick = { route ->
                         if (navController.currentDestination?.route != route) {

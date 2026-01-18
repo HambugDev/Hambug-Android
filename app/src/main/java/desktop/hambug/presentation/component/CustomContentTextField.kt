@@ -1,21 +1,21 @@
-package desktop.hambug.presentation.ui.component
+package desktop.hambug.presentation.component
 
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import desktop.hambug.presentation.ui.theme.HambugTheme
 
 @Composable
-fun CustomTitleTextField(
+fun CustomContentTextField(
     value: String,
     onValueChange: (String) -> Unit
 ) {
     BasicTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxSize(),
         value = value,
         onValueChange = onValueChange,
-        textStyle = HambugTheme.typography.body02Prominent,
-        singleLine = true
+        textStyle = HambugTheme.typography.body03,
+        singleLine = false
     )
 }

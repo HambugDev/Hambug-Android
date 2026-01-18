@@ -35,10 +35,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
-import desktop.hambug.presentation.ui.component.CustomContentTextField
-import desktop.hambug.presentation.ui.component.CustomSnackbar
-import desktop.hambug.presentation.ui.component.CustomTitleTextField
-import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.CustomContentTextField
+import desktop.hambug.presentation.component.CustomSnackbar
+import desktop.hambug.presentation.component.CustomTitleTextField
+import desktop.hambug.presentation.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Back
 import desktop.hambug.presentation.ui.theme.HambugTheme

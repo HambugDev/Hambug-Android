@@ -18,8 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import desktop.hambug.domain.model.Board
-import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
-import desktop.hambug.presentation.ui.component.IndicatorSize
+import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.IndicatorSize
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter

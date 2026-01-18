@@ -54,7 +54,7 @@ import desktop.hambug.presentation.component.HambugDialog
 import desktop.hambug.presentation.my.component.NicknameUpdateDialog
 import desktop.hambug.presentation.my.component.UserRemoveDialog
 import desktop.hambug.presentation.my.component.UserRemoveSuccessDialog
-import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Activity
 import desktop.hambug.presentation.ui.icon.appicons.ArrowRight

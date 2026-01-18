@@ -29,7 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import desktop.hambug.presentation.component.EmptyStateView
 import desktop.hambug.presentation.noti.component.NotiItem
-import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Back
 import desktop.hambug.presentation.ui.theme.HambugTheme

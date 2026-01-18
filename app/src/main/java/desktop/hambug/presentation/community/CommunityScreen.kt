@@ -41,8 +41,8 @@ import desktop.hambug.domain.model.FilterType
 import desktop.hambug.presentation.community.component.CustomFloatingActionButton
 import desktop.hambug.presentation.community.component.FeedViewContent
 import desktop.hambug.presentation.community.component.ListViewContent
-import desktop.hambug.presentation.ui.component.CustomSnackbar
-import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.CustomSnackbar
+import desktop.hambug.presentation.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.theme.CommunityFilterSelected

@@ -42,9 +42,8 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.HomeBoard
 import desktop.hambug.domain.model.HomeBurger
-import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
-import desktop.hambug.presentation.ui.icon.appicons.Bell
 import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.icon.appicons.Comment
 import desktop.hambug.presentation.ui.icon.appicons.Hambug

@@ -1,4 +1,4 @@
-package desktop.hambug.presentation.ui.component
+package desktop.hambug.presentation.navigation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,7 +33,7 @@ data class BottomNavItem(
 )
 
 @Composable
-fun HambugBottomNav(
+fun AppBottomBar(
     currentRoute: String,
     onNavItemClick: (String) -> Unit,
 ) {

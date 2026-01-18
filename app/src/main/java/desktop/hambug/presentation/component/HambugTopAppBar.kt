@@ -1,4 +1,4 @@
-package desktop.hambug.presentation.ui.component
+package desktop.hambug.presentation.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications

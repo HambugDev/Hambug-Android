@@ -1,4 +1,4 @@
-package desktop.hambug.presentation.ui.component
+package desktop.hambug.presentation.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
