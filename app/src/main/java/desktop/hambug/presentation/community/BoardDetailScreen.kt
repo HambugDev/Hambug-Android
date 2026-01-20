@@ -51,7 +51,7 @@ import desktop.hambug.presentation.community.component.CommentInputBar
 import desktop.hambug.presentation.component.ActionListBottomSheet
 import desktop.hambug.presentation.component.model.BottomSheetAction
 import desktop.hambug.presentation.component.model.CornerType
-import desktop.hambug.presentation.component.CustomSnackbar
+import desktop.hambug.presentation.component.snackbar.CustomSnackbar
 import desktop.hambug.presentation.component.HambugDialog
 import desktop.hambug.presentation.component.HambugLoadingIndicator
 import desktop.hambug.presentation.component.IndicatorSize

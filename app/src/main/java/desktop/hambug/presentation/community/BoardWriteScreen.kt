@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -31,7 +29,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,16 +47,16 @@ import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.Category
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
 import desktop.hambug.presentation.component.CustomContentTextField
-import desktop.hambug.presentation.component.CustomSnackbar
+import desktop.hambug.presentation.component.snackbar.CustomSnackbar
 import desktop.hambug.presentation.component.CustomTitleTextField
 import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.topbar.BackTopBar
+import desktop.hambug.presentation.component.topbar.TopBarTitle
 import desktop.hambug.presentation.ui.icon.AppIcons
-import desktop.hambug.presentation.ui.icon.appicons.BackDetail
 import desktop.hambug.presentation.ui.icon.appicons.Camera
 import desktop.hambug.presentation.ui.icon.appicons.CircleCross
 import desktop.hambug.presentation.ui.theme.HambugTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoardWriteScreen(
     navController: NavHostController,
@@ -110,27 +107,9 @@ fun BoardWriteScreen(
     Scaffold(
         containerColor = Color.White,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "게시물 작성",
-                        style = HambugTheme.typography.title02,
-                        color = HambugTheme.colors.textHeadline
-                    )
-                },
-                navigationIcon = {
-                    Icon(
-                        modifier = Modifier
-                            .clickable { navController.popBackStack() }
-                            .padding(16.dp),
-                        imageVector = AppIcons.BackDetail,
-                        contentDescription = null,
-                        tint = HambugTheme.colors.iconDisabled,
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = HambugTheme.colors.bgWhite
-                )
+            BackTopBar(
+                title = { TopBarTitle("게시물 작성") },
+                onBackClick = { navController.popBackStack() }
             )
         },
         snackbarHost = {

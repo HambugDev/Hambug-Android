@@ -27,8 +27,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,6 +53,8 @@ import desktop.hambug.presentation.my.component.NicknameUpdateDialog
 import desktop.hambug.presentation.my.component.UserRemoveDialog
 import desktop.hambug.presentation.my.component.UserRemoveSuccessDialog
 import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.topbar.MainTopBar
+import desktop.hambug.presentation.component.topbar.TopBarTitle
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.Activity
 import desktop.hambug.presentation.ui.icon.appicons.ArrowRight
@@ -112,17 +112,8 @@ fun MypageScreen(
     Scaffold(
         containerColor = HambugTheme.colors.bgWhite,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "마이페이지",
-                        style = HambugTheme.typography.title02,
-                        color = HambugTheme.colors.textHeadline
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HambugTheme.colors.bgWhite
-                )
+            MainTopBar(
+                title = { TopBarTitle("마이페이지") }
             )
         }
     ) { paddingValues ->

@@ -19,13 +19,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,8 +40,9 @@ import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.HomeBoard
 import desktop.hambug.domain.model.HomeBurger
 import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.topbar.MainTopBar
+import desktop.hambug.presentation.component.topbar.NotiIcon
 import desktop.hambug.presentation.ui.icon.AppIcons
-import desktop.hambug.presentation.ui.icon.appicons.BellBorder
 import desktop.hambug.presentation.ui.icon.appicons.Comment
 import desktop.hambug.presentation.ui.icon.appicons.Hambug
 import desktop.hambug.presentation.ui.icon.appicons.Heart
@@ -52,7 +50,6 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.util.toKoreanCategory
 import desktop.hambug.presentation.util.toTimeAgoString
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -66,27 +63,15 @@ fun HomeScreen(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = HambugTheme.colors.bgNormal,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("") },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = HambugTheme.colors.bgNormal
-                ),
-                navigationIcon = {
-                    HomeNavigationIcon()
-                },
+            MainTopBar(
+                title = { HomeTopbarLogo() },
                 actions = {
-                    Icon(
-                        modifier = Modifier
-                            .clickable { navController.navigate("bell") }
-//                            .padding(16.dp)
-                            .padding(8.dp)
-                            .size(32.dp),
-//                        imageVector = AppIcons.Bell,
-                        imageVector = AppIcons.BellBorder,
-                        contentDescription = null,
+                    NotiIcon(
+                        onClick = { navController.navigate("bell") },
                         tint = HambugTheme.colors.iconDefault
                     )
-                }
+                },
+                containerColor = HambugTheme.colors.bgNormal
             )
         }
     ) { paddingValues ->
@@ -135,9 +120,8 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeNavigationIcon() {
+fun HomeTopbarLogo() {
     Row(
-        modifier = Modifier.padding(start = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
