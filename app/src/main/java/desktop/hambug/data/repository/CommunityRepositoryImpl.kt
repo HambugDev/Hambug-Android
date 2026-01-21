@@ -6,7 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import desktop.hambug.data.api.HambugApi
 import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.dto.community.CreateCommentRequest
-import desktop.hambug.data.dto.community.LikeBoardData
+import desktop.hambug.data.dto.community.LikeBoardResponse
 import desktop.hambug.data.dto.report.ReportRequest
 import desktop.hambug.data.mapper.toEntity
 import desktop.hambug.domain.model.BoardDetail
@@ -30,7 +30,9 @@ class CommunityRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.toEntity()
+        val boardsData = response.data ?: throw Exception("boards 데이터 없음")
+
+        return boardsData.toEntity()
     }
 
     override suspend fun getCategoryBoards(category: String, lastId: Int?): BoardPage {
@@ -40,7 +42,9 @@ class CommunityRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.toEntity()
+        val boardsData = response.data ?: throw Exception("categoryBoards 데이터 없음")
+
+        return boardsData.toEntity()
     }
 
     override suspend fun getBoardDetail(boardId: Int): BoardDetail {
@@ -50,7 +54,9 @@ class CommunityRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.toEntity()
+        val boardDetailData = response.data ?: throw Exception("boardDetail 데이터 없음")
+
+        return boardDetailData.toEntity()
     }
 
     override suspend fun createBoard(title: String, content: String, category: String): Int {
@@ -60,7 +66,7 @@ class CommunityRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.id
+        return response.data?.id ?: throw Exception("유효하지 않은 게시물 ID")
     }
 
     override suspend fun createBoardWithImages(
@@ -95,7 +101,7 @@ class CommunityRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.id
+        return response.data?.id ?: throw Exception("유효하지 않은 게시물 ID")
     }
 
     override suspend fun deleteBoard(boardId: Int) {
@@ -106,14 +112,14 @@ class CommunityRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun likeBoard(boardId: Int): LikeBoardData {
+    override suspend fun likeBoard(boardId: Int): LikeBoardResponse {
         val response = hambugApi.likeBoard(boardId)
 
         if (!response.success) {
             throw Exception(response.message)
         }
 
-        return response.data
+        return response.data ?: throw Exception("likeBoard 데이터 없음")
     }
 
     override suspend fun getComments(boardId: Int): List<Comment> {
@@ -123,7 +129,8 @@ class CommunityRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.content.map { it.toEntity() }
+        // mapNotNull을 사용하여 id가 없는 아이템 제거
+        return response.data?.content?.mapNotNull { it.toEntity() } ?: emptyList()
     }
 
     override suspend fun createComment(boardId: Int, content: String) {

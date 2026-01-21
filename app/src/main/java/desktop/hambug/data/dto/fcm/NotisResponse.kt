@@ -5,40 +5,30 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NotisResponse(
-    @SerialName("success")
-    val success: Boolean,
-    @SerialName("data")
-    val data: NotisData,
-    @SerialName("message")
-    val message: String
-)
-
-@Serializable
-data class NotisData(
     @SerialName("content")
     val content: List<NotiItem> = emptyList(),
     @SerialName("lastId")
-    val lastId: Int? = null,
+    val nextCursorId: Int = -1,
     @SerialName("hasNext")
-    val hasNext: Boolean = false
+    val nextPage: Boolean = false
 )
 
 @Serializable
 data class NotiItem(
     @SerialName("id")
-    val id: Int? = null,
+    val id: Int = 0,
     @SerialName("title")
-    val title: String? = null,
+    val title: String = "",
     @SerialName("content")
-    val content: String? = null,
+    val content: String = "",
     @SerialName("type")
-    val type: String? = null,
+    val type: String = "",
     @SerialName("targetId")
     val targetId: Int? = null,
     @SerialName("thumbnailUrl")
-    val thumbnailUrl: String? = null,
+    val thumbnailUrl: String = "",
     @SerialName("isRead")
-    val isRead: Boolean? = null,
+    val isRead: Boolean = false,
     @SerialName("createdAt")
-    val createdAt: String? = null
+    val createdAt: String = ""
 )

@@ -1,12 +1,14 @@
-package desktop.hambug.data.dto.report
+package desktop.hambug.data.dto.auth
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ReportResponse(
+data class RefreshResponse(
     @SerialName("success")
     val success: Boolean,
+    @SerialName("data")
+    val data: String,
     @SerialName("message")
     val message: String
 )

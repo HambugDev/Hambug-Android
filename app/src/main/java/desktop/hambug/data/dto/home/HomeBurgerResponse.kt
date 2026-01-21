@@ -5,24 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HomeBurgerResponse(
-    @SerialName("success")
-    val success: Boolean,
-    @SerialName("data")
-    val data: List<HomeBurgerData>,
-    @SerialName("message")
-    val message: String
-)
-
-@Serializable
-data class HomeBurgerData(
     @SerialName("id")
-    val id: Int,
+    val id: Int = 0,
     @SerialName("menuImage")
-    val menuImage: String,
+    val menuImage: String = "",
     @SerialName("franchise")
-    val franchise: String,
+    val franchise: String = "",
     @SerialName("menuName")
-    val menuName: String,
+    val menuName: String = "",
     @SerialName("menuDescription")
-    val menuDescription: String
+    val menuDescription: String = ""
 )

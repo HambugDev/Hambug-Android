@@ -1,15 +1,15 @@
 package desktop.hambug.data.mapper
 
-import desktop.hambug.data.dto.home.HomeBurgerData
-import desktop.hambug.data.dto.UserInfoData
-import desktop.hambug.data.dto.community.BoardDetailData
+import desktop.hambug.data.dto.home.HomeBurgerResponse
+import desktop.hambug.data.dto.my.UserInfoResponse
+import desktop.hambug.data.dto.community.BoardDetailResponse
 import desktop.hambug.data.dto.community.BoardItem
-import desktop.hambug.data.dto.community.BoardsData
+import desktop.hambug.data.dto.community.BoardsResponse
 import desktop.hambug.data.dto.community.CommentItem
 import desktop.hambug.data.dto.community.MyBoardItem
 import desktop.hambug.data.dto.community.MyCommentItem
 import desktop.hambug.data.dto.fcm.NotiItem
-import desktop.hambug.data.dto.home.HomeBoardData
+import desktop.hambug.data.dto.home.HomeBoardResponse
 import desktop.hambug.domain.model.Board
 import desktop.hambug.domain.model.BoardDetail
 import desktop.hambug.domain.model.BoardPage
@@ -21,7 +21,7 @@ import desktop.hambug.domain.model.MyComment
 import desktop.hambug.domain.model.Noti
 import desktop.hambug.domain.model.UserInfo
 
-fun HomeBurgerData.toEntity(): HomeBurger {
+fun HomeBurgerResponse.toEntity(): HomeBurger {
     return HomeBurger(
         id = this.id,
         imageUrl = this.menuImage,
@@ -31,9 +31,11 @@ fun HomeBurgerData.toEntity(): HomeBurger {
     )
 }
 
-fun HomeBoardData.toEntity(): HomeBoard {
+fun HomeBoardResponse.toEntity(): HomeBoard? {
+    val validId = this.id ?: return null
+
     return HomeBoard(
-        id = this.id,
+        id = validId,
         title = this.title,
         content = this.content,
         category = this.category,
@@ -44,7 +46,7 @@ fun HomeBoardData.toEntity(): HomeBoard {
     )
 }
 
-fun UserInfoData.toEntity(): UserInfo {
+fun UserInfoResponse.toEntity(): UserInfo {
     return UserInfo(
         userId = this.userId,
         nickname = this.nickname,
@@ -53,28 +55,31 @@ fun UserInfoData.toEntity(): UserInfo {
     )
 }
 
-fun BoardItem.toEntity(): Board {
+fun BoardItem.toEntity(): Board? {
+    val validId = this.id ?: return null
+
     return Board(
-        id = this.id,
+        id = validId,
         title = this.title,
         content = this.content,
         imageUrl = if (this.imageUrls.isEmpty()) null else this.imageUrls[0],
-        authorNickname = this.authorNickname ?: "햄린이_0123456789",
+        authorNickname = this.authorNickname,
         createdAt = this.createdAt,
         likeCount = this.likeCount,
         commentCount = this.commentCount
     )
 }
 
-fun BoardsData.toEntity(): BoardPage {
+fun BoardsResponse.toEntity(): BoardPage {
     return BoardPage(
-        content = this.content.map { it.toEntity() },
-        nextCursorId = this.nextCursorId,
+        // mapNotNull을 사용하여 id가 없는 아이템 제거
+        content = this.content.mapNotNull { it.toEntity() },
+        nextCursorId = if (this.nextPage) this.nextCursorId else -1,
         nextPage = this.nextPage
     )
 }
 
-fun BoardDetailData.toEntity(): BoardDetail {
+fun BoardDetailResponse.toEntity(): BoardDetail {
     return BoardDetail(
         id = this.id,
         title = this.title,
@@ -90,20 +95,24 @@ fun BoardDetailData.toEntity(): BoardDetail {
     )
 }
 
-fun CommentItem.toEntity(): Comment {
+fun CommentItem.toEntity(): Comment? {
+    val validId = this.id ?: return null
+
     return Comment(
-        id = this.id,
+        id = validId,
         content = this.content,
-        authorNickname = this.authorNickname ?: "햄린이_0123456789",
+        authorNickname = this.authorNickname,
         authorProfileImageUrl = this.authorProfileImageUrl,
         isAuthor = this.isAuthor,
         createdAt = this.createdAt
     )
 }
 
-fun MyBoardItem.toEntity(): MyBoard {
+fun MyBoardItem.toEntity(): MyBoard? {
+    val validId = this.id ?: return null
+
     return MyBoard(
-        id = this.id,
+        id = validId,
         title = this.title,
         authorNickname = this.authorNickname,
         likeCount = this.likeCount,
@@ -113,9 +122,11 @@ fun MyBoardItem.toEntity(): MyBoard {
     )
 }
 
-fun MyCommentItem.toEntity(): MyComment {
+fun MyCommentItem.toEntity(): MyComment? {
+    val validId = this.boardId ?: return null
+
     return MyComment(
-        boardId = this.boardId,
+        boardId = validId,
         boardTitle = this.title,
         commentId = this.commentId,
         commentContent = this.content,
@@ -123,14 +134,16 @@ fun MyCommentItem.toEntity(): MyComment {
     )
 }
 
-fun NotiItem.toEntity(): Noti {
+fun NotiItem.toEntity(): Noti? {
+    val validId = this.targetId ?: return null
+
     return Noti(
-        notiId = this.id ?: -1,
-        title = this.title ?: "",
-        content = this.content ?: "",
-        type = this.type ?: "",
-        targetId = this.targetId ?: -1,
-        thumbnailUrl = this.thumbnailUrl ?: "",
-        createdAt = this.createdAt ?: ""
+        notiId = this.id,
+        title = this.title,
+        content = this.content,
+        type = this.type,
+        targetId = validId,
+        thumbnailUrl = this.thumbnailUrl,
+        createdAt = this.createdAt
     )
 }

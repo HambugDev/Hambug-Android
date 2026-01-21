@@ -4,11 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RefreshResponse(
+data class BaseResponse<T>(
     @SerialName("success")
-    val success: Boolean,
+    val success: Boolean = false,
     @SerialName("data")
-    val data: String,
+    val data: T? = null,
     @SerialName("message")
-    val message: String
+    val message: String = ""
 )

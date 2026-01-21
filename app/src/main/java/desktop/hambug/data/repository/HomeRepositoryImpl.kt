@@ -18,7 +18,7 @@ class HomeRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.map { it.toEntity() }
+        return response.data?.map { it.toEntity() } ?: emptyList()
     }
 
     override suspend fun getHomeBoards(): List<HomeBoard> {
@@ -28,6 +28,7 @@ class HomeRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.map { it.toEntity() }
+        // mapNotNull을 사용하여 id가 없는 아이템 제거
+        return response.data?.mapNotNull { it.toEntity() } ?: emptyList()
     }
 }
