@@ -5,20 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LikeBoardResponse(
-    @SerialName("success")
-    val success: Boolean,
-    @SerialName("data")
-    val data: LikeBoardData,
-    @SerialName("message")
-    val message: String,
-)
-
-@Serializable
-data class LikeBoardData(
     @SerialName("boardId")
-    val boardId: Int,
+    val boardId: Int = 0,
     @SerialName("likeCount")
-    val likeCount: Int,
+    val likeCount: Int = 0,
     @SerialName("liked")
-    val liked: Boolean
+    val liked: Boolean = false
 )

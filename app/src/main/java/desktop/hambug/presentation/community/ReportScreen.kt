@@ -12,16 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,16 +31,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import desktop.hambug.presentation.community.component.RequiredFieldTitle
-import desktop.hambug.presentation.ui.component.CustomContentTextField
-import desktop.hambug.presentation.ui.component.CustomSnackbar
-import desktop.hambug.presentation.ui.component.CustomTitleTextField
-import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
-import desktop.hambug.presentation.ui.icon.AppIcons
-import desktop.hambug.presentation.ui.icon.appicons.Back
+import desktop.hambug.presentation.component.CustomContentTextField
+import desktop.hambug.presentation.component.snackbar.CustomSnackbar
+import desktop.hambug.presentation.component.CustomTitleTextField
+import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.topbar.BackTopBar
+import desktop.hambug.presentation.component.topbar.TopBarTitle
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportScreen(
     navController: NavHostController,
@@ -86,27 +81,9 @@ fun ReportScreen(
     Scaffold(
         containerColor = Color.White,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "신고",
-                        style = HambugTheme.typography.title02,
-                        color = HambugTheme.colors.textHeadline
-                    )
-                },
-                navigationIcon = {
-                    Icon(
-                        modifier = Modifier
-                            .clickable { navController.popBackStack() }
-                            .padding(16.dp),
-                        imageVector = AppIcons.Back,
-                        contentDescription = null,
-                        tint = HambugTheme.colors.iconDisabled,
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = HambugTheme.colors.bgWhite
-                )
+            BackTopBar(
+                title = { TopBarTitle("신고") },
+                onBackClick = { navController.popBackStack() }
             )
         },
         snackbarHost = {

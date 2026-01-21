@@ -5,44 +5,34 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BoardDetailResponse(
-    @SerialName("success")
-    val success: Boolean,
-    @SerialName("data")
-    val data: BoardDetailData,
-    @SerialName("message")
-    val message: String
-)
-
-@Serializable
-data class BoardDetailData(
     @SerialName("id")
-    val id: Int,
+    val id: Int = 0,
     @SerialName("title")
-    val title: String,
+    val title: String = "",
     @SerialName("content")
-    val content: String,
+    val content: String = "",
     @SerialName("category")
-    val category: String,
+    val category: String = "",
     @SerialName("imageUrls")
-    val imageUrls: List<String>,
+    val imageUrls: List<String> = emptyList(),
     @SerialName("authorNickname")
-    val authorNickname: String,
+    val authorNickname: String = "햄린이_0123456789",
     @SerialName("authorProfileImageUrl")
-    val authorProfileImageUrl: String,
+    val authorProfileImageUrl: String = "",
     @SerialName("authorId")
-    val authorId: Int,
+    val authorId: Int = 0,
     @SerialName("createdAt")
-    val createdAt: String,
+    val createdAt: String = "",
     @SerialName("updatedAt")
-    val updatedAt: String,
+    val updatedAt: String = "",
     @SerialName("viewCount")
-    val viewCount: Int,
+    val viewCount: Int = 0,
     @SerialName("likeCount")
-    val likeCount: Int,
+    val likeCount: Int = 0,
     @SerialName("commentCount")
-    val commentCount: Int,
+    val commentCount: Int = 0,
     @SerialName("isLiked")
-    val isLiked: Boolean,
+    val isLiked: Boolean = false,
     @SerialName("isAuthor")
-    val isAuthor: Boolean
+    val isAuthor: Boolean = false
 )

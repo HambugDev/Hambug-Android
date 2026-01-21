@@ -7,7 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Category
 import desktop.hambug.domain.model.CategoryType
 import desktop.hambug.domain.usecase.community.CreateBoardUseCase
-import desktop.hambug.presentation.common.SnackbarMessage
+import desktop.hambug.presentation.component.snackbar.SnackbarMessage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

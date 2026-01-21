@@ -1,31 +1,24 @@
 package desktop.hambug.data.api
 
-import desktop.hambug.data.dto.CommonResponse
-import desktop.hambug.data.dto.home.HomeBurgerResponse
-import desktop.hambug.data.dto.LoginRequest
-import desktop.hambug.data.dto.LoginResponse
-import desktop.hambug.data.dto.NicknameUpdateRequest
-import desktop.hambug.data.dto.NicknameUpdateResponse
-import desktop.hambug.data.dto.ProfileImageUpdateResponse
-import desktop.hambug.data.dto.UserInfoResponse
+import desktop.hambug.data.dto.BaseResponse
+import desktop.hambug.data.dto.auth.LoginResponse
+import desktop.hambug.data.dto.auth.LoginRequest
 import desktop.hambug.data.dto.community.BoardDetailResponse
+import desktop.hambug.data.dto.my.NicknameUpdateRequest
 import desktop.hambug.data.dto.community.BoardsResponse
 import desktop.hambug.data.dto.community.CommentsResponse
 import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.dto.community.CreateBoardResponse
 import desktop.hambug.data.dto.community.CreateCommentRequest
-import desktop.hambug.data.dto.community.CreateCommentResponse
-import desktop.hambug.data.dto.community.DeleteBoardResponse
-import desktop.hambug.data.dto.community.DeleteCommentResponse
 import desktop.hambug.data.dto.community.LikeBoardResponse
 import desktop.hambug.data.dto.community.MyBoardsResponse
 import desktop.hambug.data.dto.community.MyCommentsResponse
 import desktop.hambug.data.dto.fcm.FcmTokenRequest
-import desktop.hambug.data.dto.fcm.FcmTokenResponse
-import desktop.hambug.data.dto.home.HomeBoardResponse
 import desktop.hambug.data.dto.fcm.NotisResponse
+import desktop.hambug.data.dto.home.HomeBoardResponse
+import desktop.hambug.data.dto.home.HomeBurgerResponse
+import desktop.hambug.data.dto.my.UserInfoResponse
 import desktop.hambug.data.dto.report.ReportRequest
-import desktop.hambug.data.dto.report.ReportResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -41,57 +34,57 @@ import retrofit2.http.Query
 interface HambugApi {
     // JWT 토큰으로 내 정보 조회
     @GET("auth/me")
-    suspend fun getUserInfo(): UserInfoResponse
+    suspend fun getUserInfo(): BaseResponse<UserInfoResponse>
 
     // 소셜 로그인
     @POST("auth/login/{provider}")
     suspend fun login(
         @Path("provider") provider: String,
         @Body request: LoginRequest
-    ): LoginResponse
+    ): BaseResponse<LoginResponse>
 
     // 로그아웃
     @POST("auth/logout")
-    suspend fun logout(): CommonResponse
+    suspend fun logout(): BaseResponse<Boolean>
 
     // 회원탈퇴
     @POST("auth/unlink/{provider}")
     suspend fun unlink(
         @Path("provider") provider: String
-    ): CommonResponse
+    ): BaseResponse<Boolean>
 
     // 오늘의 추천 햄버거 조회
     @GET("burgers/recommended")
-    suspend fun getHomeBurgers(): HomeBurgerResponse
+    suspend fun getHomeBurgers(): BaseResponse<List<HomeBurgerResponse>>
 
     // 인기 게시물 조회
     @GET("boards/trending")
-    suspend fun getHomeBoards(): HomeBoardResponse
+    suspend fun getHomeBoards(): BaseResponse<List<HomeBoardResponse>>
 
     // 게시물 전체 조회
     @GET("boards")
     suspend fun getBoards(
         @Query("lastId") lastId: Int? = null
-    ): BoardsResponse
+    ): BaseResponse<BoardsResponse>
 
     // 카테고리별 게시물 조회
     @GET("boards/category")
     suspend fun getCategoryBoards(
         @Query("category") category: String,
         @Query("lastId") lastId: Int? = null
-    ): BoardsResponse
+    ): BaseResponse<BoardsResponse>
 
     // 게시물 상세 조회
     @GET("boards/{id}")
     suspend fun getBoardDetail(
         @Path("id") id: Int
-    ): BoardDetailResponse
+    ): BaseResponse<BoardDetailResponse>
 
     // 게시물 생성
     @POST("boards")
     suspend fun createBoard(
         @Body request: CreateBoardRequest
-    ): CreateBoardResponse
+    ): BaseResponse<CreateBoardResponse>
 
     // 게시물 생성 (이미지 포함)
     @Multipart
@@ -99,52 +92,52 @@ interface HambugApi {
     suspend fun createBoardWithImages(
         @Part("request") request: RequestBody,
         @Part images: List<MultipartBody.Part>
-    ): CreateBoardResponse
+    ): BaseResponse<CreateBoardResponse>
 
     // 게시물 삭제
     @DELETE("boards/{id}")
     suspend fun deleteBoard(
         @Path("id") id: Int
-    ): DeleteBoardResponse
+    ): BaseResponse<Boolean>
 
     // 좋아요 토글
     @POST("/api/v1/boards/{boardId}/likes")
     suspend fun likeBoard(
         @Path("boardId") boardId: Int
-    ): LikeBoardResponse
+    ): BaseResponse<LikeBoardResponse>
 
     // 댓글 목록 조회
     @GET("/api/v1/boards/{boardId}/comments")
     suspend fun getComments(
         @Path("boardId") boardId: Int
-    ): CommentsResponse
+    ): BaseResponse<CommentsResponse>
 
     // 댓글 생성
     @POST("boards/{boardId}/comments")
     suspend fun createComment(
         @Path("boardId") boardId: Int,
         @Body request: CreateCommentRequest
-    ): CreateCommentResponse
+    ): BaseResponse<Unit>
 
     // 댓글 삭제
     @DELETE("boards/{boardId}/comments/{commentId}")
     suspend fun deleteComment(
         @Path("boardId") boardId: Int,
         @Path("commentId") commentId: Int
-    ): DeleteCommentResponse
+    ): BaseResponse<Boolean>
 
     // 게시물/댓글 신고
     @POST("reports")
     suspend fun report(
         @Body request: ReportRequest
-    ): ReportResponse
+    ): BaseResponse<Unit>
 
     // 닉네임 변경
     @PUT("users/{id}/nickname")
     suspend fun putUserNickname(
         @Path("id") id: Int,
         @Body request: NicknameUpdateRequest
-    ): NicknameUpdateResponse
+    ): BaseResponse<UserInfoResponse>
 
     // 프로필 이미지 변경
     @Multipart
@@ -152,23 +145,23 @@ interface HambugApi {
     suspend fun putUserProfileImage(
         @Path("id") id: Int,
         @Part file: MultipartBody.Part
-    ): ProfileImageUpdateResponse
+    ): BaseResponse<UserInfoResponse>
 
     // 내 게시물 목록 조회
     @GET("my-pages/boards")
-    suspend fun getMyBoards(): MyBoardsResponse
+    suspend fun getMyBoards(): BaseResponse<MyBoardsResponse>
 
     // 내 댓글 목록 조회
     @GET("my-pages/comments")
-    suspend fun getMyComments(): MyCommentsResponse
+    suspend fun getMyComments(): BaseResponse<MyCommentsResponse>
 
     // FCM 토큰 등록/갱신
     @POST("fcm/tokens")
     suspend fun updateFcmToken(
         @Body request: FcmTokenRequest
-    ): FcmTokenResponse
+    ): BaseResponse<Boolean>
 
     // 알림 목록 조회
     @GET("notifications")
-    suspend fun getNotis(): NotisResponse
+    suspend fun getNotis(): BaseResponse<NotisResponse>
 }

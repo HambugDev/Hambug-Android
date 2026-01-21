@@ -4,8 +4,8 @@ import android.content.Context
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import desktop.hambug.data.api.HambugApi
-import desktop.hambug.data.dto.LoginData
-import desktop.hambug.data.dto.LoginRequest
+import desktop.hambug.data.dto.auth.LoginResponse
+import desktop.hambug.data.dto.auth.LoginRequest
 import desktop.hambug.data.local.HambugTokenManager
 import desktop.hambug.domain.repository.AuthRepository
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -17,7 +17,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenManager: HambugTokenManager
 ) : AuthRepository {
 
-    override suspend fun login(context: Context): LoginData {
+    override suspend fun login(context: Context): LoginResponse {
 
         // 카카오 accessToken 획득
         val kakaoAccessToken = suspendCancellableCoroutine { continuation ->
@@ -52,11 +52,18 @@ class AuthRepositoryImpl @Inject constructor(
 
         // 응답 처리
         if (response.success) {
-            tokenManager.saveTokens(
-                accessToken = response.data.token.accessToken,
-                refreshToken = response.data.token.refreshToken
-            )
-            return response.data
+            val loginData = response.data ?: throw Exception("로그인 성공했지만 데이터 없음")
+
+            val accessToken = loginData.token?.accessToken
+            val refreshToken = loginData.token?.refreshToken
+
+            if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
+                throw Exception("서버 응답 성공했지만 인증 토큰 누락")
+            }
+
+            tokenManager.saveTokens(accessToken, refreshToken)
+
+            return loginData
         } else {
             throw Exception("서버 로그인 실패: ${response.message}")
         }

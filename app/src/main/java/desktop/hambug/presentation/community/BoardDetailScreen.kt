@@ -51,10 +51,10 @@ import desktop.hambug.presentation.community.component.CommentInputBar
 import desktop.hambug.presentation.component.ActionListBottomSheet
 import desktop.hambug.presentation.component.model.BottomSheetAction
 import desktop.hambug.presentation.component.model.CornerType
-import desktop.hambug.presentation.ui.component.CustomSnackbar
-import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
-import desktop.hambug.presentation.ui.component.IndicatorSize
-import desktop.hambug.presentation.ui.component.TwoButtonDialog
+import desktop.hambug.presentation.component.snackbar.CustomSnackbar
+import desktop.hambug.presentation.component.HambugDialog
+import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.IndicatorSize
 import desktop.hambug.presentation.ui.icon.AppIcons
 import desktop.hambug.presentation.ui.icon.appicons.BackDetail
 import desktop.hambug.presentation.ui.icon.appicons.CommentDetail
@@ -380,16 +380,16 @@ fun BoardDetailScreen(
 
     // 게시물 삭제 모달
     if (showBoardRemoveDialog) {
-        TwoButtonDialog(
+        HambugDialog(
             title = "게시물을 삭제하시겠어요?",
-            content = null,
+            content = "삭제한 게시물은 되돌릴 수 없습니다.",
+            buttonText = "삭제",
             onDismiss = { showBoardRemoveDialog = false },
             onCancel = { showBoardRemoveDialog = false },
             onConfirm = {
                 boardDetailViewModel.deleteBoard(
                     onSuccess = {
                         communityViewModel.resetAllCache()
-
                         showBoardRemoveDialog = false
                         navController.popBackStack()
                     }
@@ -400,9 +400,10 @@ fun BoardDetailScreen(
 
     // 댓글 삭제 모달
     if (showCommentRemoveDialog) {
-        TwoButtonDialog(
+        HambugDialog(
             title = "댓글을 삭제하시겠어요?",
             content = "삭제한 댓글은 되돌릴 수 없습니다.",
+            buttonText = "삭제",
             onDismiss = {
                 showCommentRemoveDialog = false
                 boardDetailViewModel.clearSelectedComment()

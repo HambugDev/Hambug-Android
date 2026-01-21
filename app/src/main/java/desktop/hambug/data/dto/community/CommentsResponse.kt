@@ -5,40 +5,30 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CommentsResponse(
-    @SerialName("success")
-    val success: Boolean,
-    @SerialName("data")
-    val data: CommentsData,
-    @SerialName("message")
-    val message: String
-)
-
-@Serializable
-data class CommentsData(
     @SerialName("content")
     val content: List<CommentItem> = emptyList(),
     @SerialName("nextCursorId")
-    val nextCursorId: Int?,
+    val nextCursorId: Int = -1,
     @SerialName("nextPage")
-    val nextPage: Boolean
+    val nextPage: Boolean = false
 )
 
 @Serializable
 data class CommentItem(
     @SerialName("id")
-    val id: Int,
+    val id: Int? = null,
     @SerialName("content")
-    val content: String,
+    val content: String = "",
     @SerialName("authorId")
-    val authorId: Int?,
+    val authorId: Int = 0,
     @SerialName("authorNickname")
-    val authorNickname: String?,
+    val authorNickname: String = "햄린이_0123456789",
     @SerialName("authorProfileImageUrl")
-    val authorProfileImageUrl: String,
+    val authorProfileImageUrl: String = "",
     @SerialName("isAuthor")
-    val isAuthor: Boolean,
+    val isAuthor: Boolean = false,
     @SerialName("createdAt")
-    val createdAt: String,
+    val createdAt: String = "",
     @SerialName("updatedAt")
-    val updatedAt: String
+    val updatedAt: String = ""
 )

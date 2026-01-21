@@ -1,6 +1,6 @@
 package desktop.hambug.data.api
 
-import desktop.hambug.data.dto.RefreshResponse
+import desktop.hambug.data.dto.auth.RefreshResponse
 import retrofit2.http.Header
 import retrofit2.http.POST
 

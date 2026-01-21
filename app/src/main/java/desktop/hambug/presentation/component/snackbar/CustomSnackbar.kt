@@ -1,4 +1,4 @@
-package desktop.hambug.presentation.ui.component
+package desktop.hambug.presentation.component.snackbar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

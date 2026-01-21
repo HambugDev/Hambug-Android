@@ -27,6 +27,7 @@ class FcmRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.content.map { it.toEntity() }
+        // mapNotNull을 사용하여 targetId가 없는 아이템 제거
+        return response.data?.content?.mapNotNull { it.toEntity() } ?: emptyList()
     }
 }

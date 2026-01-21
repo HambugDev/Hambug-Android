@@ -1,4 +1,4 @@
-package desktop.hambug.data.dto
+package desktop.hambug.data.dto.my
 
 import kotlinx.serialization.Serializable
 

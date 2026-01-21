@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import desktop.hambug.data.api.HambugApi
-import desktop.hambug.data.dto.NicknameUpdateRequest
+import desktop.hambug.data.dto.my.NicknameUpdateRequest
 import desktop.hambug.data.mapper.toEntity
 import desktop.hambug.domain.model.MyBoard
 import desktop.hambug.domain.model.MyComment
@@ -28,7 +28,9 @@ class MyRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.toEntity()
+        val userInfoData = response.data ?: throw Exception("userInfo 데이터 없음")
+
+        return userInfoData.toEntity()
     }
 
     override suspend fun updateUserNickname(userId: Int, nickname: String): UserInfo {
@@ -39,7 +41,9 @@ class MyRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.toEntity()
+        val userInfoData = response.data ?: throw Exception("userInfo 데이터 없음")
+
+        return userInfoData.toEntity()
     }
 
     override suspend fun updateUserProfileImage(userId: Int, imageUri: Uri?): UserInfo {
@@ -62,7 +66,9 @@ class MyRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.toEntity()
+        val userInfoData = response.data ?: throw Exception("userInfo 데이터 없음")
+
+        return userInfoData.toEntity()
     }
 
     override suspend fun getMyBoards(): List<MyBoard> {
@@ -72,7 +78,7 @@ class MyRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.content.map { it.toEntity() }
+        return response.data?.content?.mapNotNull { it.toEntity() } ?: emptyList()
     }
 
     override suspend fun getMyComments(): List<MyComment> {
@@ -82,6 +88,7 @@ class MyRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
 
-        return response.data.content.map { it.toEntity() }
+        // mapNotNull을 사용하여 boardId가 없는 아이템 제거
+        return response.data?.content?.mapNotNull { it.toEntity() } ?: emptyList()
     }
 }

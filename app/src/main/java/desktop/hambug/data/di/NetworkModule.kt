@@ -50,6 +50,13 @@ object NetworkModule {
         return AuthInterceptor(tokenManager)
     }
 
+    @Provides
+    @Singleton
+    fun provideJson(): Json = Json {
+        ignoreUnknownKeys = true  // 알 수 없는 필드 무시
+        coerceInputValues = true  // null이나 잘못된 값을 기본값으로 강제 변환
+    }
+
     // Refresh API용 OkHttpClient
     @Provides
     @Singleton
@@ -70,10 +77,10 @@ object NetworkModule {
     @Singleton
     @RefreshRetrofit
     fun provideRefreshRetrofit(
-        @RefreshOkHttpClient okHttpClient: OkHttpClient
+        @RefreshOkHttpClient okHttpClient: OkHttpClient,
+        json: Json
     ): Retrofit {
         val contentType = "application/json".toMediaType()
-        val json = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
@@ -103,9 +110,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        json: Json
+    ): Retrofit {
         val contentType = "application/json".toMediaType()
-        val json = Json { ignoreUnknownKeys = true }
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)

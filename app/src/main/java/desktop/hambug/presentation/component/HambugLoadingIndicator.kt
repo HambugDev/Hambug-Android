@@ -1,4 +1,4 @@
-package desktop.hambug.presentation.ui.component
+package desktop.hambug.presentation.component
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator

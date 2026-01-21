@@ -12,18 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,14 +36,14 @@ import desktop.hambug.domain.model.FilterType
 import desktop.hambug.presentation.community.component.CustomFloatingActionButton
 import desktop.hambug.presentation.community.component.FeedViewContent
 import desktop.hambug.presentation.community.component.ListViewContent
-import desktop.hambug.presentation.ui.component.CustomSnackbar
-import desktop.hambug.presentation.ui.component.HambugLoadingIndicator
-import desktop.hambug.presentation.ui.icon.AppIcons
-import desktop.hambug.presentation.ui.icon.appicons.BellBorder
+import desktop.hambug.presentation.component.snackbar.CustomSnackbar
+import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.topbar.MainTopBar
+import desktop.hambug.presentation.component.topbar.NotiIcon
+import desktop.hambug.presentation.component.topbar.TopBarTitle
 import desktop.hambug.presentation.ui.theme.CommunityFilterSelected
 import desktop.hambug.presentation.ui.theme.HambugTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
     navController: NavHostController,
@@ -102,28 +97,20 @@ fun CommunityScreen(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = Color.White,
         topBar = {
-            TopAppBar(
+            MainTopBar(
                 title = {
-                    Text(
+                    TopBarTitle(
                         text = "커뮤니티",
-                        style = HambugTheme.typography.title02,
                         color = HambugTheme.colors.primWhite
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = HambugTheme.colors.primRed
-                ),
                 actions = {
-                    Icon(
-                        modifier = Modifier
-                            .clickable { navController.navigate("bell") }
-                            .padding(8.dp)
-                            .size(32.dp),
-                        imageVector = AppIcons.BellBorder,
-                        contentDescription = null,
+                    NotiIcon(
+                        onClick = { navController.navigate("bell") },
                         tint = HambugTheme.colors.bgWhite
                     )
-                }
+                },
+                containerColor = HambugTheme.colors.primRed,
             )
         },
         snackbarHost = {
