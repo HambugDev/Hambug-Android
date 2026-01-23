@@ -12,6 +12,8 @@ interface CommunityRepository {
     suspend fun getBoardDetail(boardId: Int): BoardDetail
     suspend fun createBoard(title: String, content: String, category: String): Int
     suspend fun createBoardWithImages(title: String, content: String, category: String, imageUris: List<Uri>): Int
+    suspend fun updateBoard(boardId: Int, title: String, content: String, category: String)
+    suspend fun updateBoardWithImages(boardId: Int, title: String, content: String, category: String, oldImageUrls: List<String>, newImageUris: List<Uri>)
     suspend fun deleteBoard(boardId: Int)
     suspend fun likeBoard(boardId: Int): LikeBoardResponse
     suspend fun getComments(boardId: Int): List<Comment>

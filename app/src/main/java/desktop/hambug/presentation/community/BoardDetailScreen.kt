@@ -200,7 +200,7 @@ fun BoardDetailScreen(
 
                     // 게시물 이미지 영역
                     item {
-                        if (board.imageUrls != null) {
+                        if (board.imageUrls.isNotEmpty()) {
                             BoardDetailImageSection(imageUrls = board.imageUrls)
                             Spacer(Modifier.height(20.dp))
                         } else {
@@ -293,7 +293,7 @@ fun BoardDetailScreen(
             listOf(
                 BottomSheetAction(
                     text = "수정",
-                    onClick = { },
+                    onClick = { navController.navigate("write?boardId=${board.id}") },
                     cornerType = CornerType.TOP
                 ),
                 BottomSheetAction(

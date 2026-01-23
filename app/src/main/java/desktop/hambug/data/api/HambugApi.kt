@@ -13,6 +13,7 @@ import desktop.hambug.data.dto.community.CreateCommentRequest
 import desktop.hambug.data.dto.community.LikeBoardResponse
 import desktop.hambug.data.dto.community.MyBoardsResponse
 import desktop.hambug.data.dto.community.MyCommentsResponse
+import desktop.hambug.data.dto.community.UpdateBoardRequest
 import desktop.hambug.data.dto.fcm.FcmTokenRequest
 import desktop.hambug.data.dto.fcm.NotisResponse
 import desktop.hambug.data.dto.home.HomeBoardResponse
@@ -93,6 +94,22 @@ interface HambugApi {
         @Part("request") request: RequestBody,
         @Part images: List<MultipartBody.Part>
     ): BaseResponse<CreateBoardResponse>
+
+    // 게시물 수정
+    @PUT("/api/v1/boards/{id}")
+    suspend fun updateBoard(
+        @Path("id") id: Int,
+        @Body request: UpdateBoardRequest
+    ): BaseResponse<Unit>
+
+    // 게시물 수정 (이미지 포함)
+    @Multipart
+    @PUT("/api/v1/boards/{id}/with-images")
+    suspend fun updateBoardWithImages(
+        @Path("id") id: Int,
+        @Part("request") request: RequestBody,
+        @Part images: List<MultipartBody.Part>
+    ): BaseResponse<Unit>
 
     // 게시물 삭제
     @DELETE("boards/{id}")

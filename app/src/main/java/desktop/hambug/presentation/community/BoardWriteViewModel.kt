@@ -1,12 +1,15 @@
 package desktop.hambug.presentation.community
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Category
 import desktop.hambug.domain.model.CategoryType
 import desktop.hambug.domain.usecase.community.CreateBoardUseCase
+import desktop.hambug.domain.usecase.community.GetBoardDetailUseCase
+import desktop.hambug.domain.usecase.community.UpdateBoardUseCase
 import desktop.hambug.presentation.component.snackbar.SnackbarMessage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,18 +18,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 sealed interface BoardWriteEvent {
-    data class NavigateToDetail(val boardId: Int) : BoardWriteEvent
+    data class CreateSuccess(val boardId: Int) : BoardWriteEvent
+    data class UpdateSuccess(val boardId: Int) : BoardWriteEvent
 }
 
 @HiltViewModel
 class BoardWriteViewModel @Inject constructor(
-    private val createBoardUseCase: CreateBoardUseCase
+    savedStateHandle: SavedStateHandle,
+    private val createBoardUseCase: CreateBoardUseCase,
+    private val boardDetailUseCase: GetBoardDetailUseCase,
+    private val updateBoardUseCase: UpdateBoardUseCase
 ) : ViewModel() {
 
     val categoryList = listOf(
@@ -36,7 +42,10 @@ class BoardWriteViewModel @Inject constructor(
         Category(4, "맛집추천", "햄버거 맛집 정보를 추천해주세요", CategoryType.RECOMMENDATION)
     )
 
-    private val _uiState = MutableStateFlow(BoardWriteUiState())
+    private val boardId: Int = savedStateHandle["boardId"] ?: -1
+    val isEditMode = boardId != -1
+
+    private val _uiState = MutableStateFlow<BoardWriteUiState>(BoardWriteUiState.Loading)
     val uiState: StateFlow<BoardWriteUiState> = _uiState.asStateFlow()
 
     private val _currentCategory = MutableStateFlow(categoryList[0])
@@ -54,6 +63,35 @@ class BoardWriteViewModel @Inject constructor(
     // 최근에 발행된 메시지 1개 저장
     private val _snackbarMessage = MutableSharedFlow<SnackbarMessage>(replay = 1)
     val snackbarMessage = _snackbarMessage.asSharedFlow()
+
+    init {
+        if (isEditMode) {
+            loadBoardInfo()
+        } else {
+            _uiState.value = BoardWriteUiState.Success()
+        }
+    }
+
+    private fun loadBoardInfo() {
+        viewModelScope.launch {
+            boardDetailUseCase(boardId)
+                .onSuccess { board ->
+                    _uiState.value = BoardWriteUiState.Success(
+                        existingImageUrls = board.imageUrls
+                    )
+
+                    _boardTitle.value = board.title
+                    _boardContent.value = board.content
+
+                    // 카테고리 매칭
+                    val category = categoryList.find { it.type.name == board.category } ?: categoryList[0]
+                    _currentCategory.value = category
+                }
+                .onFailure { exception ->
+                    Timber.e(exception, "게시물 상세 조회 실패")
+                }
+        }
+    }
 
     /**
      * 카테고리 설정
@@ -77,27 +115,54 @@ class BoardWriteViewModel @Inject constructor(
     }
 
     /**
-     * Photo Picker에서 선택된 이미지 업데이트
+     * Photo Picker에서 선택된 이미지 추가
      */
-    fun onPhotoSelected(uris: List<Uri>) {
-        _uiState.update { it.copy(selectedImageUris = uris) }
+    fun addImages(uris: List<Uri>) {
+        val state = _uiState.value
+        if (state is BoardWriteUiState.Success) {
+            // 총 이미지 개수 (기본 URL + 이미 선택된 URI)
+            val totalCnt = state.existingImageUrls.size + state.selectedImageUris.size
+            // 추가 가능한 개수
+            val remainSpace = 5 - totalCnt
+
+            // 추가 가능한 만큼만 잘라서 합치기
+            if (remainSpace > 0) {
+                val newImages = uris.take(remainSpace)
+                _uiState.value = state.copy(
+                    selectedImageUris = state.selectedImageUris + newImages
+                )
+            }
+        }
     }
 
     /**
-     * 이미지의 X 버튼 클릭 시 해당 이미지 제거
+     * 새로 선택한 이미지 제거 (URI)
      */
-    fun onRemovePhoto(uri: Uri) {
-        _uiState.update { state ->
-            state.copy(
+    fun onRemoveNewImage(uri: Uri) {
+        val state = _uiState.value
+        if (state is BoardWriteUiState.Success) {
+            _uiState.value = state.copy(
                 selectedImageUris = state.selectedImageUris.filter { it != uri }
             )
         }
     }
 
     /**
-     * 게시물 생성
+     * 기존 이미지 제거 (URL)
      */
-    fun createBoard() {
+    fun onRemoveOldImage(url: String) {
+        val state = _uiState.value
+        if (state is BoardWriteUiState.Success) {
+            _uiState.value = state.copy(
+                existingImageUrls = state.existingImageUrls.filter { it != url }
+            )
+        }
+    }
+
+    /**
+     * 게시물 생성 또는 수정
+     */
+    fun saveBoard() {
         // 필수 항목 미입력 시, 메시지 발행 후 종료
         getSnackbarMessage(_boardTitle.value, _boardContent.value)?.let { message ->
             viewModelScope.launch {
@@ -106,27 +171,46 @@ class BoardWriteViewModel @Inject constructor(
             return
         }
 
-        if (_uiState.value.isCreating) return
+        val state = _uiState.value
+        if (state !is BoardWriteUiState.Success) return
+
+        // 저장 시작
+        _uiState.value = state.copy(isSaving = true)
 
         viewModelScope.launch {
-            // 로딩 시작
-            _uiState.update { it.copy(isCreating = true) }
-
             try {
                 val title = _boardTitle.value.trim()
                 val content = _boardContent.value.trim()
                 val category = _currentCategory.value.type.name
-                val imageUris = _uiState.value.selectedImageUris
+                val oldImageUrls = state.existingImageUrls
+                val newImageUris = state.selectedImageUris
 
-                createBoardUseCase(title, content, category, imageUris)
-                    .onSuccess { boardId ->
-                        _eventFlow.send(BoardWriteEvent.NavigateToDetail(boardId))
+                if (isEditMode) {
+                    // 수정
+                    updateBoardUseCase(
+                        boardId = boardId,
+                        title = title,
+                        content = content,
+                        category = category,
+                        oldImageUrls = oldImageUrls,
+                        newImageUris = newImageUris
+                    ).onSuccess {
+                        _eventFlow.send(BoardWriteEvent.UpdateSuccess(boardId))
+                    }.onFailure { exception ->
+                        Timber.e(exception, "게시물 수정 실패")
                     }
-                    .onFailure { exception ->
-                        Timber.e(exception, "게시물 생성 실패")
-                    }
+                } else {
+                    // 생성
+                    createBoardUseCase(title, content, category, newImageUris)
+                        .onSuccess { boardId ->
+                            _eventFlow.send(BoardWriteEvent.CreateSuccess(boardId))
+                        }
+                        .onFailure { exception ->
+                            Timber.e(exception, "게시물 생성 실패")
+                        }
+                }
             } finally {
-                _uiState.update { it.copy(isCreating = false) }
+                _uiState.value = state.copy(isSaving = false)
             }
         }
     }
