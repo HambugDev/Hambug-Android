@@ -214,7 +214,15 @@ fun HambugApp(
             composable("bell") {
                 NotificationScreen(navController = navController)
             }
-            composable("write") {
+            composable(
+                route = "write?boardId={boardId}",
+                arguments = listOf(
+                    navArgument("boardId") {
+                        type = NavType.IntType
+                        defaultValue = -1
+                    }
+                )
+            ) {
                 BoardWriteScreen(navController = navController)
             }
             composable(

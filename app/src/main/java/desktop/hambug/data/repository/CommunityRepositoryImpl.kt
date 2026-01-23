@@ -7,6 +7,7 @@ import desktop.hambug.data.api.HambugApi
 import desktop.hambug.data.dto.community.CreateBoardRequest
 import desktop.hambug.data.dto.community.CreateCommentRequest
 import desktop.hambug.data.dto.community.LikeBoardResponse
+import desktop.hambug.data.dto.community.UpdateBoardRequest
 import desktop.hambug.data.dto.report.ReportRequest
 import desktop.hambug.data.mapper.toEntity
 import desktop.hambug.domain.model.BoardDetail
@@ -16,7 +17,9 @@ import desktop.hambug.domain.repository.CommunityRepository
 import desktop.hambug.util.ImageFileUtil
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
+import timber.log.Timber
 import javax.inject.Inject
 
 class CommunityRepositoryImpl @Inject constructor(
@@ -102,6 +105,53 @@ class CommunityRepositoryImpl @Inject constructor(
         }
 
         return response.data?.id ?: throw Exception("유효하지 않은 게시물 ID")
+    }
+
+    override suspend fun updateBoard(boardId: Int, title: String, content: String, category: String) {
+        val response = hambugApi.updateBoard(boardId, UpdateBoardRequest(title, content, category))
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
+    }
+
+    override suspend fun updateBoardWithImages(
+        boardId: Int,
+        title: String,
+        content: String,
+        category: String,
+        oldImageUrls: List<String>,
+        newImageUris: List<Uri>
+    ) {
+        val requestJson = JSONObject().apply {
+            put("title", title)
+            put("content", content)
+            put("category", category)
+            put("imageUrls", JSONArray(oldImageUrls))  // 유지할 기존 이미지
+        }.toString()
+
+        val requestBody = requestJson.toRequestBody("application/json".toMediaType())
+
+        // 추가된 이미지를 MultipartBody.Part 리스트로 변환
+        val imageParts = if (newImageUris.isNotEmpty()) {
+            ImageFileUtil.createMultipartBodyParts(
+                context = context,
+                fileUris = newImageUris,
+                partName = "images"
+            )
+        } else {
+            emptyList()
+        }
+
+        val response = hambugApi.updateBoardWithImages(
+            id = boardId,
+            request = requestBody,
+            images = imageParts
+        )
+
+        if (!response.success) {
+            throw Exception(response.message)
+        }
     }
 
     override suspend fun deleteBoard(boardId: Int) {

@@ -75,7 +75,7 @@ fun BoardWriteScreen(
         contract = ActivityResultContracts.PickMultipleVisualMedia(5)
     ) { uris ->
         if (uris.isNotEmpty()) {
-            boardWriteViewModel.onPhotoSelected(uris)
+            boardWriteViewModel.addImages(uris)
         }
     }
 
@@ -85,9 +85,15 @@ fun BoardWriteScreen(
     LaunchedEffect(true) {
         boardWriteViewModel.eventFlow.collect { event ->
             when(event) {
-                is BoardWriteEvent.NavigateToDetail -> {
+                is BoardWriteEvent.CreateSuccess -> {
                     navController.navigate("community_detail/${event.boardId}?isNewBoard=true") {
                         popUpTo("write") { inclusive = true }
+                    }
+                }
+                is BoardWriteEvent.UpdateSuccess -> {
+                    navController.navigate("community_detail/${event.boardId}") {
+                        // 기존 상세화면까지 스택 제거
+                        popUpTo("community_detail/${event.boardId}") { inclusive = true }
                     }
                 }
             }
@@ -121,90 +127,111 @@ fun BoardWriteScreen(
             }
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = 20.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                RequiredFieldTitle(title = "카테고리")
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // 카테고리 목록
-                CategoryButtonSection(
-                    categoryList = categoryList,
-                    currentCategory = currentCategory,
-                    onClick = { categoryType -> boardWriteViewModel.setCategory(categoryType) }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 제목 영역
-                WriteTitleSection(
-                    boardTitle = boardTitle,
-                    boardWriteViewModel = boardWriteViewModel
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 내용 영역
-                WriteContentSection(
-                    placeholder = currentCategory.placeholder,
-                    boardContent = boardContent,
-                    boardWriteViewModel = boardWriteViewModel
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // 이미지 표시 영역
-                if (uiState.selectedImageUris.isNotEmpty()) {
-                    WriteImageSection(
-                        selectedImageUris = uiState.selectedImageUris,
-                        onRemoveClick = { uri ->
-                            boardWriteViewModel.onRemovePhoto(uri)
-                        }
-                    )
+        when (uiState) {
+            is BoardWriteUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    HambugLoadingIndicator()
                 }
+            }
+            is BoardWriteUiState.Error -> {}
+            is BoardWriteUiState.Success -> {
+                val state = uiState as BoardWriteUiState.Success
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .padding(horizontal = 20.dp)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        RequiredFieldTitle(title = "카테고리")
 
-                // 사진추가 버튼
-                WriteImageAddButton(
-                    imageCnt = uiState.selectedImageUris.size,
-                    onClick = {
-                        // Photo Picker 실행 요청
-                        multiplePhotoPickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // 카테고리 목록
+                        CategoryButtonSection(
+                            categoryList = categoryList,
+                            currentCategory = currentCategory,
+                            onClick = { categoryType -> boardWriteViewModel.setCategory(categoryType) }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // 제목 영역
+                        WriteTitleSection(
+                            boardTitle = boardTitle,
+                            boardWriteViewModel = boardWriteViewModel
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // 내용 영역
+                        WriteContentSection(
+                            placeholder = currentCategory.placeholder,
+                            boardContent = boardContent,
+                            boardWriteViewModel = boardWriteViewModel
                         )
                     }
-                )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // 등록 버튼
-                WriteRegisterButton(
-                    onClick = { boardWriteViewModel.createBoard() }
-                )
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        // 이미지 표시 영역
+                        if (state.existingImageUrls.isNotEmpty() || state.selectedImageUris.isNotEmpty()) {
+                            WriteImageSection(
+                                existingImageUrls = state.existingImageUrls,
+                                selectedImageUris = state.selectedImageUris,
+                                onRemoveOldImage = { url ->
+                                    boardWriteViewModel.onRemoveOldImage(url)
+                                },
+                                onRemoveNewImage = { uri ->
+                                    boardWriteViewModel.onRemoveNewImage(uri)
+                                }
+                            )
+                        }
 
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
+                        Spacer(modifier = Modifier.height(16.dp))
 
-        if (uiState.isCreating) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                HambugLoadingIndicator()
+                        // 사진추가 버튼
+                        WriteImageAddButton(
+                            imageCnt = state.existingImageUrls.size + state.selectedImageUris.size,
+                            onClick = {
+                                // Photo Picker 실행 요청
+                                multiplePhotoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // 등록/수정 버튼
+                        WriteRegisterButton(
+                            isEditMode = boardWriteViewModel.isEditMode,
+                            onClick = { boardWriteViewModel.saveBoard() }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
+
+                if (state.isSaving) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        HambugLoadingIndicator()
+                    }
+                }
             }
         }
     }
@@ -311,17 +338,28 @@ fun WriteContentSection(
 
 @Composable
 fun WriteImageSection(
+    existingImageUrls: List<String>,
     selectedImageUris: List<Uri>,
-    onRemoveClick: (Uri) -> Unit
+    onRemoveOldImage: (String) -> Unit,
+    onRemoveNewImage: (Uri) -> Unit
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // 기존 이미지 (URL)
+        items(existingImageUrls) { url ->
+            WriteImageItem(
+                image = url,
+                onRemoveClick = { onRemoveOldImage(url) }
+            )
+        }
+
+        // 새로 선택한 이미지 (URI)
         items(selectedImageUris) { uri ->
             WriteImageItem(
-                selectedImageUri = uri,
-                onRemoveClick = { onRemoveClick(uri) }
+                image = uri,
+                onRemoveClick = { onRemoveNewImage(uri) }
             )
         }
     }
@@ -329,7 +367,7 @@ fun WriteImageSection(
 
 @Composable
 fun WriteImageItem(
-    selectedImageUri: Uri,
+    image: Any,
     onRemoveClick: () -> Unit
 ) {
     Box(
@@ -339,7 +377,7 @@ fun WriteImageItem(
             modifier = Modifier
                 .size(60.dp)
                 .clip(RoundedCornerShape(6.dp)),
-            model = selectedImageUri,
+            model = image,
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -392,6 +430,7 @@ fun WriteImageAddButton(
 
 @Composable
 fun WriteRegisterButton(
+    isEditMode: Boolean,
     onClick: () -> Unit
 ) {
     Box(
@@ -403,7 +442,7 @@ fun WriteRegisterButton(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "등록",
+            text = if (isEditMode) "수정" else "등록",
             style = HambugTheme.typography.title02,
             color = HambugTheme.colors.bgWhite
         )
