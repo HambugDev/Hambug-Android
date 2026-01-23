@@ -37,9 +37,10 @@ class BoardWriteViewModel @Inject constructor(
 
     val categoryList = listOf(
         Category(1, "자유잡담", "자유롭게 이야기를 나눠보세요", CategoryType.FREE_TALK),
-        Category(2, "프랜차이즈", "프랜차이즈 햄버거 경험을 공유해주세요", CategoryType.REVIEW),
-        Category(3, "수제버거", "수제버거 경험을 공유해주세요", CategoryType.REVIEW),
-        Category(4, "맛집추천", "햄버거 맛집 정보를 추천해주세요", CategoryType.RECOMMENDATION)
+//        Category(2, "프랜차이즈", "프랜차이즈 햄버거 경험을 공유해주세요", CategoryType.REVIEW),
+//        Category(3, "수제버거", "수제버거 경험을 공유해주세요", CategoryType.REVIEW),
+        Category(2, "햄버거리뷰", "프랜차이즈/수제버거 경험을 공유해주세요", CategoryType.REVIEW),
+        Category(3, "맛집추천", "햄버거 맛집 정보를 추천해주세요", CategoryType.RECOMMENDATION)
     )
 
     private val boardId: Int = savedStateHandle["boardId"] ?: -1
