@@ -1,22 +1,23 @@
 package desktop.hambug.presentation.my
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.usecase.my.GetMyBoardsUseCase
 import desktop.hambug.domain.usecase.my.GetMyCommentsUseCase
+import desktop.hambug.presentation.base.BaseViewModel
+import desktop.hambug.util.ErrorHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class MyActivityViewModel @Inject constructor(
     private val getMyBoardsUseCase: GetMyBoardsUseCase,
-    private val getMyCommentsUseCase: GetMyCommentsUseCase
-) : ViewModel() {
+    private val getMyCommentsUseCase: GetMyCommentsUseCase,
+    errorHandler: ErrorHandler
+) : BaseViewModel(errorHandler) {
 
     private val _uiState = MutableStateFlow<MyActivityUiState>(MyActivityUiState.Loading)
     val uiState: StateFlow<MyActivityUiState> = _uiState.asStateFlow()
@@ -36,9 +37,8 @@ class MyActivityViewModel @Inject constructor(
                     _uiState.value = MyActivityUiState.Success(boards)
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "내 게시물 목록 조회 실패")
-                    val exceptionMessage = exception.message ?: "내 게시물 목록 조회 실패"
-                    _uiState.value = MyActivityUiState.Error(exceptionMessage)
+                    handleError(exception)
+                    _uiState.value = MyActivityUiState.Error
                 }
         }
     }
@@ -50,9 +50,8 @@ class MyActivityViewModel @Inject constructor(
                     _commentsState.value = MyCommentUiState.Success(comments)
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "내 댓글 목록 조회 실패")
-                    val exceptionMessage = exception.message ?: "내 댓글 목록 조회 실패"
-                    _commentsState.value = MyCommentUiState.Error(exceptionMessage)
+                    handleError(exception)
+                    _commentsState.value = MyCommentUiState.Error
                 }
         }
     }
