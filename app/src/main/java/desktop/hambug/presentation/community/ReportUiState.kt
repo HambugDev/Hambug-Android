@@ -1,5 +1,6 @@
 package desktop.hambug.presentation.community
 
-data class ReportUiState(
-    val isReporting: Boolean = false
-)
+sealed class ReportUiState {
+    data class Default(val isReporting: Boolean = false) : ReportUiState()
+    data object Error : ReportUiState()
+}

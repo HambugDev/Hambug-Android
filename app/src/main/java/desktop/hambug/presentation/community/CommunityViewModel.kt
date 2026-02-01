@@ -1,13 +1,14 @@
 package desktop.hambug.presentation.community
 
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Filter
 import desktop.hambug.domain.model.FilterType
 import desktop.hambug.domain.usecase.community.GetBoardsUseCase
 import desktop.hambug.domain.usecase.community.GetCategoryBoardsUseCase
+import desktop.hambug.presentation.base.BaseViewModel
+import desktop.hambug.util.ErrorHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,8 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 class CommunityViewModel @Inject constructor(
     private val getBoardsUseCase: GetBoardsUseCase,
-    private val getCategoryBoardsUseCase: GetCategoryBoardsUseCase
-) : ViewModel() {
+    private val getCategoryBoardsUseCase: GetCategoryBoardsUseCase,
+    errorHandler: ErrorHandler
+) : BaseViewModel(errorHandler) {
 
     // 현재 선택된 필터 상태
     private val _currentFilter = MutableStateFlow(FilterType.ALL)
@@ -168,8 +170,8 @@ class CommunityViewModel @Inject constructor(
                 .onFailure { exception ->
                     Timber.e(exception, "${filterType.name} 필터의 데이터 조회 실패")
                     if (_currentFilter.value == filterType) {
-                        val message = exception.message ?: "데이터 조회 실패"
-                        _currentUiState.value = CommunityUiState.Error(message)
+                        handleError(exception)
+                        _currentUiState.value = CommunityUiState.Error
                     }
                 }
         }

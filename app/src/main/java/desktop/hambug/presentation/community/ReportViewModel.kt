@@ -1,11 +1,12 @@
 package desktop.hambug.presentation.community
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.usecase.community.ReportUseCase
+import desktop.hambug.presentation.base.BaseViewModel
 import desktop.hambug.presentation.component.snackbar.SnackbarMessage
+import desktop.hambug.util.ErrorHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,9 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 sealed interface ReportEvent {
@@ -25,14 +24,15 @@ sealed interface ReportEvent {
 @HiltViewModel
 class ReportViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val reportUseCase: ReportUseCase
-) : ViewModel() {
+    private val reportUseCase: ReportUseCase,
+    errorHandler: ErrorHandler
+) : BaseViewModel(errorHandler) {
 
     // 내비게이션 인자 추출
     private val reportType: String = checkNotNull(savedStateHandle["reportType"])
     private val targetId: Int = checkNotNull(savedStateHandle["targetId"])
 
-    private val _uiState = MutableStateFlow(ReportUiState())
+    private val _uiState = MutableStateFlow<ReportUiState>(ReportUiState.Default())
     val uiState: StateFlow<ReportUiState> = _uiState.asStateFlow()
 
     private val _reportTitle = MutableStateFlow("")
@@ -72,10 +72,10 @@ class ReportViewModel @Inject constructor(
             return
         }
 
-        if (_uiState.value.isReporting) return
+        if (_uiState.value == ReportUiState.Default(isReporting = true)) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isReporting = true) }
+            _uiState.value = ReportUiState.Default(isReporting = true)
 
             try {
                 val title = _reportTitle.value.trim()
@@ -86,10 +86,11 @@ class ReportViewModel @Inject constructor(
                         _eventFlow.send(ReportEvent.NavigateToDetail)
                     }
                     .onFailure { exception ->
-                        Timber.e(exception, "게시물/댓글 신고 실패")
+                        handleError(exception)
+                        _uiState.value = ReportUiState.Error
                     }
             } finally {
-                _uiState.update { it.copy(isReporting = false) }
+                _uiState.value = ReportUiState.Default(isReporting = false)
             }
         }
     }

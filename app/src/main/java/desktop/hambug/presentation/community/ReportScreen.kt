@@ -48,8 +48,9 @@ fun ReportScreen(
     val uiState by reportViewModel.uiState.collectAsStateWithLifecycle()
     val reportTitle by reportViewModel.reportTitle.collectAsStateWithLifecycle()
     val reportContent by reportViewModel.reportContent.collectAsStateWithLifecycle()
-
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val isReporting = (uiState as? ReportUiState.Default)?.isReporting ?: false
 
     LaunchedEffect(Unit) {
         // 신고 완료 이벤트 처리
@@ -75,6 +76,16 @@ fun ReportScreen(
                     duration = SnackbarDuration.Short
                 )
             }
+        }
+    }
+
+    // 에러 스낵바 메시지
+    LaunchedEffect(Unit) {
+        reportViewModel.errorMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
         }
     }
 
@@ -125,7 +136,7 @@ fun ReportScreen(
                 Box(
                     modifier = Modifier
                         .clickable(
-                            enabled = !uiState.isReporting,
+                            enabled = !isReporting,
                             onClick = { reportViewModel.submitReport() }
                         )
                         .fillMaxWidth()
@@ -144,7 +155,7 @@ fun ReportScreen(
             }
         }
 
-        if (uiState.isReporting) {
+        if (isReporting) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center

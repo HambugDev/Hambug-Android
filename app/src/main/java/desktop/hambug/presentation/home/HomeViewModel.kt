@@ -1,6 +1,5 @@
 package desktop.hambug.presentation.home
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.HomeBoard
@@ -8,6 +7,8 @@ import desktop.hambug.domain.model.HomeBurger
 import desktop.hambug.domain.usecase.home.GetHomeBoardsUseCase
 import desktop.hambug.domain.usecase.home.GetHomeBurgersUseCase
 import desktop.hambug.domain.usecase.fcm.SyncFcmTokenUseCase
+import desktop.hambug.presentation.base.BaseViewModel
+import desktop.hambug.util.ErrorHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,8 +21,9 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getHomeBurgersUseCase: GetHomeBurgersUseCase,
     private val getHomeBoardsUseCase: GetHomeBoardsUseCase,
-    private val syncFcmTokenUseCase: SyncFcmTokenUseCase
-) : ViewModel() {
+    private val syncFcmTokenUseCase: SyncFcmTokenUseCase,
+    errorHandler: ErrorHandler
+) : BaseViewModel(errorHandler) {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -50,10 +52,9 @@ class HomeViewModel @Inject constructor(
                     handleLoadError(burgersResult, boardsResult)
                 }
             } catch (e: Exception) {
-                Timber.e(e, "홈 데이터 조회 중 예외 발생")
-                _uiState.value = HomeUiState.Error("홈 데이터 조회 중 예외 발생")
+                handleError(e)
+                _uiState.value = HomeUiState.Error
             }
-
         }
     }
 
@@ -61,27 +62,24 @@ class HomeViewModel @Inject constructor(
         burgersResult: Result<List<HomeBurger>>,
         boardsResult: Result<List<HomeBoard>>
     ) {
-        val errorMessage = when {
+        when {
             burgersResult.isFailure && boardsResult.isFailure -> {
-                Timber.e("홈 데이터 조회 실패")
-                "홈 데이터 조회 실패"
+                Timber.e("home 데이터 조회 실패")
             }
             burgersResult.isFailure -> {
-                Timber.e("버거 데이터 조회 실패")
-                "버거 데이터 조회 실패"
+                Timber.e("home 추천버거 조회 실패")
             }
             else -> {
-                Timber.e("게시물 데이터 조회 실패")
-                "게시물 데이터 조회 실패"
+                Timber.e("home 인기글 조회 실패")
             }
         }
-        _uiState.value = HomeUiState.Error(errorMessage)
+        _uiState.value = HomeUiState.Error
     }
 
     /**
      * FCM 토큰 동기화
      */
-    fun syncFcmToken() {
+    private fun syncFcmToken() {
         if (isFcmTokenSynced) {
             Timber.d("FCM 토큰 이미 동기화됨")
             return
