@@ -69,6 +69,7 @@ fun BoardWriteScreen(
     val currentCategory by boardWriteViewModel.currentCategory.collectAsStateWithLifecycle()
     val boardTitle by boardWriteViewModel.boardTitle.collectAsStateWithLifecycle()
     val boardContent by boardWriteViewModel.boardContent.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // 다중 이미지 선택용 런처 등록 (최대 5개)
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
@@ -78,8 +79,6 @@ fun BoardWriteScreen(
             boardWriteViewModel.addImages(uris)
         }
     }
-
-    val snackbarHostState = remember { SnackbarHostState() }
 
     // 이벤트 구독하여 화면 이동 처리
     LaunchedEffect(true) {
@@ -105,6 +104,16 @@ fun BoardWriteScreen(
         boardWriteViewModel.snackbarMessage.collect { message ->
             snackbarHostState.showSnackbar(
                 message = message.message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
+    // 에러 메시지 스낵바
+    LaunchedEffect(Unit) {
+        boardWriteViewModel.errorMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
                 duration = SnackbarDuration.Short
             )
         }

@@ -1,7 +1,6 @@
 package desktop.hambug.presentation.community
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Comment
@@ -11,11 +10,12 @@ import desktop.hambug.domain.usecase.community.DeleteCommentUseCase
 import desktop.hambug.domain.usecase.community.GetBoardDetailUseCase
 import desktop.hambug.domain.usecase.community.GetCommentsUseCase
 import desktop.hambug.domain.usecase.community.LikeBoardUseCase
+import desktop.hambug.presentation.base.BaseViewModel
+import desktop.hambug.util.ErrorHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,8 +26,9 @@ class BoardDetailViewModel @Inject constructor(
     private val likeBoardUseCase: LikeBoardUseCase,
     private val getCommentsUseCase: GetCommentsUseCase,
     private val createCommentUseCase: CreateCommentUseCase,
-    private val deleteCommentUseCase: DeleteCommentUseCase
-) : ViewModel() {
+    private val deleteCommentUseCase: DeleteCommentUseCase,
+    errorHandler: ErrorHandler
+) : BaseViewModel(errorHandler) {
 
     private val boardId: Int = checkNotNull(savedStateHandle["boardId"])
     val isNewBoard: Boolean = savedStateHandle["isNewBoard"] ?: false
@@ -62,12 +63,15 @@ class BoardDetailViewModel @Inject constructor(
         viewModelScope.launch {
             boardDetailUseCase(boardId)
                 .onSuccess { board ->
+
+                    handleError(Throwable())
+
+
                     _uiState.value = BoardDetailUiState.Success(board)
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "게시물 상세 조회 실패")
-                    val exceptionMessage = exception.message ?: "게시물 상세 조회 실패"
-                    _uiState.value = BoardDetailUiState.Error(exceptionMessage)
+                    handleError(exception)
+                    _uiState.value = BoardDetailUiState.Error
                 }
         }
     }
@@ -79,9 +83,8 @@ class BoardDetailViewModel @Inject constructor(
                     _commentsState.value = CommentsUiState.Success(comments)
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "댓글 목록 조회 실패")
-                    val exceptionMessage = exception.message ?: "댓글 목록 조회 실패"
-                    _commentsState.value = CommentsUiState.Error(exceptionMessage)
+                    handleError(exception)
+                    _commentsState.value = CommentsUiState.Error
                 }
         }
     }
@@ -96,7 +99,7 @@ class BoardDetailViewModel @Inject constructor(
                     onSuccess()
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "게시물 삭제 실패")
+                    handleError(exception)
                 }
         }
     }
@@ -140,7 +143,7 @@ class BoardDetailViewModel @Inject constructor(
                     )
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "좋아요 토글 실패")
+                    handleError(exception)
                     // 실패 시 이전 상태로
                     _uiState.value = BoardDetailUiState.Success(previousBoard)
                 }
@@ -167,7 +170,7 @@ class BoardDetailViewModel @Inject constructor(
                     loadComments()
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "댓글 생성 실패")
+                    handleError(exception)
                 }
         }
     }
@@ -194,7 +197,7 @@ class BoardDetailViewModel @Inject constructor(
                     _showCommentDeleteSnackbar.value = true
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "댓글 삭제 실패")
+                    handleError(exception)
                 }
         }
     }

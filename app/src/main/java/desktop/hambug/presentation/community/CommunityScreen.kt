@@ -93,6 +93,16 @@ fun CommunityScreen(
             }
     }
 
+    // 에러 메시지 스낵바
+    LaunchedEffect(Unit) {
+        communityViewModel.errorMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = Color.White,
@@ -115,9 +125,7 @@ fun CommunityScreen(
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                CustomSnackbar(
-                    snackbarData = data
-                )
+                CustomSnackbar(data)
             }
         },
         floatingActionButton = {

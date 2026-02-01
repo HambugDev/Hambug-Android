@@ -85,7 +85,7 @@ fun MyActivityScreen(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(bottom = 20.dp)
+                modifier = Modifier.padding(bottom = 40.dp)
             ) { data ->
                 CustomSnackbar(data)
             }

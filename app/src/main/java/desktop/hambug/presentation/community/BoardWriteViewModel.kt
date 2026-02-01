@@ -2,7 +2,6 @@ package desktop.hambug.presentation.community
 
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.model.Category
@@ -10,7 +9,9 @@ import desktop.hambug.domain.model.CategoryType
 import desktop.hambug.domain.usecase.community.CreateBoardUseCase
 import desktop.hambug.domain.usecase.community.GetBoardDetailUseCase
 import desktop.hambug.domain.usecase.community.UpdateBoardUseCase
+import desktop.hambug.presentation.base.BaseViewModel
 import desktop.hambug.presentation.component.snackbar.SnackbarMessage
+import desktop.hambug.util.ErrorHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 sealed interface BoardWriteEvent {
@@ -32,8 +32,9 @@ class BoardWriteViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val createBoardUseCase: CreateBoardUseCase,
     private val boardDetailUseCase: GetBoardDetailUseCase,
-    private val updateBoardUseCase: UpdateBoardUseCase
-) : ViewModel() {
+    private val updateBoardUseCase: UpdateBoardUseCase,
+    errorHandler: ErrorHandler
+) : BaseViewModel(errorHandler) {
 
     val categoryList = listOf(
         Category(1, "자유잡담", "자유롭게 이야기를 나눠보세요", CategoryType.FREE_TALK),
@@ -89,7 +90,8 @@ class BoardWriteViewModel @Inject constructor(
                     _currentCategory.value = category
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "게시물 상세 조회 실패")
+                    handleError(exception)
+                    _uiState.value = BoardWriteUiState.Error
                 }
         }
     }
@@ -198,7 +200,8 @@ class BoardWriteViewModel @Inject constructor(
                     ).onSuccess {
                         _eventFlow.send(BoardWriteEvent.UpdateSuccess(boardId))
                     }.onFailure { exception ->
-                        Timber.e(exception, "게시물 수정 실패")
+                        handleError(exception)
+                        _uiState.value = BoardWriteUiState.Error
                     }
                 } else {
                     // 생성
@@ -207,7 +210,8 @@ class BoardWriteViewModel @Inject constructor(
                             _eventFlow.send(BoardWriteEvent.CreateSuccess(boardId))
                         }
                         .onFailure { exception ->
-                            Timber.e(exception, "게시물 생성 실패")
+                            handleError(exception)
+                            _uiState.value = BoardWriteUiState.Error
                         }
                 }
             } finally {

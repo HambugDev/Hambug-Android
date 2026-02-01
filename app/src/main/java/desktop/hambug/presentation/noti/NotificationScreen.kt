@@ -11,8 +11,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +29,7 @@ import androidx.navigation.NavHostController
 import desktop.hambug.presentation.component.EmptyStateView
 import desktop.hambug.presentation.noti.component.NotiItem
 import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.snackbar.CustomSnackbar
 import desktop.hambug.presentation.component.topbar.BackTopBar
 import desktop.hambug.presentation.component.topbar.TopBarTitle
 import desktop.hambug.presentation.ui.theme.HambugTheme
@@ -34,6 +40,17 @@ fun NotificationScreen(
     notificationViewModel: NotificationViewModel = hiltViewModel()
 ) {
     val uiState by notificationViewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 에러 메시지 스낵바
+    LaunchedEffect(Unit) {
+        notificationViewModel.errorMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     Scaffold(
         containerColor = Color.White,
@@ -42,6 +59,14 @@ fun NotificationScreen(
                 title = { TopBarTitle("알림") },
                 onBackClick = { navController.popBackStack() },
             )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 40.dp)
+            ) { data ->
+                CustomSnackbar(data)
+            }
         }
     ) { paddingValues ->
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +27,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,6 +57,7 @@ import desktop.hambug.presentation.my.component.NicknameUpdateDialog
 import desktop.hambug.presentation.my.component.UserRemoveDialog
 import desktop.hambug.presentation.my.component.UserRemoveSuccessDialog
 import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.snackbar.CustomSnackbar
 import desktop.hambug.presentation.component.topbar.MainTopBar
 import desktop.hambug.presentation.component.topbar.TopBarTitle
 import desktop.hambug.presentation.ui.icon.AppIcons
@@ -80,6 +85,7 @@ fun MypageScreen(
     var showUserRemoveDialog by remember { mutableStateOf(false) }
     var showUserRemoveSuccessDialog by remember { mutableStateOf(false) }
     var showNicknameUpdateDialog by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // Photo Picker 런처 등록
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
@@ -109,12 +115,32 @@ fun MypageScreen(
         }
     }
 
+    // 에러 메시지 스낵바
+    LaunchedEffect(Unit) {
+        mypageViewModel.errorMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = Modifier.fillMaxSize(),
         containerColor = HambugTheme.colors.bgWhite,
         topBar = {
             MainTopBar(
                 title = { TopBarTitle("마이페이지") }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 40.dp)
+            ) { data ->
+                CustomSnackbar(data)
+            }
         }
     ) { paddingValues ->
 

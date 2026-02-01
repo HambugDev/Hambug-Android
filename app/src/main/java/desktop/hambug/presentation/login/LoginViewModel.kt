@@ -1,18 +1,18 @@
 package desktop.hambug.presentation.login
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.usecase.auth.KakaoLoginUseCase
 import desktop.hambug.domain.usecase.fcm.SyncFcmTokenUseCase
+import desktop.hambug.presentation.base.BaseViewModel
+import desktop.hambug.util.ErrorHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -24,10 +24,11 @@ sealed class LoginEvent {
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val kakaoLoginUseCase: KakaoLoginUseCase,
-    private val syncFcmTokenUseCase: SyncFcmTokenUseCase
-) : ViewModel() {
+    private val syncFcmTokenUseCase: SyncFcmTokenUseCase,
+    errorHandler: ErrorHandler
+) : BaseViewModel(errorHandler) {
 
-    private val _uiState = MutableStateFlow(LoginUiState())
+    private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Default())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
     private val _loginEvent = MutableSharedFlow<LoginEvent>()
@@ -35,7 +36,7 @@ class LoginViewModel @Inject constructor(
 
     fun onKakaoLogin(context: Context) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.value = LoginUiState.Default(isProcessing = true)
 
             kakaoLoginUseCase(context)
                 .onSuccess {
@@ -43,17 +44,13 @@ class LoginViewModel @Inject constructor(
                         .onSuccess { Timber.d("로그인 후 FCM 토큰 동기화 성공") }
                         .onFailure { Timber.e(it, "로그인 후 FCM 토큰 동기화 실패") }
 
-                    _uiState.update { it.copy(isLoading = false) }
+                    _uiState.value = LoginUiState.Default(isProcessing = false)
                     _loginEvent.emit(LoginEvent.NavigateToHome)
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "카카오 로그인 실패")
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = "로그인에 실패했습니다"
-                        )
-                    }
+                    _uiState.value = LoginUiState.Default(isProcessing = false)
+                    handleError(exception)
+                    _uiState.value = LoginUiState.Error
                 }
         }
     }

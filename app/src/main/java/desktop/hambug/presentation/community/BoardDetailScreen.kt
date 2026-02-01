@@ -86,7 +86,6 @@ fun BoardDetailScreen(
     var showCommentBottomSheet by remember { mutableStateOf(false) }
     var showBoardRemoveDialog by remember { mutableStateOf(false) }
     var showCommentRemoveDialog by remember { mutableStateOf(false) }
-
     val snackbarHostState = remember { SnackbarHostState() }
 
     // 신고 성공 처리
@@ -116,6 +115,16 @@ fun BoardDetailScreen(
                 duration = SnackbarDuration.Short
             )
             boardDetailViewModel.onCommentDeleteSnackbarShown()
+        }
+    }
+
+    // 에러 메시지 스낵바
+    LaunchedEffect(Unit) {
+        boardDetailViewModel.errorMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
         }
     }
 
@@ -150,7 +159,7 @@ fun BoardDetailScreen(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(bottom = 20.dp)
+                modifier = Modifier.padding(bottom = 40.dp)
             ) { data ->
                 CustomSnackbar(snackbarData = data)
             }

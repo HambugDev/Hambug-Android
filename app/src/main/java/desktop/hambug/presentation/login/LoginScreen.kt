@@ -19,11 +19,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +48,7 @@ import desktop.hambug.presentation.ui.theme.Gray1000
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.ui.theme.KakaoYellow
 import desktop.hambug.notification.NotificationPermissionHelper
+import desktop.hambug.presentation.component.snackbar.CustomSnackbar
 import timber.log.Timber
 
 @Composable
@@ -53,6 +58,9 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val isProcessing = (uiState as? LoginUiState.Default)?.isProcessing ?: false
 
     // 알림 권한 요청 런처
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
@@ -84,11 +92,33 @@ fun LoginScreen(
         }
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    // 에러 메시지 스낵바
+    LaunchedEffect(Unit) {
+        loginViewModel.errorMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = HambugTheme.colors.bgWhite,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 40.dp)
+            ) { data ->
+                CustomSnackbar(data)
+            }
+        }
+    ) { paddingValues ->
+
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -100,12 +130,15 @@ fun LoginScreen(
                 LoginHeaderSection()
                 Spacer(modifier = Modifier.height(100.dp))
                 LoginButtonSection(
-                    onClickKakao = { loginViewModel.onKakaoLogin(context) },
+                    onClickKakao = {
+                        // 중복 클릭 방지
+                        if (!isProcessing) loginViewModel.onKakaoLogin(context)
+                    },
                     onClickApple = {}
                 )
             }
 
-            if (uiState.isLoading) {
+            if (isProcessing) {
                 Box(
                     modifier = Modifier
                         .size(72.dp)

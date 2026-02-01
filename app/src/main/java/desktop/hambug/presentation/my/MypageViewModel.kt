@@ -1,7 +1,6 @@
 package desktop.hambug.presentation.my
 
 import android.net.Uri
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import desktop.hambug.domain.usecase.my.GetUserInfoUseCase
@@ -9,6 +8,8 @@ import desktop.hambug.domain.usecase.my.UpdateUserNicknameUseCase
 import desktop.hambug.domain.usecase.my.UpdateUserProfileImageUseCase
 import desktop.hambug.domain.usecase.auth.LogoutUseCase
 import desktop.hambug.domain.usecase.auth.UnlinkUseCase
+import desktop.hambug.presentation.base.BaseViewModel
+import desktop.hambug.util.ErrorHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -30,8 +31,9 @@ class MypageViewModel @Inject constructor(
     private val updateUserNicknameUseCase: UpdateUserNicknameUseCase,
     private val updateUserProfileImageUseCase: UpdateUserProfileImageUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val unlinkUseCase: UnlinkUseCase
-) : ViewModel() {
+    private val unlinkUseCase: UnlinkUseCase,
+    errorHandler: ErrorHandler
+) : BaseViewModel(errorHandler) {
 
     private val _uiState = MutableStateFlow<MyUiState>(MyUiState.Loading)
     val uiState: StateFlow<MyUiState> = _uiState.asStateFlow()
@@ -63,9 +65,8 @@ class MypageViewModel @Inject constructor(
                     _uiState.value = MyUiState.Success(userInfo)
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "내 정보 조회 실패")
-                    val exceptionMessage = exception.message ?: "데이터 로딩 중 오류 발생"
-                    _uiState.value = MyUiState.Error(exceptionMessage)
+                    handleError(exception)
+                    _uiState.value = MyUiState.Error
                 }
         }
     }
@@ -140,9 +141,8 @@ class MypageViewModel @Inject constructor(
                         onSuccess()
                     }
                     .onFailure { exception ->
-                        Timber.e(exception, "닉네임 변경 실패")
-                        val exceptionMessage = exception.message ?: "닉네임 변경 실패"
-                        _uiState.value = MyUiState.Error(exceptionMessage)
+                        handleError(exception)
+                        _uiState.value = MyUiState.Error
                     }
 
                 _nicknameState.update { it.copy(isSaving = false) }
@@ -173,8 +173,8 @@ class MypageViewModel @Inject constructor(
                     _uiState.value = MyUiState.Success(userInfo)
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "프로필 업데이트 실패")
-                    _uiState.value = MyUiState.Error(exception.message ?: "프로필 업데이트 실패")
+                    handleError(exception)
+                    _uiState.value = MyUiState.Error
                 }
         }
     }
@@ -208,7 +208,7 @@ class MypageViewModel @Inject constructor(
                     Timber.d("로그아웃 성공")
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "로그아웃 실패")
+                    handleError(exception)
                 }
         }
     }
@@ -227,7 +227,7 @@ class MypageViewModel @Inject constructor(
                     onSuccess()
                 }
                 .onFailure { exception ->
-                    Timber.e(exception, "회원탈퇴 실패")
+                    handleError(exception)
                     _isUnlinking.value = false
                     onFailure()
                 }

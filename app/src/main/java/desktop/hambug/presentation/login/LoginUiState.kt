@@ -1,6 +1,6 @@
 package desktop.hambug.presentation.login
 
-data class LoginUiState(
-    val isLoading: Boolean = false,
-    val error: String? = null
-)
+sealed class LoginUiState {
+    data class Default(val isProcessing: Boolean = false) : LoginUiState()
+    data object Error : LoginUiState()
+}

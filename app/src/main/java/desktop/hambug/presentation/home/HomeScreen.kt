@@ -22,9 +22,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +45,7 @@ import coil3.compose.AsyncImage
 import desktop.hambug.domain.model.HomeBoard
 import desktop.hambug.domain.model.HomeBurger
 import desktop.hambug.presentation.component.HambugLoadingIndicator
+import desktop.hambug.presentation.component.snackbar.CustomSnackbar
 import desktop.hambug.presentation.component.topbar.MainTopBar
 import desktop.hambug.presentation.component.topbar.NotiIcon
 import desktop.hambug.presentation.ui.icon.AppIcons
@@ -58,6 +64,17 @@ fun HomeScreen(
     )
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 에러 메시지 스낵바
+    LaunchedEffect(Unit) {
+        homeViewModel.errorMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -73,6 +90,14 @@ fun HomeScreen(
                 },
                 containerColor = HambugTheme.colors.bgNormal
             )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(bottom = 40.dp)
+            ) { data ->
+                CustomSnackbar(data)
+            }
         }
     ) { paddingValues ->
 
