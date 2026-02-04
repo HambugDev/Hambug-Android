@@ -118,6 +118,8 @@ dependencies {
     implementation(libs.coil.svg)
     // timber
     implementation(libs.timber)
+    // browser
+    implementation(libs.browser)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

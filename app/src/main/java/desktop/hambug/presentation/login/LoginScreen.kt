@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import desktop.hambug.MainActivity
 import desktop.hambug.R
 import desktop.hambug.presentation.component.HambugLoadingIndicator
 import desktop.hambug.presentation.ui.icon.AppIcons
@@ -57,6 +58,7 @@ fun LoginScreen(
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val activity = context as? MainActivity
     val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -77,6 +79,16 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         if (!NotificationPermissionHelper.hasNotificationPermission(context)) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    // apple 로그인 콜백 처리
+    LaunchedEffect(Unit) {
+        activity?.appleIdentityToken?.collect { token ->
+            if (token != null) {
+                Timber.d("LoginScreen에서 apple identity token 수신")
+                loginViewModel.handleAppleCallback(token)
+            }
         }
     }
 
@@ -134,7 +146,9 @@ fun LoginScreen(
                         // 중복 클릭 방지
                         if (!isProcessing) loginViewModel.onKakaoLogin(context)
                     },
-                    onClickApple = {}
+                    onClickApple = {
+                        if (!isProcessing) loginViewModel.onAppleLogin(context)
+                    }
                 )
             }
 

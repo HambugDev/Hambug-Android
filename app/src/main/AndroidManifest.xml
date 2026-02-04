@@ -27,6 +27,7 @@
             </intent-filter>
         </activity>
 
+        <!-- kakao 로그인 -->
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true"
@@ -39,6 +40,34 @@
                 <data
                     android:host="oauth"
                     android:scheme="kakao${kakaoNativeAppKey}" />
+            </intent-filter>
+        </activity>
+
+        <!-- apple 로그인 -->
+        <activity
+            android:name=".presentation.login.AppleLoginCallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="hambug.p-e.kr"
+                    android:pathPrefix="/api/auth/apple/android/callback" />
+            </intent-filter>
+
+            <!-- 커스텀 스킴 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="hambug"
+                    android:host="apple-callback" />
             </intent-filter>
         </activity>
 
