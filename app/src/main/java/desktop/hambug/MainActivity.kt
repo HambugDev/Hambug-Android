@@ -41,7 +41,10 @@ import desktop.hambug.presentation.component.ForceUpdateDialog
 import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.util.VersionManager
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -53,6 +56,10 @@ class MainActivity : ComponentActivity() {
     lateinit var versionManager: VersionManager
 
     private val _fcmBoardId = MutableStateFlow<Int?>(null)
+
+    // Apple 로그인 토큰 전달용
+    private val _appleIdentityToken = MutableStateFlow<String?>(null)
+    val appleIdentityToken: StateFlow<String?> = _appleIdentityToken.asStateFlow()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -107,8 +114,18 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        // 앱 켜진 상태에서 알림 클릭 시 여기서 검사
-        checkIntentForBoardId(intent)
+        setIntent(intent)                 // 새 intent로 업데이트
+        checkIntentForAppleToken(intent)  // Apple 로그인 콜백 처리
+        checkIntentForBoardId(intent)     // FCM 알림 처리 (앱 켜진 상태에서)
+    }
+
+    private fun checkIntentForAppleToken(intent: Intent?) {
+        intent?.getStringExtra("apple_identity_token")?.let { token ->
+            Timber.d("apple identity token 수신")
+            _appleIdentityToken.value = token
+            // 중복 처리 방지
+            intent.removeExtra("apple_identity_token")
+        }
     }
 
     private fun createNotificationChannel() {

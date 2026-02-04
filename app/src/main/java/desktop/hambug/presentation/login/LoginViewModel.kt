@@ -3,6 +3,7 @@ package desktop.hambug.presentation.login
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import desktop.hambug.domain.usecase.auth.AppleLoginUseCase
 import desktop.hambug.domain.usecase.auth.KakaoLoginUseCase
 import desktop.hambug.domain.usecase.fcm.SyncFcmTokenUseCase
 import desktop.hambug.presentation.base.BaseViewModel
@@ -23,8 +24,9 @@ sealed class LoginEvent {
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val kakaoLoginUseCase: KakaoLoginUseCase,
     private val syncFcmTokenUseCase: SyncFcmTokenUseCase,
+    private val kakaoLoginUseCase: KakaoLoginUseCase,
+    private val appleLoginUseCase: AppleLoginUseCase,
     errorHandler: ErrorHandler
 ) : BaseViewModel(errorHandler) {
 
@@ -39,19 +41,36 @@ class LoginViewModel @Inject constructor(
             _uiState.value = LoginUiState.Default(isProcessing = true)
 
             kakaoLoginUseCase(context)
-                .onSuccess {
-                    syncFcmTokenUseCase()
-                        .onSuccess { Timber.d("로그인 후 FCM 토큰 동기화 성공") }
-                        .onFailure { Timber.e(it, "로그인 후 FCM 토큰 동기화 실패") }
-
-                    _uiState.value = LoginUiState.Default(isProcessing = false)
-                    _loginEvent.emit(LoginEvent.NavigateToHome)
-                }
-                .onFailure { exception ->
-                    _uiState.value = LoginUiState.Default(isProcessing = false)
-                    handleError(exception)
-                    _uiState.value = LoginUiState.Error
-                }
+                .onSuccess { handleLoginSuccess() }
+                .onFailure { handleLoginFailure(it) }
         }
+    }
+
+    fun onAppleLogin(context: Context) {
+        AppleLoginHelper.startAppleLogin(context)
+    }
+
+    fun handleAppleCallback(identityToken: String) {
+        viewModelScope.launch {
+            _uiState.value = LoginUiState.Default(isProcessing = true)
+
+            appleLoginUseCase(identityToken)
+                .onSuccess { handleLoginSuccess() }
+                .onFailure { handleLoginFailure(it) }
+        }
+    }
+
+    private suspend fun handleLoginSuccess() {
+        syncFcmTokenUseCase()
+            .onSuccess { Timber.d("로그인 후 FCM 토큰 동기화 성공") }
+            .onFailure { Timber.e(it, "로그인 후 FCM 토큰 동기화 실패") }
+        _uiState.value = LoginUiState.Default(isProcessing = false)
+        _loginEvent.emit(LoginEvent.NavigateToHome)
+    }
+
+    private suspend fun handleLoginFailure(exception: Throwable) {
+        _uiState.value = LoginUiState.Default(isProcessing = false)
+        handleError(exception)
+        _uiState.value = LoginUiState.Error
     }
 }

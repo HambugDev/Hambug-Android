@@ -4,6 +4,7 @@ import android.content.Context
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import desktop.hambug.data.api.HambugApi
+import desktop.hambug.data.dto.BaseResponse
 import desktop.hambug.data.dto.auth.LoginResponse
 import desktop.hambug.data.dto.auth.LoginRequest
 import desktop.hambug.data.local.HambugTokenManager
@@ -17,7 +18,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenManager: HambugTokenManager
 ) : AuthRepository {
 
-    override suspend fun login(context: Context): LoginResponse {
+    override suspend fun loginWithKakao(context: Context): LoginResponse {
 
         // 카카오 accessToken 획득
         val kakaoAccessToken = suspendCancellableCoroutine { continuation ->
@@ -50,7 +51,17 @@ class AuthRepositoryImpl @Inject constructor(
         val request = LoginRequest(accessToken = kakaoAccessToken)
         val response = hambugApi.login(provider = "kakao", request = request)
 
-        // 응답 처리
+        return processLoginResponse(response)
+    }
+
+    override suspend fun loginWithApple(identityToken: String): LoginResponse {
+        val request = LoginRequest(accessToken = identityToken)
+        val response = hambugApi.login(provider = "apple", request = request)
+
+        return processLoginResponse(response)
+    }
+
+    private suspend fun processLoginResponse(response: BaseResponse<LoginResponse>): LoginResponse {
         if (response.success) {
             val loginData = response.data ?: throw Exception("로그인 성공했지만 데이터 없음")
 
