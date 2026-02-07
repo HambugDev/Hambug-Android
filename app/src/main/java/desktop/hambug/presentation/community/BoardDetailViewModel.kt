@@ -63,10 +63,6 @@ class BoardDetailViewModel @Inject constructor(
         viewModelScope.launch {
             boardDetailUseCase(boardId)
                 .onSuccess { board ->
-
-                    handleError(Throwable())
-
-
                     _uiState.value = BoardDetailUiState.Success(board)
                 }
                 .onFailure { exception ->
