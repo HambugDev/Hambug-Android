@@ -27,6 +27,7 @@ coroutines = "1.10.2"
 coil = "3.1.0"
 timber = "5.0.1"
 browser = "1.9.0"
+hiltAndroidTesting = "2.56.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -67,6 +68,7 @@ coil-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 browser = { module = "androidx.browser:browser", version.ref = "browser" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroidTesting" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

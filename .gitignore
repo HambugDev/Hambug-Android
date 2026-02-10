@@ -18,6 +18,7 @@ local.properties
 .DS_Store
 
 # IDE specific files (Android Studio)
+.idea/
 .idea/caches/
 .idea/libraries/
 .idea/workspace.xml
