@@ -50,12 +50,14 @@ import desktop.hambug.presentation.ui.theme.HambugTheme
 import desktop.hambug.presentation.ui.theme.KakaoYellow
 import desktop.hambug.notification.NotificationPermissionHelper
 import desktop.hambug.presentation.component.snackbar.CustomSnackbar
+import desktop.hambug.util.TestEnvironment
 import timber.log.Timber
 
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    loginViewModel: LoginViewModel = hiltViewModel()
+    loginViewModel: LoginViewModel = hiltViewModel(),
+    testEnvironment: TestEnvironment = hiltViewModel<LoginViewModel>().testEnvironment
 ) {
     val context = LocalContext.current
     val activity = context as? MainActivity
@@ -77,7 +79,9 @@ fun LoginScreen(
 
     // 권한 요청
     LaunchedEffect(Unit) {
-        if (!NotificationPermissionHelper.hasNotificationPermission(context)) {
+        // 테스트 환경에서는 권한 요청 생략
+        if (!testEnvironment.isFakeTest() &&
+            !NotificationPermissionHelper.hasNotificationPermission(context)) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }

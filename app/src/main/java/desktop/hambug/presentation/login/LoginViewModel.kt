@@ -8,6 +8,7 @@ import desktop.hambug.domain.usecase.auth.KakaoLoginUseCase
 import desktop.hambug.domain.usecase.fcm.SyncFcmTokenUseCase
 import desktop.hambug.presentation.base.BaseViewModel
 import desktop.hambug.util.ErrorHandler
+import desktop.hambug.util.TestEnvironment
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -27,6 +28,7 @@ class LoginViewModel @Inject constructor(
     private val syncFcmTokenUseCase: SyncFcmTokenUseCase,
     private val kakaoLoginUseCase: KakaoLoginUseCase,
     private val appleLoginUseCase: AppleLoginUseCase,
+    val testEnvironment: TestEnvironment,
     errorHandler: ErrorHandler
 ) : BaseViewModel(errorHandler) {
 
